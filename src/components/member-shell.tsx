@@ -9,6 +9,7 @@ import { EmptyState, Spinner } from './ui';
 
 const STUDENT_LINKS: ShellLink[] = [
   { href: '/dashboard', label: 'Dashboard', icon: 'star', exact: true },
+  { href: '/dashboard/lessons', label: 'Lessons', icon: 'calendar' },
   { href: '/applications', label: 'My applications', icon: 'file' },
   { href: '/apply', label: 'Apply', icon: 'book' },
   { href: '/faq', label: 'Help', icon: 'help' },
@@ -16,6 +17,8 @@ const STUDENT_LINKS: ShellLink[] = [
 
 const MENTOR_LINKS: ShellLink[] = [
   { href: '/dashboard', label: 'Dashboard', icon: 'star', exact: true },
+  { href: '/dashboard/lessons', label: 'Lessons', icon: 'calendar' },
+  { href: '/dashboard/availability', label: 'My availability', icon: 'clock' },
   { href: '/dashboard/profile', label: 'My profile', icon: 'users' },
   { href: '/applications', label: 'My applications', icon: 'file' },
   { href: '/faq', label: 'Help', icon: 'help' },

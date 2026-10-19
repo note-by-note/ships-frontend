@@ -347,3 +347,54 @@ export interface Paged<T> {
     statusCounts?: Record<string, number>;
   };
 }
+
+// --- Lessons (see ships-api/src/routes/lessons.ts) ---------------------------------
+
+export type Weekday = 'Mon' | 'Tue' | 'Wed' | 'Thu' | 'Fri' | 'Sat' | 'Sun';
+
+export interface LessonRules {
+  windows: Record<Weekday, { start: string; end: string }>;
+  blockMinutes: number;
+  durations: number[];
+}
+
+export interface ScheduleDay {
+  day: Weekday;
+  slots: string[];
+}
+
+export interface LessonSlot {
+  id: string;
+  day: Weekday;
+  start: string;
+  durationMinutes: number;
+  timeZone: string;
+  status: 'proposed' | 'confirmed' | 'declined' | 'replaced' | 'withdrawn';
+  proposedBy: 'mentor' | 'student';
+  note: string;
+  createdAt: string;
+}
+
+export interface AbsenceNotice {
+  id: string;
+  date: string;
+  reporterSide: 'mentor' | 'student';
+  message: string;
+  acknowledgedAt: string | null;
+  createdAt?: string;
+}
+
+export interface Pairing {
+  id: string;
+  side: 'mentor' | 'student';
+  instrument: string;
+  mentor: { id: string; name: string };
+  student: { id: string; name: string };
+  studentContact: { name?: string; email?: string } | null;
+  timeZone: string;
+  schedule: ScheduleDay[];
+  busy: { day: Weekday; start: string; durationMinutes: number }[];
+  lesson: LessonSlot | null;
+  proposal: LessonSlot | null;
+  absences: AbsenceNotice[];
+}

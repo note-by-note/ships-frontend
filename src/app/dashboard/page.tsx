@@ -7,7 +7,8 @@ import { DashboardHeading, Panel, StatTile } from '@/components/dashboard-shell'
 import { Icon } from '@/components/marketing';
 import { Alert, Badge, Button, ButtonLink, Spinner, StatusBadge, humanize } from '@/components/ui';
 import { ApiError, api } from '@/lib/api';
-import type { Application, MatchRequest, MentorProfile, OwnMatchRequest } from '@/lib/types';
+import { DAY_NAMES, formatDate, formatRange, zoneLabel } from '@/lib/schedule';
+import type { Application, MatchRequest, MentorProfile, OwnMatchRequest, Pairing } from '@/lib/types';
 
 // Student and mentor dashboards, after the Figma "student-dashboard" and
 // "mentor-dashboard" frames. Only sections with real data behind them are
@@ -48,6 +49,7 @@ function StudentDashboard() {
       <div className="grid gap-6 xl:grid-cols-[1fr_340px]">
         <div className="flex flex-col gap-6">
           <NextStep application={studentApplication} hasMentor={Boolean(mentor)} loading={!applications || !requests} />
+          <LessonsSummary />
 
           <Panel title="Your applications" action={<Link href="/applications" className="text-sm font-semibold text-coral">See all</Link>}>
             {!applications ? (
@@ -80,7 +82,7 @@ function StudentDashboard() {
             )}
           </Panel>
 
-          <ComingLater items={['Upcoming lessons and meeting links', 'Lesson notes and practice assignments', 'Messages with your mentor']} />
+          <ComingLater items={['Meeting links for lessons', 'Lesson notes and practice assignments', 'Messages with your mentor']} />
         </div>
 
         <div className="flex flex-col gap-6">
@@ -248,6 +250,7 @@ function MentorDashboard() {
 
       <div className="grid gap-6 xl:grid-cols-[1fr_340px]">
         <div className="flex flex-col gap-6">
+          <LessonsSummary />
           <Panel title="Requests waiting for you">
             {!requests ? (
               <Spinner />
@@ -301,7 +304,7 @@ function MentorDashboard() {
             )}
           </Panel>
 
-          <ComingLater items={['Lesson schedule and Google Meet links', 'Lesson notes and practice assignments', 'Volunteer hours log']} />
+          <ComingLater items={['Google Meet links for lessons', 'Lesson notes and practice assignments', 'Volunteer hours log']} />
         </div>
 
         <div className="flex flex-col gap-6">
@@ -318,5 +321,51 @@ function MentorDashboard() {
         </div>
       </div>
     </>
+  );
+}
+
+// --- Lessons summary (both sides) -----------------------------------------------------------
+
+/** Each weekly lesson, plus anything waiting on this person: a new notice or a proposal to answer. */
+function LessonsSummary() {
+  const [pairings, setPairings] = useState<Pairing[] | null>(null);
+
+  useEffect(() => {
+    api.get<{ data: Pairing[] }>('/lessons').then((body) => setPairings(body.data)).catch(() => setPairings([]));
+  }, []);
+
+  if (!pairings || !pairings.length) return null;
+
+  return (
+    <Panel title="Lessons" action={<Link href="/dashboard/lessons" className="text-sm font-semibold text-coral">Manage</Link>}>
+      <ul className="flex flex-col gap-3">
+        {pairings.map((pairing) => {
+          const other = (pairing.side === 'mentor' ? pairing.student : pairing.mentor).name.replace(/\s*\(test\)$/, '');
+          const notices = pairing.absences.filter((absence) => absence.reporterSide !== pairing.side && !absence.acknowledgedAt);
+          const toAnswer = pairing.proposal && pairing.proposal.proposedBy !== pairing.side;
+          return (
+            <li key={pairing.id} className="rounded-xl bg-paper p-4">
+              <p className="font-semibold text-ink">
+                {other} · <span className="font-normal text-ink-soft">{pairing.instrument}</span>
+              </p>
+              <p className="text-sm text-ink-soft">
+                {pairing.lesson
+                  ? `${DAY_NAMES[pairing.lesson.day]}s, ${formatRange(pairing.lesson.start, pairing.lesson.durationMinutes)} (${zoneLabel(pairing.timeZone)})`
+                  : 'No weekly time agreed yet'}
+              </p>
+              {toAnswer ? (
+                <p className="mt-2 text-sm font-semibold text-warn">{other} proposed a new time — answer it on the Lessons page.</p>
+              ) : null}
+              {notices.map((notice) => (
+                <p key={notice.id} className="mt-2 text-sm font-semibold text-coral">
+                  {other} can’t make {formatDate(notice.date)}
+                  {notice.message ? ` — “${notice.message}”` : ''}
+                </p>
+              ))}
+            </li>
+          );
+        })}
+      </ul>
+    </Panel>
   );
 }
