@@ -32,7 +32,7 @@ export function FormsList() {
 
   const load = useCallback(() => {
     api
-      .get<Paged<FormListing>>('/forms?limit=50')
+      .get<Paged<FormListing>>('/forms?scope=all&limit=50')
       .then((body) => setForms(body.data))
       .catch(() => {
         setForms([]);

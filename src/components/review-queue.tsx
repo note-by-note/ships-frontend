@@ -46,7 +46,7 @@ export function ReviewQueue() {
   );
 
   useEffect(() => {
-    api.get<Paged<FormListing>>('/forms?limit=50').then((body) => setForms(body.data)).catch(() => setForms([]));
+    api.get<Paged<FormListing>>('/forms?scope=all&limit=50').then((body) => setForms(body.data)).catch(() => setForms([]));
   }, []);
 
   useEffect(() => {
