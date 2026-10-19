@@ -22,10 +22,11 @@ export function ReviewQueue() {
   const formSlug = searchParams.get('formSlug') ?? '';
   const query = searchParams.get('q') ?? '';
   const page = Number(searchParams.get('page') ?? '1');
+  const includeTest = searchParams.get('includeTest') === '1';
 
   // The result is stored with the query it answered, so "are we loading?" is a
   // comparison rather than a second piece of state to keep in step.
-  const queryKey = `${status}|${formSlug}|${query}|${page}`;
+  const queryKey = `${status}|${formSlug}|${query}|${page}|${includeTest}`;
   const [result, setResult] = useState<{ key: string; page: Paged<ApplicationListing> | null } | null>(null);
   const [forms, setForms] = useState<FormListing[]>([]);
   const [search, setSearch] = useState(query);
@@ -46,7 +47,7 @@ export function ReviewQueue() {
   );
 
   useEffect(() => {
-    api.get<Paged<FormListing>>('/forms?limit=50').then((body) => setForms(body.data)).catch(() => setForms([]));
+    api.get<Paged<FormListing>>('/forms?scope=all&limit=50').then((body) => setForms(body.data)).catch(() => setForms([]));
   }, []);
 
   useEffect(() => {
@@ -57,6 +58,7 @@ export function ReviewQueue() {
     if (formSlug) params.set('formSlug', formSlug);
     if (query) params.set('q', query);
     if (page > 1) params.set('page', String(page));
+    if (includeTest) params.set('includeTest', '1');
 
     api
       .get<Paged<ApplicationListing>>(`/applications?${params.toString()}`)
@@ -70,7 +72,7 @@ export function ReviewQueue() {
     return () => {
       cancelled = true;
     };
-  }, [status, formSlug, query, page, queryKey]);
+  }, [status, formSlug, query, page, includeTest, queryKey]);
 
   const counts = current?.meta.statusCounts ?? {};
 
@@ -144,6 +146,16 @@ export function ReviewQueue() {
             </option>
           ))}
         </Select>
+
+        <label className="flex items-center gap-2 text-sm text-ink-soft">
+          <input
+            type="checkbox"
+            checked={includeTest}
+            onChange={(event) => setParam('includeTest', event.target.checked ? '1' : '')}
+            className="size-4 accent-accent"
+          />
+          Show test data
+        </label>
       </div>
 
       {loading ? (
@@ -179,6 +191,11 @@ export function ReviewQueue() {
                       >
                         {application.applicantName || 'Unnamed applicant'}
                       </Link>
+                      {application.isTest ? (
+                        <Badge tone="warn" className="ml-2">
+                          Test
+                        </Badge>
+                      ) : null}
                       <p className="text-xs text-ink-faint">{application.applicantEmail}</p>
                     </td>
                     <td className="hidden px-4 py-3 text-ink-soft sm:table-cell">

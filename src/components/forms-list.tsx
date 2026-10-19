@@ -29,10 +29,11 @@ export function FormsList() {
   const [error, setError] = useState<string | null>(null);
   const [creating, setCreating] = useState(false);
   const [duplicating, setDuplicating] = useState<FormListing | null>(null);
+  const [switching, setSwitching] = useState<string | null>(null);
 
   const load = useCallback(() => {
     api
-      .get<Paged<FormListing>>('/forms?limit=50')
+      .get<Paged<FormListing>>('/forms?scope=all&limit=50')
       .then((body) => setForms(body.data))
       .catch(() => {
         setForms([]);
@@ -42,13 +43,59 @@ export function FormsList() {
 
   useEffect(load, [load]);
 
+  /** Open = published, closed = closed. Opening a draft publishes it. */
+  async function setOpen(form: FormListing, open: boolean) {
+    setSwitching(form.slug);
+    setError(null);
+    try {
+      await api.patch(`/forms/${form.slug}`, { status: open ? 'published' : 'closed' });
+      load();
+    } catch (err) {
+      setError(err instanceof ApiError ? `${form.title}: ${err.message}` : 'That change did not save.');
+    } finally {
+      setSwitching(null);
+    }
+  }
+
+  async function closeAll() {
+    const open = (forms ?? []).filter((form) => form.status === 'published');
+    if (!open.length || !window.confirm(`Stop accepting applications on ${open.length} form${open.length === 1 ? '' : 's'}?`)) return;
+    setSwitching('all');
+    setError(null);
+    try {
+      for (const form of open) await api.patch(`/forms/${form.slug}`, { status: 'closed' });
+    } catch (err) {
+      setError(err instanceof ApiError ? err.message : 'Not every form could be closed.');
+    } finally {
+      setSwitching(null);
+      load();
+    }
+  }
+
+  const openCount = (forms ?? []).filter((form) => form.accepting).length;
+
   return (
     <>
       <PageHeader
         title="Forms"
         description="Every application, mentor intake and job posting. Editing a live form bumps its version; applications already submitted keep the questions they were asked."
-        actions={<Button onClick={() => setCreating(true)}>New form</Button>}
+        actions={
+          <>
+            <Button variant="secondary" onClick={closeAll} disabled={switching !== null || !forms?.some((form) => form.status === 'published')}>
+              Close all applications
+            </Button>
+            <Button onClick={() => setCreating(true)}>New form</Button>
+          </>
+        }
       />
+
+      {forms ? (
+        <p className="mb-6 text-sm text-ink-soft">
+          <strong className="text-ink">{openCount}</strong> {openCount === 1 ? 'form is' : 'forms are'} accepting
+          applications right now. Use the switch on each form to open or close it — closed forms stay visible with a
+          “not open” message, and nobody can start or send an application.
+        </p>
+      ) : null}
 
       {error ? (
         <div className="mb-6">
@@ -120,6 +167,8 @@ export function FormsList() {
                   </Link>
                 </p>
               </div>
+
+              <OpenSwitch form={form} busy={switching !== null} onChange={(open) => setOpen(form, open)} />
 
               <div className="flex shrink-0 gap-2">
                 <Button variant="secondary" size="sm" onClick={() => setDuplicating(form)}>
@@ -242,5 +291,34 @@ function FormDialog({
         </div>
       </form>
     </Card>
+  );
+}
+
+/** The per-form "accepting applications" switch. */
+function OpenSwitch({ form, busy, onChange }: { form: FormListing; busy: boolean; onChange: (open: boolean) => void }) {
+  if (form.status === 'archived') return <span className="text-sm text-ink-faint">Archived</span>;
+
+  const open = form.status === 'published';
+  // Published but outside its open/close dates: switched on, yet not taking applications.
+  const scheduled = open && !form.accepting;
+  const label = open ? (scheduled ? 'Open — outside its dates' : 'Accepting applications') : form.status === 'draft' ? 'Draft' : 'Closed';
+
+  return (
+    <label className="flex shrink-0 items-center gap-3 text-sm">
+      <span className={open && !scheduled ? 'font-medium text-ok' : 'text-ink-soft'}>{label}</span>
+      <span className="relative inline-flex items-center">
+        <input
+          type="checkbox"
+          role="switch"
+          aria-label={`Accept applications for ${form.title}`}
+          checked={open}
+          disabled={busy}
+          onChange={(event) => onChange(event.target.checked)}
+          className="peer sr-only"
+        />
+        <span className="h-6 w-11 rounded-full bg-line-strong transition-colors peer-checked:bg-sage peer-disabled:opacity-50 peer-focus-visible:ring-2 peer-focus-visible:ring-navy" />
+        <span className="absolute left-0.5 size-5 rounded-full bg-white shadow transition-transform peer-checked:translate-x-5" />
+      </span>
+    </label>
   );
 }

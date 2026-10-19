@@ -1,11 +1,6 @@
 import type { Metadata } from 'next';
 import Link from 'next/link';
-import { Playfair_Display } from 'next/font/google';
 import { MentorDirectory } from '@/components/mentor-directory';
-
-// Display face from the Figma design. Loaded here rather than in the root
-// layout so the application flow keeps its quieter type.
-const playfair = Playfair_Display({ variable: '--font-playfair', subsets: ['latin'] });
 
 export const metadata: Metadata = {
   title: 'Find a Mentor',
@@ -32,7 +27,7 @@ const STEPS = [
 
 export default function FindAMentorPage() {
   return (
-    <div className={`${playfair.variable} bg-cream text-navy`}>
+    <div className="bg-cream text-navy">
       {/* Hero */}
       <section className="px-5 pt-12 pb-10 md:px-10 lg:px-20 lg:pt-20">
         <div className="mx-auto max-w-7xl">
