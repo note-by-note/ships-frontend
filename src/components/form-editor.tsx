@@ -93,6 +93,8 @@ export function FormEditor({ slug }: { slug: string }) {
   const [title, setTitle] = useState('');
   const [description, setDescription] = useState('');
   const [successMessage, setSuccessMessage] = useState('');
+  const [opensAt, setOpensAt] = useState('');
+  const [closesAt, setClosesAt] = useState('');
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const [saved, setSaved] = useState(false);
@@ -109,6 +111,8 @@ export function FormEditor({ slug }: { slug: string }) {
         setTitle(body.data.title);
         setDescription(body.data.description);
         setSuccessMessage(body.data.settings.successMessage);
+        setOpensAt(toLocalInput(body.data.opensAt));
+        setClosesAt(toLocalInput(body.data.closesAt));
         setOpenSection(body.data.sections[0]?.key ?? null);
       })
       .catch((err: unknown) =>
@@ -172,6 +176,8 @@ export function FormEditor({ slug }: { slug: string }) {
         description,
         sections,
         settings: { ...form.settings, successMessage },
+        opensAt: opensAt ? new Date(opensAt).toISOString() : null,
+        closesAt: closesAt ? new Date(closesAt).toISOString() : null,
         ...(nextStatus ? { status: nextStatus } : {}),
       });
       setForm(body.data);
@@ -360,7 +366,9 @@ export function FormEditor({ slug }: { slug: string }) {
             <div>
               <h2 className="font-medium text-ink">Status</h2>
               <p className="mt-1 text-sm text-ink-soft">
-                {form.status === 'published'
+                {form.status === 'published' && !form.accepting
+                  ? 'Published, but outside its open and close dates, so not taking applications right now.'
+                  : form.status === 'published'
                   ? 'Live and accepting applications.'
                   : form.status === 'draft'
                     ? 'Only admins can see this. Publish when you are ready.'
@@ -383,6 +391,38 @@ export function FormEditor({ slug }: { slug: string }) {
                   Archive
                 </Button>
               ) : null}
+            </div>
+
+            <div className="grid w-full gap-4 border-t border-line pt-4 sm:grid-cols-2">
+              <Field label="Opens" help="Before this, the form shows its “not open” message.">
+                {({ id }) => (
+                  <TextInput
+                    id={id}
+                    type="datetime-local"
+                    value={opensAt}
+                    onChange={(e) => {
+                      markDirty();
+                      setOpensAt(e.target.value);
+                    }}
+                  />
+                )}
+              </Field>
+              <Field label="Closes" help="Applications stop automatically at this time.">
+                {({ id }) => (
+                  <TextInput
+                    id={id}
+                    type="datetime-local"
+                    value={closesAt}
+                    onChange={(e) => {
+                      markDirty();
+                      setClosesAt(e.target.value);
+                    }}
+                  />
+                )}
+              </Field>
+              <p className="text-xs text-ink-faint sm:col-span-2">
+                Dates only apply while the form is published. Click Save to keep date changes.
+              </p>
             </div>
           </Card>
         </div>
@@ -933,4 +973,12 @@ function FormPreview({
       </Card>
     </div>
   );
+}
+
+/** ISO timestamp → the value a datetime-local input expects, in local time. */
+function toLocalInput(value: string | null): string {
+  if (!value) return '';
+  const date = new Date(value);
+  const offset = date.getTimezoneOffset() * 60_000;
+  return new Date(date.getTime() - offset).toISOString().slice(0, 16);
 }

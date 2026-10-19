@@ -49,6 +49,12 @@ export default function StaffOverviewPage() {
 
       {overview ? (
         <div className="flex flex-col gap-8">
+          {!overview.emailConfigured ? (
+            <Alert tone="warn">
+              Email isn’t set up yet, so absence notifications are only shown on dashboards, not emailed. Add the
+              SMTP settings to the API’s <code>.env</code> (see <code>.env.example</code>) to turn email on.
+            </Alert>
+          ) : null}
           <div className="grid gap-4 sm:grid-cols-2 xl:grid-cols-4">
             <StatTile label="Waiting for review" value={submitted('submitted')} hint="Submitted, not yet looked at" />
             <StatTile label="Under review" value={submitted('under_review')} />

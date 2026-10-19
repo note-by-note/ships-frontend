@@ -334,6 +334,8 @@ export interface StaffOverview {
   mentors: { total: number; published: number; accepting: number };
   accounts: Record<string, number>;
   matchRequests: Record<string, number>;
+  /** Whether the API has SMTP settings, i.e. absence emails actually go out. */
+  emailConfigured: boolean;
 }
 
 export interface Paged<T> {

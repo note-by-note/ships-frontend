@@ -1,6 +1,6 @@
 'use client';
 
-import { useState } from 'react';
+import { useEffect, useRef, useState } from 'react';
 import Link from 'next/link';
 import { usePathname, useRouter } from 'next/navigation';
 import { NAV_LINKS, SITE } from '@/lib/site';
@@ -9,11 +9,16 @@ import { Icon } from './marketing';
 import { cx } from './ui';
 
 const MEMBER_LINKS = [
-  { href: '/dashboard', label: 'My dashboard' },
+  { href: '/dashboard', label: 'Dashboard' },
+  { href: '/dashboard/lessons', label: 'Lessons' },
   { href: '/applications', label: 'My applications' },
+  { href: '/dashboard/settings', label: 'Settings' },
 ];
 
-const STAFF_LINKS = [{ href: '/admin', label: 'Staff area' }];
+const STAFF_LINKS = [
+  { href: '/admin', label: 'Dashboard' },
+  { href: '/admin/applications', label: 'Applications' },
+];
 
 function isActive(pathname: string, href: string) {
   return pathname === href || pathname.startsWith(`${href}/`);
@@ -26,6 +31,9 @@ export function SiteHeader() {
   const [menuOpen, setMenuOpen] = useState(false);
 
   const accountLinks = user ? (user.isStaff ? STAFF_LINKS : MEMBER_LINKS) : [];
+  // Staff land in the staff area; students and mentors in their dashboard.
+  const dashboardHref = user?.isStaff ? '/admin' : '/dashboard';
+  const navLinks = user ? [...NAV_LINKS, { href: dashboardHref, label: 'Dashboard' }] : NAV_LINKS;
 
   async function handleSignOut() {
     setMenuOpen(false);
@@ -42,7 +50,7 @@ export function SiteHeader() {
         </Link>
 
         <nav aria-label="Main" className="hidden flex-1 items-center justify-center gap-1 xl:flex">
-          {NAV_LINKS.map((link) => {
+          {navLinks.map((link) => {
             const active = isActive(pathname, link.href);
             return (
               <Link
@@ -64,28 +72,7 @@ export function SiteHeader() {
 
         <div className="ml-auto hidden items-center gap-2 xl:ml-0 xl:flex">
           {loading ? null : user ? (
-            <details className="group relative">
-              <summary className="flex cursor-pointer list-none items-center gap-2 rounded-full border border-cream/25 px-4 py-2 text-sm hover:border-cream/60">
-                {user.name}
-                <span aria-hidden className="text-xs transition-transform group-open:rotate-180">
-                  ▾
-                </span>
-              </summary>
-              <div className="absolute right-0 mt-2 w-56 rounded-xl bg-white p-2 text-navy shadow-xl">
-                {accountLinks.map((link) => (
-                  <Link key={link.href} href={link.href} className="block rounded-lg px-3 py-2 text-sm hover:bg-cream">
-                    {link.label}
-                  </Link>
-                ))}
-                <button
-                  type="button"
-                  onClick={handleSignOut}
-                  className="block w-full rounded-lg px-3 py-2 text-left text-sm hover:bg-cream"
-                >
-                  Sign out
-                </button>
-              </div>
-            </details>
+            <AccountMenu name={user.name} links={accountLinks} onSignOut={handleSignOut} />
           ) : (
             <>
               <Link href="/login" className="rounded-full px-4 py-2 text-sm font-medium text-cream/85 hover:text-cream">
@@ -113,7 +100,12 @@ export function SiteHeader() {
       {menuOpen ? (
         <div id="mobile-menu" className="border-t border-cream/10 xl:hidden">
           <nav aria-label="Main" className="mx-auto flex max-w-7xl flex-col px-5 py-4 md:px-8">
-            {[{ href: '/', label: 'Home' }, ...NAV_LINKS, { href: '/faq', label: 'FAQ' }].map((link) => (
+            {[
+              { href: '/', label: 'Home' },
+              ...(user ? [{ href: dashboardHref, label: 'Dashboard' }] : []),
+              ...NAV_LINKS,
+              { href: '/faq', label: 'FAQ' },
+            ].map((link) => (
               <Link
                 key={link.href}
                 href={link.href}
@@ -169,5 +161,103 @@ export function SiteHeader() {
         </div>
       ) : null}
     </header>
+  );
+}
+
+/**
+ * The name button and its menu. Opens on hover (with a short grace period so
+ * moving the pointer down into the menu doesn't close it), and also on click,
+ * tap and keyboard — hover alone would shut out touch screens and keyboards.
+ */
+function AccountMenu({
+  name,
+  links,
+  onSignOut,
+}: {
+  name: string;
+  links: { href: string; label: string }[];
+  onSignOut: () => void;
+}) {
+  const [open, setOpen] = useState(false);
+  const closeTimer = useRef<ReturnType<typeof setTimeout> | null>(null);
+  const container = useRef<HTMLDivElement>(null);
+  const pathname = usePathname();
+
+  const cancelClose = () => {
+    if (closeTimer.current) clearTimeout(closeTimer.current);
+    closeTimer.current = null;
+  };
+  const show = () => {
+    cancelClose();
+    setOpen(true);
+  };
+  const hideSoon = () => {
+    cancelClose();
+    closeTimer.current = setTimeout(() => setOpen(false), 180);
+  };
+
+  // Close after navigating, and clean up a pending timer on unmount.
+  useEffect(() => {
+    // eslint-disable-next-line react-hooks/set-state-in-effect
+    setOpen(false);
+  }, [pathname]);
+  useEffect(() => cancelClose, []);
+
+  return (
+    <div
+      ref={container}
+      className="relative"
+      onMouseEnter={show}
+      onMouseLeave={hideSoon}
+      onKeyDown={(event) => {
+        if (event.key === 'Escape') setOpen(false);
+      }}
+      onBlur={(event) => {
+        if (!container.current?.contains(event.relatedTarget as Node | null)) setOpen(false);
+      }}
+    >
+      <button
+        type="button"
+        aria-haspopup="menu"
+        aria-expanded={open}
+        onClick={() => setOpen((value) => !value)}
+        className={cx(
+          'flex items-center gap-2 rounded-full border px-4 py-2 text-sm transition-colors',
+          open ? 'border-cream/60 bg-cream/10' : 'border-cream/25 hover:border-cream/60',
+        )}
+      >
+        {name}
+        <span aria-hidden className={cx('text-xs transition-transform', open && 'rotate-180')}>
+          ▾
+        </span>
+      </button>
+
+      {open ? (
+        // pt-2 rather than a margin: the gap stays part of the hover area.
+        <div className="absolute right-0 top-full z-50 w-56 pt-2">
+          <div role="menu" className="rounded-xl bg-white p-2 text-navy shadow-xl">
+            {links.map((link) => (
+              <Link
+                key={link.href}
+                href={link.href}
+                role="menuitem"
+                className="block rounded-lg px-3 py-2 text-sm hover:bg-cream focus-visible:bg-cream"
+              >
+                {link.label}
+              </Link>
+            ))}
+            <div className="my-1 border-t border-line" />
+            <button
+              type="button"
+              role="menuitem"
+              onClick={onSignOut}
+              className="block w-full rounded-lg px-3 py-2 text-left text-sm hover:bg-cream focus-visible:bg-cream"
+            >
+              Sign out
+            </button>
+          </div>
+        </div>
+      ) : null}
+    </div>
   );
 }
