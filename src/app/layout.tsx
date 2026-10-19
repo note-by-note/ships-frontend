@@ -3,6 +3,7 @@ import { Inter, Playfair_Display } from 'next/font/google';
 import { AuthProvider } from '@/components/auth-provider';
 import { SiteFooter } from '@/components/site-footer';
 import { SiteHeader } from '@/components/site-header';
+import { TestModeBanner } from '@/components/test-mode-banner';
 import './globals.css';
 
 // Type from the Figma design: Playfair Display for headings, Inter for text.
@@ -30,6 +31,7 @@ export default function RootLayout({ children }: LayoutProps<'/'>) {
             Skip to content
           </a>
           <SiteHeader />
+          <TestModeBanner />
           <main id="main" className="flex-1">
             {children}
           </main>

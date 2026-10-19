@@ -1,8 +1,16 @@
 'use client';
 
 import { createContext, useCallback, useContext, useEffect, useMemo, useState } from 'react';
-import { api, onAuthChange, restoreSession, setSession, signOut as clearSession } from '@/lib/api';
-import type { AccountUser } from '@/lib/types';
+import {
+  api,
+  beginTestSession,
+  endTestSession,
+  onAuthChange,
+  restoreSession,
+  setSession,
+  signOut as clearSession,
+} from '@/lib/api';
+import type { AccountUser, Permission } from '@/lib/types';
 
 interface SessionEnvelope {
   data: { user: AccountUser; accessToken: string; refreshToken: string };
@@ -16,6 +24,12 @@ interface AuthValue {
   register(input: { name: string; email: string; password: string; role?: 'student' | 'mentor' }): Promise<AccountUser>;
   signOut(): Promise<void>;
   refreshUser(): Promise<void>;
+  /** True if the signed-in account's role grants this permission. */
+  can(permission: Permission): boolean;
+  /** Staff only: switch into a test account. */
+  enterTestAccount(id: string): Promise<AccountUser>;
+  /** Leave a test account and go back to the staff account behind it. */
+  leaveTestAccount(): Promise<void>;
 }
 
 const AuthContext = createContext<AuthValue | null>(null);
@@ -78,6 +92,20 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
         setUser(null);
       },
       refreshUser: loadUser,
+      can(permission) {
+        return Boolean(user?.permissions?.includes(permission));
+      },
+      async enterTestAccount(id) {
+        const body = await api.post<SessionEnvelope>(`/testing/accounts/${id}/session`);
+        beginTestSession({ accessToken: body.data.accessToken, refreshToken: body.data.refreshToken });
+        setUser(body.data.user);
+        return body.data.user;
+      },
+      async leaveTestAccount() {
+        const restored = await endTestSession();
+        if (restored) await loadUser();
+        else setUser(null);
+      },
     }),
     [user, loading, loadUser],
   );

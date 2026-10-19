@@ -187,9 +187,34 @@ export interface ApplicationListing {
   submittedAt: string | null;
   updatedAt: string;
   noteCount: number;
+  isTest?: boolean;
 }
 
-export type UserRole = 'student' | 'mentor' | 'admin';
+export type StaffRole = 'admin' | 'tech' | 'outreach' | 'marketing';
+export type UserRole = 'student' | 'mentor' | StaffRole;
+
+/** Mirrors `ships-api/src/util/permissions.ts`. */
+export type Permission =
+  | 'roles.manage'
+  | 'users.view'
+  | 'users.manage'
+  | 'mentors.view'
+  | 'mentors.manage'
+  | 'forms.manage'
+  | 'applications.review'
+  | 'stats.view'
+  | 'testing.use';
+
+export const STAFF_ROLES: StaffRole[] = ['admin', 'tech', 'outreach', 'marketing'];
+
+export const ROLE_LABELS: Record<UserRole, string> = {
+  student: 'Student',
+  mentor: 'Mentor',
+  admin: 'Admin',
+  tech: 'Tech',
+  outreach: 'Outreach',
+  marketing: 'Marketing',
+};
 
 export interface AccountUser {
   id: string;
@@ -198,6 +223,117 @@ export interface AccountUser {
   role: UserRole;
   active: boolean;
   createdAt: string;
+  isStaff: boolean;
+  permissions: Permission[];
+  isTest: boolean;
+  mentorProfile?: { id: string; name: string; slug: string } | null;
+}
+
+export interface DirectoryUser {
+  id: string;
+  email: string;
+  name: string;
+  role: UserRole;
+  active: boolean;
+  isTest?: boolean;
+  lastLoginAt?: string | null;
+  createdAt: string;
+  mentorProfile: { id: string; name: string; slug: string } | null;
+}
+
+export interface MentorProfile {
+  id: string;
+  name: string;
+  slug: string;
+  pronouns?: string;
+  location?: string;
+  timeZone?: string;
+  instruments: string[];
+  languages: string[];
+  experienceLevels: string[];
+  ageGroups: string[];
+  formats: string[];
+  availability: { days: string[]; times: string[] };
+  genres: string[];
+  experienceHeadline?: string;
+  yearsTeaching?: number;
+  shortBio?: string;
+  teachingPhilosophy?: string;
+  about?: string;
+  acceptingStudents: boolean;
+  published: boolean;
+  verified: boolean;
+  isTest?: boolean;
+  screening?: { backgroundCheckCleared?: boolean; childSafetyCertified?: boolean; note?: string };
+  account?: { id: string; name: string; email: string } | null;
+}
+
+export interface MentorListing {
+  id: string;
+  name: string;
+  slug: string;
+  instruments: string[];
+  published: boolean;
+  verified: boolean;
+  acceptingStudents: boolean;
+  backgroundCheckCleared: boolean;
+  isTest: boolean;
+  account: { id: string; name: string; email: string } | null;
+  updatedAt: string;
+}
+
+export interface MatchRequest {
+  id: string;
+  status: 'pending' | 'accepted' | 'declined' | 'withdrawn';
+  instrument: string;
+  format?: string;
+  preferredDays?: string[];
+  preferredTimes?: string[];
+  timeZone?: string;
+  message?: string;
+  requester?: { name: string; email: string; phone?: string };
+  student?: { firstName?: string; ageGroup?: string; experienceLevel?: string };
+  createdAt: string;
+  respondedAt?: string | null;
+}
+
+export interface OwnMatchRequest {
+  id: string;
+  status: MatchRequest['status'];
+  instrument: string;
+  createdAt: string;
+  respondedAt: string | null;
+  mentor: { id: string; name: string; slug: string } | null;
+}
+
+export interface TestAccount {
+  id: string;
+  name: string;
+  email: string;
+  role: 'student' | 'mentor';
+  mentorProfile: { id: string; name: string; slug: string } | null;
+  applicationCount: number;
+  matchRequestCount: number;
+  createdAt: string;
+}
+
+export interface Options {
+  instruments: string[];
+  languages: string[];
+  experienceLevels: string[];
+  ageGroups: string[];
+  formats: string[];
+  availabilityDays: string[];
+  availabilityTimes: string[];
+  genres: string[];
+}
+
+export interface StaffOverview {
+  applications: { byStatus: Record<string, number>; byKind: Record<string, number> };
+  openForms: number;
+  mentors: { total: number; published: number; accepting: number };
+  accounts: Record<string, number>;
+  matchRequests: Record<string, number>;
 }
 
 export interface Paged<T> {

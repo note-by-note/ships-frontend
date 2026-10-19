@@ -183,8 +183,82 @@ export async function restoreSession(): Promise<boolean> {
   return refreshOnce();
 }
 
+// --- Test mode ---------------------------------------------------------------
+//
+// Staff can switch into a test account (see the API's routes/testing.ts). While
+// they do, their own refresh token waits under STAFF_REFRESH_KEY so "return to
+// my account" can restore it without signing in again.
+
+const STAFF_REFRESH_KEY = 'nbn.staffRefresh';
+
+function readKey(key: string): string | null {
+  try {
+    return typeof window === 'undefined' ? null : window.localStorage.getItem(key);
+  } catch {
+    return null;
+  }
+}
+
+function writeKey(key: string, value: string | null) {
+  try {
+    if (typeof window === 'undefined') return;
+    if (value) window.localStorage.setItem(key, value);
+    else window.localStorage.removeItem(key);
+  } catch {
+    /* see getRefreshToken */
+  }
+}
+
+async function revokeRefreshToken(token: string | null) {
+  if (!token) return;
+  try {
+    await fetch(`${BASE_URL}/auth/logout`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ refreshToken: token }),
+    });
+  } catch {
+    /* best effort, as in signOut */
+  }
+}
+
+export function isInTestSession(): boolean {
+  return Boolean(readKey(STAFF_REFRESH_KEY));
+}
+
+/** Switch to a test account's session, keeping the staff session to come back to. */
+export function beginTestSession(session: { accessToken: string; refreshToken: string }) {
+  if (isInTestSession()) {
+    // Hopping from one test account to another: retire the one being left.
+    void revokeRefreshToken(getRefreshToken());
+  } else {
+    writeKey(STAFF_REFRESH_KEY, getRefreshToken());
+  }
+  setSession(session);
+}
+
+/** Leave the test account and restore the staff session. False if it could not be restored. */
+export async function endTestSession(): Promise<boolean> {
+  const staffToken = readKey(STAFF_REFRESH_KEY);
+  const testToken = getRefreshToken();
+  writeKey(STAFF_REFRESH_KEY, null);
+  void revokeRefreshToken(testToken);
+
+  if (!staffToken) {
+    setSession(null);
+    return false;
+  }
+  accessToken = null;
+  setRefreshToken(staffToken);
+  return refreshOnce();
+}
+
 export async function signOut(): Promise<void> {
   const token = getRefreshToken();
+  // Signing out of a test session signs out of the staff session behind it too.
+  const staffToken = readKey(STAFF_REFRESH_KEY);
+  writeKey(STAFF_REFRESH_KEY, null);
+  void revokeRefreshToken(staffToken);
   setSession(null);
   if (!token) return;
 

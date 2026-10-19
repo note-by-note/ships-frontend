@@ -8,12 +8,12 @@ import { useAuth } from './auth-provider';
 import { Icon } from './marketing';
 import { cx } from './ui';
 
-const ACCOUNT_LINKS = [{ href: '/applications', label: 'My applications' }];
-
-const ADMIN_LINKS = [
-  { href: '/admin/applications', label: 'Review applications' },
-  { href: '/admin/forms', label: 'Edit forms' },
+const MEMBER_LINKS = [
+  { href: '/dashboard', label: 'My dashboard' },
+  { href: '/applications', label: 'My applications' },
 ];
+
+const STAFF_LINKS = [{ href: '/admin', label: 'Staff area' }];
 
 function isActive(pathname: string, href: string) {
   return pathname === href || pathname.startsWith(`${href}/`);
@@ -25,7 +25,7 @@ export function SiteHeader() {
   const router = useRouter();
   const [menuOpen, setMenuOpen] = useState(false);
 
-  const accountLinks = user ? [...ACCOUNT_LINKS, ...(user.role === 'admin' ? ADMIN_LINKS : [])] : [];
+  const accountLinks = user ? (user.isStaff ? STAFF_LINKS : MEMBER_LINKS) : [];
 
   async function handleSignOut() {
     setMenuOpen(false);
