@@ -17,10 +17,11 @@
   --color-line: #e7e3dc;
   --color-line-strong: #d4cfc6;
 
-  --color-accent: #3f6b58;
-  --color-accent-hover: #345847;
-  --color-accent-soft: #eef3f0;
-  --color-accent-ring: #3f6b5833;
+  /* Accent = the Figma navy, so the application pages match the public site. */
+  --color-accent: #1e2a44;
+  --color-accent-hover: #2c3b5c;
+  --color-accent-soft: #eaeef4;
+  --color-accent-ring: #1e2a4433;
 
   --color-danger: #a13c31;
   --color-danger-soft: #fdf2f0;
@@ -30,8 +31,8 @@
   --color-ok-soft: #eef3f0;
 
   /*
-   * Marketing palette, from the Figma homepage. Used by the public-facing
-   * pages (Find a Mentor) rather than the application flow above.
+   * Marketing palette, from the Figma design ("Note by Note — Complete Website
+   * Design"). Used by the public pages, the header and the footer.
    */
   --color-navy: #1e2a44;
   --color-cream: #f5f0e7;
@@ -39,10 +40,13 @@
   --color-coral: #d97863;
   --color-sage: #9eaf9b;
   --color-sky: #a8c4d8;
+  /* Section grounds from the Figma homepage: the mission band and the quieter alternate. */
+  --color-mist: #dde4ea;
+  --color-stone: #ebe9e3;
 
-  --font-sans: var(--font-geist-sans), ui-sans-serif, system-ui, sans-serif;
+  --font-sans: var(--font-inter), ui-sans-serif, system-ui, sans-serif;
   --font-display: var(--font-playfair), Georgia, serif;
-  --font-mono: var(--font-geist-mono), ui-monospace, monospace;
+  --font-mono: ui-monospace, SFMono-Regular, Menlo, monospace;
 
   --radius-card: 0.75rem;
 }
