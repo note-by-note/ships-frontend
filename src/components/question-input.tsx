@@ -178,7 +178,7 @@ export function QuestionInput({ question, value, error, onChange }: Props) {
                 htmlFor={id}
                 className="w-14 shrink-0 rounded-lg border border-line-strong bg-surface py-1 text-center text-sm font-medium tabular-nums"
               >
-                {Number.isFinite(current) ? current : '—'}
+                {Number.isFinite(current) ? current : '?'}
               </output>
             </div>
           )}

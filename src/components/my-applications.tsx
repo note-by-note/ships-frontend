@@ -55,7 +55,7 @@ export function MyApplications() {
             <p className="mt-1 text-sm text-ink-soft">
               {application.submittedAt
                 ? `Sent ${new Date(application.submittedAt).toLocaleDateString()}`
-                : `Saved ${new Date(application.updatedAt).toLocaleDateString()} — not sent yet`}
+                : `Saved ${new Date(application.updatedAt).toLocaleDateString()} (not sent yet)`}
             </p>
           </div>
 

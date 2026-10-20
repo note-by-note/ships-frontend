@@ -127,7 +127,7 @@ export default function HomePage() {
             <Heading before="Music lessons, without the" accent="price tag" after="." />
             <p className="leading-relaxed text-navy/75">
               Private lessons are expensive, and plenty of students who want to learn never get the chance.
-              Note by Note connects students who already play with students who want to start — online, and
+              Note by Note connects students who already play with students who want to start, online and
               free.
             </p>
             <ArrowLink href="/about" className="w-max">

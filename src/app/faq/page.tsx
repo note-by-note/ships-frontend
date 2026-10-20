@@ -22,7 +22,7 @@ const GROUPS: { title: string; questions: { q: string; a: ReactNode }[] }[] = [
       },
       {
         q: 'Who teaches the lessons?',
-        a: 'Student volunteers who play the instrument and want to help others learn it. They aren’t necessarily professional musicians or trained teachers — they’re people who know their instrument and explain it patiently.',
+        a: 'Student volunteers who play the instrument and want to help others learn it. They aren’t necessarily professional musicians or trained teachers. They’re people who know their instrument and explain it patiently.',
       },
       {
         q: 'How are lessons held?',
@@ -30,7 +30,7 @@ const GROUPS: { title: string; questions: { q: string; a: ReactNode }[] }[] = [
       },
       {
         q: 'Do I need any experience?',
-        a: 'No. Complete beginners are welcome — lessons start at the beginning.',
+        a: 'No. Complete beginners are welcome, and lessons start at the beginning.',
       },
       {
         q: 'Do I need my own instrument?',

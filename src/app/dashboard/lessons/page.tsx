@@ -342,7 +342,7 @@ function Absences({
               </Select>
             )}
           </Field>
-          <Field label="Message (optional)" help={`Let ${otherLabel} know — e.g. a school trip, or a suggested makeup time.`}>
+          <Field label="Message (optional)" help={`Let ${otherLabel} know why (for example, a school trip), or suggest a makeup time.`}>
             {({ id }) => <TextArea id={id} rows={2} maxLength={500} value={message} onChange={(e) => setMessage(e.target.value)} />}
           </Field>
           <div>

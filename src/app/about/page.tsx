@@ -63,7 +63,7 @@ export default function AboutPage() {
               know.
             </p>
             <p className="leading-relaxed text-navy/75">
-              Note by Note puts those two groups together. It runs on volunteers, and it’s still growing — the
+              Note by Note puts those two groups together. It runs on volunteers and it’s still growing, so the
               website and how we run lessons will keep changing as we learn what works.
             </p>
           </div>

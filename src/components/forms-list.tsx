@@ -92,7 +92,7 @@ export function FormsList() {
       {forms ? (
         <p className="mb-6 text-sm text-ink-soft">
           <strong className="text-ink">{openCount}</strong> {openCount === 1 ? 'form is' : 'forms are'} accepting
-          applications right now. Use the switch on each form to open or close it — closed forms stay visible with a
+          applications right now. Use the switch on each form to open or close it. Closed forms stay visible with a
           “not open” message, and nobody can start or send an application.
         </p>
       ) : null}
@@ -301,7 +301,7 @@ function OpenSwitch({ form, busy, onChange }: { form: FormListing; busy: boolean
   const open = form.status === 'published';
   // Published but outside its open/close dates: switched on, yet not taking applications.
   const scheduled = open && !form.accepting;
-  const label = open ? (scheduled ? 'Open — outside its dates' : 'Accepting applications') : form.status === 'draft' ? 'Draft' : 'Closed';
+  const label = open ? (scheduled ? 'Open, but outside its dates' : 'Accepting applications') : form.status === 'draft' ? 'Draft' : 'Closed';
 
   return (
     <label className="flex shrink-0 items-center gap-3 text-sm">

@@ -129,7 +129,7 @@ export function MentorDirectory() {
         <div className="rounded-3xl border border-dashed border-navy/20 px-6 py-14 text-center">
           <p className="font-display text-[22px] font-bold text-navy">No mentors match yet</p>
           <p className="mx-auto mt-2 max-w-md text-[15px] text-navy/60">
-            Try another instrument or language — or apply anyway and we&apos;ll find someone for you.
+            Try another instrument or language, or apply anyway and we&apos;ll find someone for you.
           </p>
           <button
             type="button"

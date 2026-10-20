@@ -67,7 +67,7 @@ function StudentDashboard() {
                       <p className="text-xs text-ink-faint">
                         {application.submittedAt
                           ? `Sent ${new Date(application.submittedAt).toLocaleDateString()}`
-                          : `Saved ${new Date(application.updatedAt).toLocaleDateString()} — not sent yet`}
+                          : `Saved ${new Date(application.updatedAt).toLocaleDateString()} (not sent yet)`}
                       </p>
                     </div>
                     <div className="flex items-center gap-3">
@@ -264,7 +264,7 @@ function MentorDashboard() {
                       <div>
                         <p className="font-semibold text-ink">{request.student?.firstName || 'A student'}</p>
                         <p className="text-sm text-ink-soft">
-                          {request.instrument} · {request.student?.experienceLevel ?? 'Level not given'} · ages {request.student?.ageGroup ?? '—'}
+                          {request.instrument} · {request.student?.experienceLevel ?? 'Level not given'} · ages {request.student?.ageGroup ?? 'not given'}
                         </p>
                         <p className="mt-1 text-xs text-ink-faint">
                           Prefers {[...(request.preferredDays ?? []), ...(request.preferredTimes ?? [])].join(', ') || 'any time'}
@@ -354,12 +354,12 @@ function LessonsSummary() {
                   : 'No weekly time agreed yet'}
               </p>
               {toAnswer ? (
-                <p className="mt-2 text-sm font-semibold text-warn">{other} proposed a new time — answer it on the Lessons page.</p>
+                <p className="mt-2 text-sm font-semibold text-warn">{other} proposed a new time. Answer it on the Lessons page.</p>
               ) : null}
               {notices.map((notice) => (
                 <p key={notice.id} className="mt-2 text-sm font-semibold text-coral">
                   {other} can’t make {formatDate(notice.date)}
-                  {notice.message ? ` — “${notice.message}”` : ''}
+                  {notice.message ? `: “${notice.message}”` : ''}
                 </p>
               ))}
             </li>

@@ -246,7 +246,7 @@ export default function AvailabilityPage() {
 
         <p className="mt-4 text-xs text-ink-faint">
           Booked lessons are locked here. To move one, propose a new time on the{' '}
-          <Link href="/dashboard/lessons" className="underline">Lessons</Link> page — once your student accepts, the old
+          <Link href="/dashboard/lessons" className="underline">Lessons</Link> page. Once your student accepts, the old
           blocks free up.
         </p>
       </Panel>

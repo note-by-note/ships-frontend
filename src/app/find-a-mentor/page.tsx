@@ -37,7 +37,7 @@ export default function FindAMentorPage() {
           </h1>
           <p className="mt-4 max-w-2xl text-lg leading-normal text-navy/75">
             Every mentor here is a volunteer who loves their instrument. Lessons are free, online and
-            one-on-one — pick someone who sounds right, and we&apos;ll handle the rest.
+            one-on-one. Pick someone who sounds right, and we&apos;ll handle the rest.
           </p>
         </div>
       </section>
@@ -58,7 +58,7 @@ export default function FindAMentorPage() {
           <div className="flex max-w-[680px] flex-col gap-4 text-center">
             <h2 className="font-display text-3xl font-bold md:text-4xl lg:text-[48px]">How matching works</h2>
             <p className="text-base text-navy/60 lg:text-lg">
-              Not sure who to pick? Apply anyway — we match you on availability and goals.
+              Not sure who to pick? Apply anyway, and we&apos;ll match you on availability and goals.
             </p>
           </div>
           <ol className="grid w-full grid-cols-1 gap-10 md:grid-cols-3">

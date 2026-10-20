@@ -43,8 +43,8 @@ const PRESETS: { value: OptionPreset | ''; label: string }[] = [
   { value: 'experience_levels', label: 'Experience levels' },
   { value: 'age_groups', label: 'Age groups' },
   { value: 'languages', label: 'Languages' },
-  { value: 'availability_days', label: 'Availability — days' },
-  { value: 'availability_times', label: 'Availability — times' },
+  { value: 'availability_days', label: 'Availability: days' },
+  { value: 'availability_times', label: 'Availability: times' },
   { value: 'formats', label: 'Lesson formats' },
   { value: 'weekdays', label: 'Weekdays' },
   { value: 'genres', label: 'Genres' },
@@ -235,7 +235,7 @@ export function FormEditor({ slug }: { slug: string }) {
       {form.status !== 'draft' ? (
         <div className="mb-6">
           <Alert tone="warn">
-            This form is live. Changing its questions bumps it to v{form.version + 1} — applications
+            This form is live. Changing its questions bumps it to v{form.version + 1}. Applications
             already submitted keep the questions they were asked, so past reviews stay accurate.
           </Alert>
         </div>
@@ -733,7 +733,7 @@ function QuestionEditor({
           <ConditionEditor question={question} candidates={conditionCandidates} onChange={onChange} />
 
           <p className="text-xs text-ink-faint">
-            Answer key: <code className="font-mono">{question.key}</code> — fixed once applications exist,
+            Answer key: <code className="font-mono">{question.key}</code>. It’s fixed once applications exist,
             so past answers keep pointing at the right question.
           </p>
         </div>

@@ -403,7 +403,7 @@ function SaveIndicator({ state, enabled }: { state: 'idle' | 'saving' | 'saved' 
     idle: '',
     saving: 'Saving…',
     saved: 'Progress saved',
-    error: 'Could not save — your answers are still here',
+    error: 'Could not save, but your answers are still here',
   }[state];
 
   if (!text) return null;
@@ -576,7 +576,7 @@ function ReviewStep({
       <div>
         <h2 className="text-xl font-semibold text-ink">Review your application</h2>
         <p className="mt-2 text-ink-soft">
-          Everything below is what we will read. You can still change any of it — once you send it,
+          Everything below is what we will read. You can still change any of it. Once you send it,
           you cannot edit it.
         </p>
       </div>

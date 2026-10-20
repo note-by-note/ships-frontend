@@ -126,7 +126,7 @@ export function ApplicationReview({ id }: { id: string }) {
         <div className="min-w-0 space-y-6">
           {!snapshot ? (
             <Alert tone="warn">
-              This application has no saved copy of the form — it was most likely never submitted.
+              This application has no saved copy of the form. It was most likely never submitted.
             </Alert>
           ) : (
             snapshot.sections.map((section) => (

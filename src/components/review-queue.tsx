@@ -207,7 +207,7 @@ export function ReviewQueue() {
                     <td className="hidden px-4 py-3 text-ink-soft md:table-cell">
                       {application.submittedAt
                         ? new Date(application.submittedAt).toLocaleDateString()
-                        : '—'}
+                        : 'Not recorded'}
                     </td>
                   </tr>
                 ))}

@@ -29,7 +29,7 @@ export default function ContactPage() {
           <Heading as="h1" before="Get in" accent="touch" />
           <p className="max-w-xl text-lg leading-relaxed text-navy/75">
             Questions about lessons, mentoring, volunteering or partnerships? The links below may answer it
-            faster — otherwise, email the team.
+            faster. Otherwise, email the team.
           </p>
           <StickyNote className="absolute top-14 right-8 hidden md:block">Say hello ♪</StickyNote>
         </Container>

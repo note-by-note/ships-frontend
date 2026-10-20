@@ -56,7 +56,7 @@ const STUDENT_STEPS: { icon: IconName; tone: 'gold' | 'sage' | 'sky' | 'coral'; 
     icon: 'help',
     tone: 'sage',
     title: 'Ask for help any time',
-    body: 'If something isn’t working — the time, the match, anything — get in touch and we’ll sort it out.',
+    body: 'If something isn’t working (the time, the match, anything), get in touch and we’ll sort it out.',
   },
 ];
 

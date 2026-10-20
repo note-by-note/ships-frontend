@@ -66,9 +66,9 @@ export default function EditMentorPage({ params }: { params: Promise<{ id: strin
                 <dl className="grid gap-3 text-sm sm:grid-cols-2">
                   <div><dt className="text-ink-faint">Instruments</dt><dd>{mentor.instruments.join(', ')}</dd></div>
                   <div><dt className="text-ink-faint">Languages</dt><dd>{mentor.languages.join(', ')}</dd></div>
-                  <div><dt className="text-ink-faint">Levels</dt><dd>{mentor.experienceLevels.join(', ') || '—'}</dd></div>
-                  <div><dt className="text-ink-faint">Ages</dt><dd>{mentor.ageGroups.join(', ') || '—'}</dd></div>
-                  <div className="sm:col-span-2"><dt className="text-ink-faint">Short bio</dt><dd>{mentor.shortBio || '—'}</dd></div>
+                  <div><dt className="text-ink-faint">Levels</dt><dd>{mentor.experienceLevels.join(', ') || 'Not set'}</dd></div>
+                  <div><dt className="text-ink-faint">Ages</dt><dd>{mentor.ageGroups.join(', ') || 'Not set'}</dd></div>
+                  <div className="sm:col-span-2"><dt className="text-ink-faint">Short bio</dt><dd>{mentor.shortBio || 'Not set'}</dd></div>
                 </dl>
               )}
             </Panel>

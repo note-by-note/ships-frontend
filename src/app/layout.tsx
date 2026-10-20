@@ -12,7 +12,7 @@ const playfair = Playfair_Display({ variable: '--font-playfair', subsets: ['lati
 
 export const metadata: Metadata = {
   title: {
-    default: 'Note by Note — Free online music lessons',
+    default: 'Note by Note | Free online music lessons',
     template: '%s · Note by Note',
   },
   description:

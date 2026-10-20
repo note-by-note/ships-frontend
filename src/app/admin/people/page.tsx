@@ -73,7 +73,7 @@ export default function PeoplePage() {
         <ul className="mt-3 grid gap-2 sm:grid-cols-2">
           {(Object.keys(ROLE_LABELS) as UserRole[]).map((entry) => (
             <li key={entry}>
-              <strong>{ROLE_LABELS[entry]}</strong> — <span className="text-ink-soft">{ROLE_HELP[entry]}</span>
+              <strong>{ROLE_LABELS[entry]}:</strong> <span className="text-ink-soft">{ROLE_HELP[entry]}</span>
             </li>
           ))}
         </ul>
@@ -152,7 +152,7 @@ export default function PeoplePage() {
                       )}
                     </td>
                     <td className="px-4 py-3 text-ink-soft">
-                      {person.mentorProfile ? person.mentorProfile.name : person.role === 'mentor' ? <span className="text-ink-faint">Not linked</span> : '—'}
+                      {person.mentorProfile ? person.mentorProfile.name : person.role === 'mentor' ? <span className="text-ink-faint">Not linked</span> : <span className="text-ink-faint">None</span>}
                     </td>
                     <td className="px-4 py-3">
                       <div className="flex items-center gap-2">
