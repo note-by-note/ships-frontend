@@ -4,6 +4,7 @@ import Link from 'next/link';
 import { useId, useMemo, useState } from 'react';
 import { INSTRUMENTS, LANGUAGES, MENTORS, type Instrument, type Mentor } from '@/lib/mentors';
 import { cx } from './ui';
+import { APPLY_LINKS } from '@/lib/site';
 
 // Cards alternate tilt like the Figma "Meet our mentors" row, and straighten on
 // hover/focus so the one you're reading sits square.
@@ -191,7 +192,7 @@ function MentorCard({ mentor, index }: { mentor: Mentor; index: number }) {
       </blockquote>
 
       <Link
-        href="/apply"
+        href={APPLY_LINKS.student}
         className="flex w-full items-center justify-center rounded-xl bg-navy py-3 text-sm font-semibold text-cream transition-colors hover:bg-navy/90"
       >
         Request {mentor.name.split(' ')[0]}

@@ -1,6 +1,7 @@
 import type { Metadata } from 'next';
 import Link from 'next/link';
 import { MentorDirectory } from '@/components/mentor-directory';
+import { APPLY_LINKS } from '@/lib/site';
 
 export const metadata: Metadata = {
   title: 'Find a Mentor',
@@ -91,14 +92,14 @@ export default function FindAMentorPage() {
             </p>
           </div>
           <div className="flex flex-wrap justify-center gap-5">
-            <Link href="/apply" className="rounded-full bg-gold px-9 py-5 text-lg font-bold text-navy">
-              Start an application
+            <Link href={APPLY_LINKS.student} className="rounded-full bg-gold px-9 py-5 text-lg font-bold text-navy">
+              Apply for lessons
             </Link>
             <Link
-              href="/apply"
+              href={APPLY_LINKS.mentor}
               className="rounded-full border-2 border-cream px-9 py-5 text-lg font-bold text-cream"
             >
-              Become a Mentor
+              Volunteer as a mentor
             </Link>
           </div>
         </div>

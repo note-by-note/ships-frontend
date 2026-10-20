@@ -9,6 +9,18 @@ export const SITE = {
   contactEmail: null as string | null,
 };
 
+/**
+ * Direct links to each application, used by every "Apply…" / "Volunteer…"
+ * button. These are the starter forms' slugs (`npm run seed:forms`). A form's
+ * slug can't change once made, so these only need updating if the team
+ * replaces a form with a new one. If a form is closed, its page says so.
+ */
+export const APPLY_LINKS = {
+  student: '/apply/student-application',
+  mentor: '/apply/mentor-application',
+  volunteer: '/apply/volunteer-application',
+} as const;
+
 export const NAV_LINKS = [
   { href: '/how-it-works', label: 'How it works' },
   { href: '/instruments', label: 'Instruments' },
@@ -23,7 +35,7 @@ export const FOOTER_LINKS = [
   {
     title: 'Students',
     links: [
-      { href: '/apply', label: 'Apply for lessons' },
+      { href: APPLY_LINKS.student, label: 'Apply for lessons' },
       { href: '/how-it-works', label: 'How it works' },
       { href: '/instruments', label: 'Instruments' },
       { href: '/faq', label: 'FAQ' },
@@ -32,9 +44,10 @@ export const FOOTER_LINKS = [
   {
     title: 'Volunteers',
     links: [
-      { href: '/for-mentors', label: 'Become a mentor' },
-      { href: '/for-mentors#other-teams', label: 'Tech, marketing & outreach' },
-      { href: '/apply', label: 'Open applications' },
+      { href: '/for-mentors', label: 'Mentoring' },
+      { href: APPLY_LINKS.mentor, label: 'Volunteer as a mentor' },
+      { href: APPLY_LINKS.volunteer, label: 'Join tech, marketing or outreach' },
+      { href: '/apply', label: 'All applications' },
     ],
   },
   {

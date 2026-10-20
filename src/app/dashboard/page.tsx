@@ -9,6 +9,7 @@ import { Alert, Badge, Button, ButtonLink, Spinner, StatusBadge, humanize } from
 import { ApiError, api } from '@/lib/api';
 import { DAY_NAMES, formatDate, formatRange, zoneLabel } from '@/lib/schedule';
 import type { Application, MatchRequest, MentorProfile, OwnMatchRequest, Pairing } from '@/lib/types';
+import { APPLY_LINKS } from '@/lib/site';
 
 // Student and mentor dashboards, after the Figma "student-dashboard" and
 // "mentor-dashboard" frames. Only sections with real data behind them are
@@ -139,7 +140,7 @@ function NextStep({ application, hasMentor, loading }: { application?: Applicati
   const step = hasMentor
     ? { title: 'You’re matched', body: 'Your mentor will be in touch to set up your first lesson.', href: null }
     : !application
-      ? { title: 'Start your application', body: 'Tell us which instrument you’d like to learn and when you’re free.', href: '/apply' }
+      ? { title: 'Start your application', body: 'Tell us which instrument you’d like to learn and when you’re free.', href: APPLY_LINKS.student }
       : application.status === 'draft'
         ? { title: 'Finish your application', body: 'Your answers are saved. Send it when you’re ready.', href: `/apply/${application.formSlug}` }
         : application.status === 'accepted'

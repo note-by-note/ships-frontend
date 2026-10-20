@@ -14,6 +14,7 @@ import {
   StickyNote,
   type IconName,
 } from '@/components/marketing';
+import { APPLY_LINKS } from '@/lib/site';
 
 export const metadata: Metadata = {
   title: 'Become a mentor',
@@ -91,7 +92,7 @@ export default function ForMentorsPage() {
           </div>
         }
       >
-        <PillLink href="/apply">Apply to be a mentor</PillLink>
+        <PillLink href={APPLY_LINKS.mentor}>Volunteer as a mentor</PillLink>
         <PillLink href="#other-teams" variant="outline">
           Other ways to volunteer
         </PillLink>
@@ -173,7 +174,7 @@ export default function ForMentorsPage() {
             ))}
           </ul>
           <div className="mt-10 flex justify-center">
-            <PillLink href="/apply">See open volunteer applications</PillLink>
+            <PillLink href={APPLY_LINKS.volunteer}>Apply to volunteer</PillLink>
           </div>
         </Container>
       </Section>
@@ -181,7 +182,7 @@ export default function ForMentorsPage() {
       <CtaBand
         title={<Heading before="Ready to" accent="teach" after="?" accentTone="gold" className="text-cream" />}
         description="Apply to be a mentor. Someone on the team reads every application and will be in touch."
-        primary={{ href: '/apply', label: 'Apply to be a mentor' }}
+        primary={{ href: APPLY_LINKS.mentor, label: 'Volunteer as a mentor' }}
         secondary={{ href: '/faq', label: 'Read the FAQ' }}
       />
     </>
