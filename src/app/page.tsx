@@ -16,6 +16,7 @@ import {
   StickyNote,
   type IconName,
 } from '@/components/marketing';
+import { APPLY_LINKS } from '@/lib/site';
 
 // Layout follows "note-by-note-homepage-desktop" in the Figma file. Copy is
 // rewritten to the brand voice, and the design's sample statistics, mentors and
@@ -85,7 +86,7 @@ const FACTS = [
 ];
 
 const PATHWAYS = [
-  { href: '/for-mentors', label: 'Become a mentor', tone: 'bg-gold/30' },
+  { href: APPLY_LINKS.mentor, label: 'Volunteer as a mentor', tone: 'bg-gold/30' },
   { href: '/partners', label: 'Partner with us', tone: 'bg-sage/30' },
   { href: '/faq', label: 'Read the FAQ', tone: 'bg-sky/30' },
   { href: '/contact', label: 'Other questions', tone: 'bg-white' },
@@ -104,9 +105,9 @@ export default function HomePage() {
               want to learn.
             </p>
             <div className="flex flex-wrap gap-3">
-              <PillLink href="/apply">Apply for lessons</PillLink>
-              <PillLink href="/for-mentors" variant="outline">
-                Become a mentor
+              <PillLink href={APPLY_LINKS.student}>Apply for lessons</PillLink>
+              <PillLink href={APPLY_LINKS.mentor} variant="outline">
+                Volunteer as a mentor
               </PillLink>
             </div>
             <p className="max-w-sm text-sm font-semibold text-navy/80">
@@ -219,10 +220,13 @@ export default function HomePage() {
               </li>
             ))}
           </ul>
-          <div className="mt-10 flex justify-center">
-            <PillLink href="/for-mentors" variant="gold">
-              Become a mentor
+          <div className="mt-10 flex flex-wrap items-center justify-center gap-x-6 gap-y-3">
+            <PillLink href={APPLY_LINKS.mentor} variant="gold">
+              Volunteer as a mentor
             </PillLink>
+            <ArrowLink href="/for-mentors" className="text-cream">
+              What mentors do
+            </ArrowLink>
           </div>
         </Container>
       </Section>
@@ -256,6 +260,9 @@ export default function HomePage() {
             <strong className="text-navy">We’re just getting started.</strong> Volunteer with us and help shape
             what Note by Note becomes.
           </p>
+          <div className="mt-8 flex justify-center">
+            <PillLink href={APPLY_LINKS.volunteer}>Apply to volunteer</PillLink>
+          </div>
         </Container>
       </Section>
 
@@ -264,8 +271,8 @@ export default function HomePage() {
           <Heading before="Ready to play your" accent="first note" after="?" accentTone="gold" className="text-cream" />
         }
         description="Apply for free lessons, or volunteer to teach what you already know."
-        primary={{ href: '/apply', label: 'Apply for lessons' }}
-        secondary={{ href: '/for-mentors', label: 'Become a mentor' }}
+        primary={{ href: APPLY_LINKS.student, label: 'Apply for lessons' }}
+        secondary={{ href: APPLY_LINKS.mentor, label: 'Volunteer as a mentor' }}
       />
 
       {/* Contact */}

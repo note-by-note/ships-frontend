@@ -2,6 +2,7 @@ import type { Metadata } from 'next';
 import Link from 'next/link';
 import type { ReactNode } from 'react';
 import { ContactEmail, Container, Heading, Icon, IconBadge, PillLink, Section } from '@/components/marketing';
+import { APPLY_LINKS } from '@/lib/site';
 
 export const metadata: Metadata = {
   title: 'FAQ',
@@ -69,7 +70,7 @@ const GROUPS: { title: string; questions: { q: string; a: ReactNode }[] }[] = [
         q: 'How do I apply?',
         a: (
           <>
-            Use the mentor application on our <Link href="/apply" className="underline underline-offset-2">apply page</Link>. Someone on the team
+            Fill in the <Link href={APPLY_LINKS.mentor} className="underline underline-offset-2">mentor application</Link>. Someone on the team
             reads every application.
           </>
         ),

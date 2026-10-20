@@ -12,6 +12,7 @@ import {
   SectionIntro,
   type IconName,
 } from '@/components/marketing';
+import { APPLY_LINKS } from '@/lib/site';
 
 export const metadata: Metadata = {
   title: 'How it works',
@@ -87,9 +88,9 @@ export default function HowItWorksPage() {
           </Polaroid>
         }
       >
-        <PillLink href="/apply">Apply for lessons</PillLink>
-        <PillLink href="/for-mentors" variant="outline">
-          Become a mentor
+        <PillLink href={APPLY_LINKS.student}>Apply for lessons</PillLink>
+        <PillLink href={APPLY_LINKS.mentor} variant="outline">
+          Volunteer as a mentor
         </PillLink>
       </PageHero>
 
@@ -160,7 +161,7 @@ export default function HowItWorksPage() {
       <CtaBand
         title={<Heading before="Ready to" accent="start" after="?" accentTone="gold" className="text-cream" />}
         description="Applications are open on our apply page. Questions first? The FAQ covers the common ones."
-        primary={{ href: '/apply', label: 'Apply for lessons' }}
+        primary={{ href: APPLY_LINKS.student, label: 'Apply for lessons' }}
         secondary={{ href: '/faq', label: 'Read the FAQ' }}
       />
     </>

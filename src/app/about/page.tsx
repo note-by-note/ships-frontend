@@ -12,6 +12,7 @@ import {
   SectionIntro,
   type IconName,
 } from '@/components/marketing';
+import { APPLY_LINKS } from '@/lib/site';
 
 export const metadata: Metadata = {
   title: 'About',
@@ -113,7 +114,7 @@ export default function AboutPage() {
       <CtaBand
         title={<Heading before="Want to" accent="help" after="?" accentTone="gold" className="text-cream" />}
         description="Teach as a mentor, or join the tech, marketing or outreach team."
-        primary={{ href: '/for-mentors', label: 'Become a mentor' }}
+        primary={{ href: APPLY_LINKS.mentor, label: 'Volunteer as a mentor' }}
         secondary={{ href: '/for-mentors#other-teams', label: 'Other ways to volunteer' }}
       />
     </>

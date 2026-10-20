@@ -1,6 +1,7 @@
 import type { Metadata } from 'next';
 import { InstrumentExplorer } from '@/components/instrument-explorer';
 import { ArtPanel, Container, CtaBand, Heading, IconBadge, PageHero, Polaroid, Section } from '@/components/marketing';
+import { APPLY_LINKS } from '@/lib/site';
 
 export const metadata: Metadata = {
   title: 'Instruments',
@@ -51,7 +52,7 @@ export default function InstrumentsPage() {
       <CtaBand
         title={<Heading before="Found your" accent="instrument" after="?" accentTone="gold" className="text-cream" />}
         description="Apply for free lessons and we’ll look for a mentor who plays it."
-        primary={{ href: '/apply', label: 'Apply for lessons' }}
+        primary={{ href: APPLY_LINKS.student, label: 'Apply for lessons' }}
         secondary={{ href: '/how-it-works', label: 'How it works' }}
       />
     </>
