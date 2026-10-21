@@ -7,10 +7,12 @@
 //     don't clash with their other lessons are offered
 //   - "I can't make it": a notice for one specific upcoming lesson, which the
 //     other side sees and can mark as seen
+//   - the video call link, and lesson notes with a practice checklist
 
 import { useCallback, useEffect, useMemo, useState } from 'react';
 import Link from 'next/link';
 import { DashboardHeading, Panel } from '@/components/dashboard-shell';
+import { LessonNotes, MeetingLink } from '@/components/lesson-notes';
 import { Icon } from '@/components/marketing';
 import { Alert, Badge, Button, EmptyState, Spinner } from '@/components/ui';
 import { Field, Select, TextArea } from '@/components/ui/fields';
@@ -160,11 +162,28 @@ function PairingCard({ pairing, rules, onChange }: { pairing: Pairing; rules: Le
             </div>
           ) : null}
 
+          <MeetingLink pairing={pairing} onSaved={onChange} />
+
           <ProposeForm pairing={pairing} rules={rules} busy={busy} onSubmit={(values) => run(() => api.post(`/lessons/${pairing.id}/proposals`, values))} />
         </div>
 
-        <Absences pairing={pairing} busy={busy} otherLabel={otherLabel} run={run} />
+        <div className="flex flex-col gap-4">
+          <Absences pairing={pairing} busy={busy} otherLabel={otherLabel} run={run} />
+          <div className="flex flex-wrap gap-2">
+            <Link
+              href={`/dashboard/messages/${pairing.id}`}
+              className="rounded-lg border border-line-strong px-4 py-2 text-sm font-semibold text-navy hover:bg-paper"
+            >
+              Message {other.name.replace(/\s*\(test\)$/, '').split(' ')[0]}
+            </Link>
+            <Link href="/dashboard/resources" className="rounded-lg border border-line-strong px-4 py-2 text-sm font-semibold text-navy hover:bg-paper">
+              Shared resources
+            </Link>
+          </div>
+        </div>
       </div>
+
+      <LessonNotes pairing={pairing} />
     </Panel>
   );
 }

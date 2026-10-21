@@ -17,6 +17,7 @@ import { zoneLabel } from '@/lib/schedule';
 import type { MentorProfile, Options, PageTheme, PublicMentor, ScheduleDay } from '@/lib/types';
 import { Chips, Toggle } from './mentor-profile-form';
 import { MentorPage, OpenTimes, PAGE_THEMES } from './mentor-page';
+import { PhotoUploader } from './photo-uploader';
 import { Alert, Button, Spinner, cx } from './ui';
 import { Field, Select, TextArea, TextInput } from './ui/fields';
 
@@ -108,10 +109,10 @@ function payloadOf(draft: Draft) {
 }
 
 function problemWith(draft: Draft): string | null {
-  if (draft.name.trim().length < 2) return 'Add your name in step 2.';
-  if (!draft.instruments.length) return 'Choose at least one instrument in step 3.';
+  if (draft.name.trim().length < 2) return 'Add your name in step 3.';
+  if (!draft.instruments.length) return 'Choose at least one instrument in step 4.';
   const url = draft.sampleUrl.trim();
-  if (url && !/^https:\/\/\S+$/.test(url)) return 'The link in step 6 needs to start with https://';
+  if (url && !/^https:\/\/\S+$/.test(url)) return 'The link in step 7 needs to start with https://';
   return null;
 }
 
@@ -274,7 +275,20 @@ export function MentorPageEditor() {
             </div>
           </Step>
 
-          <Step number={2} title="The basics">
+          <Step number={2} title="Your photo">
+            <PhotoUploader
+              mentorId={profile.id}
+              name={draft.name || profile.name}
+              state={{
+                photoPath: profile.photoPath ?? null,
+                pendingPhoto: Boolean(profile.pendingPhoto),
+                photoDeclinedReason: profile.photoDeclinedReason ?? null,
+              }}
+              onChange={(next) => setProfile((current) => (current ? { ...current, ...next } : current))}
+            />
+          </Step>
+
+          <Step number={3} title="The basics">
             <div className="grid gap-4 sm:grid-cols-2">
               <Field label="Your name" required>
                 {({ id }) => <TextInput id={id} value={draft.name} onChange={(e) => set('name', e.target.value)} />}
@@ -326,7 +340,7 @@ export function MentorPageEditor() {
             </Field>
           </Step>
 
-          <Step number={3} title="What you teach" intro="Tap to select. Tap again to remove.">
+          <Step number={4} title="What you teach" intro="Tap to select. Tap again to remove.">
             <Chips label="Instruments" required options={options.instruments} value={draft.instruments} onChange={(v) => set('instruments', v)} />
             <Chips label="Levels" options={options.experienceLevels} value={draft.experienceLevels} onChange={(v) => set('experienceLevels', v)} />
             <Chips label="Student ages" options={options.ageGroups} value={draft.ageGroups} onChange={(v) => set('ageGroups', v)} />
@@ -340,7 +354,7 @@ export function MentorPageEditor() {
             />
           </Step>
 
-          <Step number={4} title="Your story" intro="Write the way you'd talk to a new student. A few sentences is plenty.">
+          <Step number={5} title="Your story" intro="Write the way you'd talk to a new student. A few sentences is plenty.">
             <Field label="Card blurb" help="The short quote on your card in Find a Mentor.">
               {({ id }) => (
                 <>
@@ -388,7 +402,7 @@ export function MentorPageEditor() {
             </Field>
           </Step>
 
-          <Step number={5} title="Your first lesson" intro="A few short points so a nervous beginner knows what to expect.">
+          <Step number={6} title="Your first lesson" intro="A few short points so a nervous beginner knows what to expect.">
             <ol className="flex flex-col gap-2">
               {draft.whatToExpect.map((item, index) => (
                 <li key={index} className="flex items-center gap-2">
@@ -424,7 +438,7 @@ export function MentorPageEditor() {
             ) : null}
           </Step>
 
-          <Step number={6} title="Music you love">
+          <Step number={7} title="Music you love">
             <Chips label="Styles" options={options.genres} value={draft.genres} onChange={(v) => set('genres', v)} />
             <Field label="Pieces, artists or soundtracks you love">
               {({ id }) => (
@@ -455,7 +469,7 @@ export function MentorPageEditor() {
             </Field>
           </Step>
 
-          <Step number={7} title="When you're free" intro="Students see your open times. Times you already teach are hidden.">
+          <Step number={8} title="When you're free" intro="Students see your open times. Times you already teach are hidden.">
             <OpenTimes schedule={profile.schedule ?? []} timeZone={draft.timeZone} name={draft.name || profile.name} />
             <Link href="/dashboard/availability" className="self-start rounded-full bg-navy px-5 py-2.5 text-sm font-semibold text-cream">
               Change my times

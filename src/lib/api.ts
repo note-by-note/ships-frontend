@@ -134,35 +134,47 @@ function refreshOnce(): Promise<boolean> {
 }
 
 export interface RequestOptions {
-  method?: 'GET' | 'POST' | 'PATCH';
+  method?: 'GET' | 'POST' | 'PATCH' | 'DELETE';
   body?: unknown;
+  /** Send this file as the raw body instead of JSON (uploads). */
+  file?: Blob;
   /** Send no Authorization header even if signed in (used by login/register). */
   anonymous?: boolean;
   signal?: AbortSignal;
 }
 
-async function send<T>(path: string, options: RequestOptions, retrying = false): Promise<T> {
+async function request(path: string, options: RequestOptions, retrying = false): Promise<Response> {
   const headers: Record<string, string> = { Accept: 'application/json' };
-  if (options.body !== undefined) headers['Content-Type'] = 'application/json';
+  if (options.file) headers['Content-Type'] = options.file.type || 'application/octet-stream';
+  else if (options.body !== undefined) headers['Content-Type'] = 'application/json';
   if (!options.anonymous && accessToken) headers.Authorization = `Bearer ${accessToken}`;
 
   const response = await fetch(`${BASE_URL}${path}`, {
     method: options.method ?? 'GET',
     headers,
-    body: options.body === undefined ? undefined : JSON.stringify(options.body),
+    body: options.file ?? (options.body === undefined ? undefined : JSON.stringify(options.body)),
     signal: options.signal,
   });
 
   if (response.status === 401 && !options.anonymous && !retrying) {
     // One retry, and only one: if the refreshed token also 401s, the session is
     // genuinely gone and looping would just spend refresh tokens.
-    if (await refreshOnce()) return send<T>(path, options, true);
+    if (await refreshOnce()) return request(path, options, true);
   }
 
   if (!response.ok) throw await parseError(response);
-  if (response.status === 204) return undefined as T;
+  return response;
+}
 
+async function send<T>(path: string, options: RequestOptions): Promise<T> {
+  const response = await request(path, options);
+  if (response.status === 204) return undefined as T;
   return (await response.json()) as T;
+}
+
+/** Where a path on the API lives, for <img src> on public files like approved photos. */
+export function apiUrl(path: string): string {
+  return `${BASE_URL}${path}`;
 }
 
 export const api = {
@@ -171,6 +183,12 @@ export const api = {
     send<T>(path, { ...options, method: 'POST', body }),
   patch: <T>(path: string, body?: unknown, options: RequestOptions = {}) =>
     send<T>(path, { ...options, method: 'PATCH', body }),
+  delete: <T>(path: string, options: RequestOptions = {}) => send<T>(path, { ...options, method: 'DELETE' }),
+  /** POST a file as the raw request body. */
+  upload: <T>(path: string, file: Blob, options: RequestOptions = {}) =>
+    send<T>(path, { ...options, method: 'POST', file }),
+  /** Fetch a private file (signed in) as a Blob, e.g. to show or save it. */
+  blob: async (path: string, options: RequestOptions = {}) => (await request(path, { ...options, method: 'GET' })).blob(),
 };
 
 /**

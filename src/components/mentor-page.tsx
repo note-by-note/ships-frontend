@@ -11,6 +11,7 @@
 import type { ReactNode } from 'react';
 import { DAY_NAMES, WEEKDAYS, formatTime, toMinutes, toTime, zoneLabel } from '@/lib/schedule';
 import type { PageTheme, PublicMentor, ScheduleDay } from '@/lib/types';
+import { Avatar } from './avatar';
 import { Icon, type IconName } from './marketing';
 import { firstNameOf } from './mentor-request';
 import { cx } from './ui';
@@ -150,11 +151,6 @@ export function MentorPage({
   const theme = PAGE_THEMES[mentor.pageTheme ?? 'sky'] ?? PAGE_THEMES.sky;
   const displayName = mentor.name.replace(/\s*\(test\)$/, '') || 'Your name';
   const first = firstNameOf(displayName);
-  const initials = displayName
-    .split(' ')
-    .map((part) => part[0])
-    .join('')
-    .slice(0, 2);
   const trust = [
     mentor.verified && 'Verified mentor',
     mentor.screening?.backgroundCheckCleared && 'Background checked',
@@ -170,15 +166,12 @@ export function MentorPage({
       <header className={cx('px-5 pt-10 pb-8 @3xl:px-10 @3xl:pt-14', theme.band)}>
         <div className="mx-auto flex max-w-5xl flex-col gap-6 @3xl:flex-row @3xl:items-end @3xl:justify-between">
           <div className="flex flex-col gap-5 @lg:flex-row @lg:items-center">
-            <span
-              aria-hidden
-              className={cx(
-                'flex size-24 shrink-0 items-center justify-center rounded-full font-display text-3xl font-bold text-navy shadow-sm ring-4 ring-cream',
-                theme.solid,
-              )}
-            >
-              {initials || '♪'}
-            </span>
+            <Avatar
+              name={displayName}
+              photoPath={mentor.photoPath}
+              tone={theme.solid}
+              className="size-24 text-3xl shadow-sm ring-4 ring-cream @3xl:size-28"
+            />
             <div className="min-w-0">
               <h1 className="font-display text-4xl leading-tight font-bold @3xl:text-5xl">
                 {displayName}

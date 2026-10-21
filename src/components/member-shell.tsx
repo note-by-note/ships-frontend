@@ -1,17 +1,21 @@
 'use client';
 
-import { useEffect, type ReactNode } from 'react';
+import { useEffect, useState, type ReactNode } from 'react';
 import Link from 'next/link';
 import { usePathname, useRouter } from 'next/navigation';
+import { api } from '@/lib/api';
 import { useAuth } from './auth-provider';
 import { DashboardShell, type ShellLink } from './dashboard-shell';
+import { MESSAGES_CHANGED } from './messages';
 import { EmptyState, Spinner } from './ui';
 
 const STUDENT_LINKS: ShellLink[] = [
   { href: '/dashboard', label: 'Dashboard', icon: 'star', exact: true },
   { href: '/dashboard/lessons', label: 'Lessons', icon: 'calendar' },
+  { href: '/dashboard/messages', label: 'Messages', icon: 'message' },
+  { href: '/dashboard/resources', label: 'Resources', icon: 'book' },
   { href: '/applications', label: 'My applications', icon: 'file' },
-  { href: '/apply', label: 'Apply', icon: 'book' },
+  { href: '/apply', label: 'Apply', icon: 'school' },
   { href: '/dashboard/settings', label: 'Settings', icon: 'mail' },
   { href: '/faq', label: 'Help', icon: 'help' },
 ];
@@ -19,18 +23,50 @@ const STUDENT_LINKS: ShellLink[] = [
 const MENTOR_LINKS: ShellLink[] = [
   { href: '/dashboard', label: 'Dashboard', icon: 'star', exact: true },
   { href: '/dashboard/lessons', label: 'Lessons', icon: 'calendar' },
+  { href: '/dashboard/messages', label: 'Messages', icon: 'message' },
+  { href: '/dashboard/resources', label: 'Resources', icon: 'book' },
   { href: '/dashboard/availability', label: 'My availability', icon: 'clock' },
   { href: '/dashboard/profile', label: 'My page', icon: 'users' },
+  { href: '/dashboard/hours', label: 'Volunteer hours', icon: 'heart' },
   { href: '/applications', label: 'My applications', icon: 'file' },
   { href: '/dashboard/settings', label: 'Settings', icon: 'mail' },
   { href: '/faq', label: 'Help', icon: 'help' },
 ];
+
+/**
+ * Unread messages for the sidebar badge. Checked on every page change and
+ * once a minute while the tab is open.
+ */
+function useUnreadMessages(enabled: boolean, pathname: string): number {
+  const [unread, setUnread] = useState(0);
+
+  useEffect(() => {
+    if (!enabled) return;
+    let cancelled = false;
+    const check = () =>
+      api
+        .get<{ meta: { unread: number } }>('/messages')
+        .then((body) => !cancelled && setUnread(body.meta.unread))
+        .catch(() => undefined);
+    void check();
+    const timer = setInterval(check, 60_000);
+    window.addEventListener(MESSAGES_CHANGED, check);
+    return () => {
+      cancelled = true;
+      clearInterval(timer);
+      window.removeEventListener(MESSAGES_CHANGED, check);
+    };
+  }, [enabled, pathname]);
+
+  return enabled ? unread : 0;
+}
 
 /** The signed-in frame for students and mentors. Staff are pointed to the staff area. */
 export function MemberShell({ children }: { children: ReactNode }) {
   const { user, loading } = useAuth();
   const router = useRouter();
   const pathname = usePathname();
+  const unread = useUnreadMessages(Boolean(user && !user.isStaff), pathname);
 
   useEffect(() => {
     if (!loading && !user) router.replace(`/login?next=${encodeURIComponent(pathname)}`);
@@ -60,7 +96,9 @@ export function MemberShell({ children }: { children: ReactNode }) {
     <DashboardShell
       title={user.role === 'mentor' ? 'Mentor dashboard' : 'Student dashboard'}
       subtitle={user.name}
-      links={user.role === 'mentor' ? MENTOR_LINKS : STUDENT_LINKS}
+      links={(user.role === 'mentor' ? MENTOR_LINKS : STUDENT_LINKS).map((link) =>
+        link.href === '/dashboard/messages' ? { ...link, badge: unread } : link,
+      )}
     >
       {children}
     </DashboardShell>
