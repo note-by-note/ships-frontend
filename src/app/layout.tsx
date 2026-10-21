@@ -1,6 +1,8 @@
 import type { Metadata } from 'next';
 import { Inter, Playfair_Display } from 'next/font/google';
 import { AuthProvider } from '@/components/auth-provider';
+import { GoogleAnalytics } from '@/components/google-analytics';
+import { SiteAnalytics } from '@/components/site-analytics';
 import { SiteFooter } from '@/components/site-footer';
 import { SiteHeader } from '@/components/site-header';
 import { TestModeBanner } from '@/components/test-mode-banner';
@@ -37,6 +39,8 @@ export default function RootLayout({ children }: LayoutProps<'/'>) {
           </main>
           <SiteFooter />
         </AuthProvider>
+        <SiteAnalytics />
+        <GoogleAnalytics />
       </body>
     </html>
   );
