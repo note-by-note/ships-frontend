@@ -7,6 +7,8 @@ export const SITE = {
   tagline: 'Free online music tutoring, run by students.',
   /** Not confirmed yet. Set this and every "Email us" link on the site goes live. */
   contactEmail: null as string | null,
+  /** Google Analytics 4 measurement ID. Set to null to turn Google Analytics off. */
+  googleAnalyticsId: 'G-HGJBD8MB3Q' as string | null,
 };
 
 /**
