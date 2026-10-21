@@ -323,7 +323,7 @@ function MentorDashboard() {
         </div>
 
         <div className="flex flex-col gap-6">
-          <Panel title="Your profile" action={<Link href="/dashboard/profile" className="text-sm font-semibold text-coral">Edit</Link>}>
+          <Panel title="Your page" action={<Link href="/dashboard/profile" className="text-sm font-semibold text-coral">Edit</Link>}>
             <p className="font-display text-lg font-bold">{profile.name}</p>
             <div className="mt-2 flex flex-wrap gap-1.5">
               {profile.instruments.map((instrument) => <Badge key={instrument}>{instrument}</Badge>)}
@@ -332,6 +332,9 @@ function MentorDashboard() {
             <p className="mt-3 text-xs text-ink-faint">
               {profile.acceptingStudents ? 'Accepting new students' : 'Not accepting new students'}
             </p>
+            <Link href={`/find-a-mentor/${profile.slug}`} className="mt-4 inline-block text-sm font-semibold text-navy underline underline-offset-4">
+              View my page
+            </Link>
           </Panel>
         </div>
       </div>

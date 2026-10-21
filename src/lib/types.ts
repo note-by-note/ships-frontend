@@ -265,12 +265,33 @@ export interface MentorProfile {
   shortBio?: string;
   teachingPhilosophy?: string;
   about?: string;
+  whatToExpect?: string[];
+  pageTheme?: PageTheme;
+  favoriteMusic?: string;
+  sampleUrl?: string;
+  responseTime?: string;
   acceptingStudents: boolean;
   published: boolean;
   verified: boolean;
   isTest?: boolean;
   screening?: { backgroundCheckCleared?: boolean; childSafetyCertified?: boolean; note?: string };
   account?: { id: string; name: string; email: string } | null;
+}
+
+export type PageTheme = 'sky' | 'gold' | 'sage' | 'coral' | 'mist';
+
+export interface MentorReview {
+  id: string;
+  authorName: string;
+  authorRole?: string;
+  rating: number;
+  body: string;
+}
+
+/** `GET /mentors/:slug`: the public page. Open times only, never booked ones. */
+export interface PublicMentor extends Omit<MentorProfile, 'account'> {
+  openSchedule: ScheduleDay[];
+  reviews: MentorReview[];
 }
 
 export interface MentorListing {
@@ -333,6 +354,7 @@ export interface Options {
   availabilityDays: string[];
   availabilityTimes: string[];
   genres: string[];
+  pageThemes?: PageTheme[];
 }
 
 export interface StaffOverview {

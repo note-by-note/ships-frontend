@@ -48,6 +48,14 @@ export default function EditMentorPage({ params }: { params: Promise<{ id: strin
                 {mentor.isTest ? <Badge tone="warn">Test profile</Badge> : null}
               </span>
             }
+            actions={
+              <Link
+                href={`/find-a-mentor/${mentor.slug}`}
+                className="rounded-lg border border-line-strong px-4 py-2 text-sm font-medium text-navy hover:bg-white"
+              >
+                View page
+              </Link>
+            }
           />
 
           <div className="grid gap-6 xl:grid-cols-[1fr_320px]">

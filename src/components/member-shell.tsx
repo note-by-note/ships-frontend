@@ -20,7 +20,7 @@ const MENTOR_LINKS: ShellLink[] = [
   { href: '/dashboard', label: 'Dashboard', icon: 'star', exact: true },
   { href: '/dashboard/lessons', label: 'Lessons', icon: 'calendar' },
   { href: '/dashboard/availability', label: 'My availability', icon: 'clock' },
-  { href: '/dashboard/profile', label: 'My profile', icon: 'users' },
+  { href: '/dashboard/profile', label: 'My page', icon: 'users' },
   { href: '/applications', label: 'My applications', icon: 'file' },
   { href: '/dashboard/settings', label: 'Settings', icon: 'mail' },
   { href: '/faq', label: 'Help', icon: 'help' },
