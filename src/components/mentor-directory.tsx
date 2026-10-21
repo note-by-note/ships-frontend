@@ -12,13 +12,12 @@
 // "Test", so the whole flow can be tried without the public seeing them.
 
 import Link from 'next/link';
-import { useEffect, useId, useMemo, useState, type FormEvent, type ReactNode } from 'react';
-import { usePathname } from 'next/navigation';
-import { ApiError, api } from '@/lib/api';
+import { useEffect, useId, useMemo, useState } from 'react';
+import { api } from '@/lib/api';
 import { APPLY_LINKS, INSTRUMENT_FAMILIES, type InstrumentFamily } from '@/lib/site';
-import type { Application, Options } from '@/lib/types';
 import { useAuth } from './auth-provider';
 import { Icon } from './marketing';
+import { MentorAction, firstNameOf, useStudentStanding, type StudentStanding } from './mentor-request';
 import { cx } from './ui';
 
 /** The card fields `GET /api/mentors` returns. */
@@ -49,11 +48,9 @@ const FAMILY_OF = new Map<string, InstrumentFamily>(
 export function MentorDirectory() {
   const [mentors, setMentors] = useState<DirectoryMentor[] | null>(null);
   const [failed, setFailed] = useState(false);
-  const [requesting, setRequesting] = useState<DirectoryMentor | null>(null);
   const [query, setQuery] = useState('');
   const [family, setFamily] = useState<InstrumentFamily | null>(null);
   const [language, setLanguage] = useState('');
-  const [applications, setApplications] = useState<Application[]>([]);
   const { user, loading: authLoading } = useAuth();
   const searchId = useId();
   const languageId = useId();
@@ -68,18 +65,7 @@ export function MentorDirectory() {
   }, [authLoading, user?.id]);
 
   // A student's own applications decide whether a card applies or requests.
-  useEffect(() => {
-    if (!user || user.isStaff) return;
-    api
-      .get<{ data: Application[] }>('/applications/mine')
-      .then((body) => setApplications(body.data))
-      .catch(() => setApplications([]));
-  }, [user]);
-
-  const studentApplication = user && !user.isStaff
-    ? applications.find((application) => application.formKind === 'mentee' && application.status !== 'withdrawn')
-    : undefined;
-  const accepted = studentApplication?.status === 'accepted';
+  const standing = useStudentStanding();
 
   const languages = useMemo(
     () => [...new Set((mentors ?? []).flatMap((mentor) => mentor.languages))].sort(),
@@ -213,15 +199,7 @@ export function MentorDirectory() {
         <ul className="grid gap-8 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4">
           {results.map((mentor, index) => (
             <li key={mentor.id}>
-              <MentorCard
-                mentor={mentor}
-                index={index}
-                onRequest={() => setRequesting(mentor)}
-                applyHref={
-                  user?.isStaff || accepted ? undefined : `${APPLY_LINKS.student}?mentor=${encodeURIComponent(mentor.slug)}`
-                }
-                chosen={!accepted && studentApplication?.requestedMentor?.slug === mentor.slug}
-              />
+              <MentorCard mentor={mentor} index={index} standing={standing} />
             </li>
           ))}
         </ul>
@@ -240,8 +218,6 @@ export function MentorDirectory() {
           </button>
         </div>
       )}
-
-      {requesting ? <RequestDialog mentor={requesting} onClose={() => setRequesting(null)} /> : null}
     </div>
   );
 }
@@ -261,30 +237,12 @@ function EmptyPanel({ title, body }: { title: string; body: string }) {
   );
 }
 
-function firstNameOf(name: string): string {
-  return name.replace(/\s*\(test\)$/, '').split(' ')[0];
-}
-
 function describeAvailability(mentor: DirectoryMentor): string {
   const parts = [...(mentor.availability?.days ?? []), ...(mentor.availability?.times ?? [])];
   return parts.length ? parts.join(', ') : 'Ask when you request';
 }
 
-function MentorCard({
-  mentor,
-  index,
-  onRequest,
-  applyHref,
-  chosen,
-}: {
-  mentor: DirectoryMentor;
-  index: number;
-  onRequest: () => void;
-  /** Set for anyone who still needs to apply: the card links to the application instead of requesting. */
-  applyHref?: string;
-  /** This is the mentor named on the student's application. */
-  chosen?: boolean;
-}) {
+function MentorCard({ mentor, index, standing }: { mentor: DirectoryMentor; index: number; standing: StudentStanding }) {
   const initials = mentor.name
     .replace(/\s*\(test\)$/, '')
     .split(' ')
@@ -294,7 +252,6 @@ function MentorCard({
   const experience =
     mentor.experienceHeadline ||
     (mentor.yearsTeaching ? `${mentor.yearsTeaching} year${mentor.yearsTeaching === 1 ? '' : 's'} teaching` : 'Volunteer mentor');
-  const accepting = mentor.acceptingStudents !== false;
 
   return (
     <article
@@ -316,7 +273,11 @@ function MentorCard({
           {initials}
         </div>
         <div className="flex min-w-0 flex-col items-start gap-1">
-          <h3 className="font-display text-xl font-bold text-navy">{mentor.name}</h3>
+          <h3 className="font-display text-xl font-bold text-navy">
+            <Link href={`/find-a-mentor/${mentor.slug}`} className="hover:underline hover:underline-offset-4">
+              {mentor.name}
+            </Link>
+          </h3>
           <div className="flex flex-wrap gap-1">
             <span className="rounded-md bg-sage/30 px-2 py-0.5 text-xs font-semibold text-navy">
               {mentor.instruments.slice(0, 2).join(' & ')}
@@ -348,272 +309,16 @@ function MentorCard({
         <div className="flex-1" />
       )}
 
-      {!accepting ? (
-        <button
-          type="button"
-          disabled
-          className="flex w-full cursor-not-allowed items-center justify-center rounded-xl bg-navy/30 py-3 text-sm font-semibold text-cream"
-        >
-          Not taking new students
-        </button>
-      ) : chosen && applyHref ? (
+      <div className="flex flex-col gap-2">
         <Link
-          href={applyHref}
-          className="flex w-full items-center justify-center gap-2 rounded-xl border-2 border-navy py-2.5 text-sm font-semibold text-navy transition-colors hover:bg-navy/5"
+          href={`/find-a-mentor/${mentor.slug}`}
+          className="group flex items-center justify-center gap-1.5 rounded-xl py-2 text-sm font-semibold text-navy hover:bg-navy/5"
         >
-          <span aria-hidden>✓</span> On your application
+          See {firstNameOf(mentor.name)}&apos;s page and times
+          <Icon name="arrow" className="size-4 transition-transform group-hover:translate-x-0.5" />
         </Link>
-      ) : applyHref ? (
-        <Link
-          href={applyHref}
-          className="flex w-full items-center justify-center rounded-xl bg-navy py-3 text-sm font-semibold text-cream transition-colors hover:bg-navy/90"
-        >
-          Apply to learn with {firstNameOf(mentor.name)}
-        </Link>
-      ) : (
-        <button
-          type="button"
-          onClick={onRequest}
-          className="flex w-full items-center justify-center rounded-xl bg-navy py-3 text-sm font-semibold text-cream transition-colors hover:bg-navy/90"
-        >
-          Request {firstNameOf(mentor.name)}
-        </button>
-      )}
-    </article>
-  );
-}
-
-/** Sends a match request to one mentor. Signs people in first if needed. */
-function RequestDialog({ mentor, onClose }: { mentor: DirectoryMentor; onClose: () => void }) {
-  const { user } = useAuth();
-  const pathname = usePathname();
-  const [options, setOptions] = useState<Options | null>(null);
-  const [form, setForm] = useState({
-    instrument: mentor.instruments[0] ?? '',
-    firstName: user?.name.replace(/\s*\(test\)$/, '').split(' ')[0] ?? '',
-    ageGroup: '',
-    experienceLevel: 'Beginner',
-    preferredDays: [] as string[],
-    preferredTimes: [] as string[],
-    message: '',
-  });
-  const [error, setError] = useState<string | null>(null);
-  const [busy, setBusy] = useState(false);
-  const [sent, setSent] = useState(false);
-
-  useEffect(() => {
-    api.get<{ data: Options }>('/options').then((body) => setOptions(body.data)).catch(() => undefined);
-  }, []);
-
-  useEffect(() => {
-    const onKey = (event: KeyboardEvent) => event.key === 'Escape' && onClose();
-    window.addEventListener('keydown', onKey);
-    return () => window.removeEventListener('keydown', onKey);
-  }, [onClose]);
-
-  function toggle(field: 'preferredDays' | 'preferredTimes', value: string) {
-    setForm((current) => ({
-      ...current,
-      [field]: current[field].includes(value) ? current[field].filter((entry) => entry !== value) : [...current[field], value],
-    }));
-  }
-
-  async function submit(event: FormEvent) {
-    event.preventDefault();
-    setBusy(true);
-    setError(null);
-    try {
-      await api.post(`/mentors/${mentor.id}/match-requests`, {
-        instrument: form.instrument,
-        preferredDays: form.preferredDays,
-        preferredTimes: form.preferredTimes,
-        message: form.message.trim() || undefined,
-        student: { firstName: form.firstName.trim(), ageGroup: form.ageGroup, experienceLevel: form.experienceLevel },
-      });
-      setSent(true);
-    } catch (err) {
-      // A 422 carries per-field reasons; show those rather than a bare "Validation failed".
-      const details = err instanceof ApiError && err.details && typeof err.details === 'object'
-        ? Object.values(err.details as Record<string, unknown>).filter((value): value is string => typeof value === 'string')
-        : [];
-      setError(
-        details.length
-          ? `Please check the form: ${details.join(' ')}`
-          : err instanceof ApiError
-            ? err.message
-            : 'We couldn’t send that request. Please try again.',
-      );
-    } finally {
-      setBusy(false);
-    }
-  }
-
-  const firstName = mentor.name.replace(/\s*\(test\)$/, '').split(' ')[0];
-
-  let content: ReactNode;
-  if (!user) {
-    content = (
-      <>
-        <p className="text-navy/75">Sign in or create a free account to send {firstName} a request.</p>
-        <div className="mt-6 flex flex-wrap gap-3">
-          <Link href={`/login?next=${encodeURIComponent(pathname)}`} className="rounded-full bg-navy px-6 py-3 text-sm font-semibold text-cream">
-            Sign in
-          </Link>
-          <Link href="/register" className="rounded-full border-2 border-navy px-6 py-3 text-sm font-semibold text-navy">
-            Create an account
-          </Link>
-        </div>
-      </>
-    );
-  } else if (user.isStaff) {
-    content = (
-      <p className="text-navy/75">
-        Staff accounts can’t send requests. To try this, open{' '}
-        <Link href="/admin/testing" className="font-semibold underline">Test mode</Link>, switch to a test student and
-        request a test mentor.
-      </p>
-    );
-  } else if (sent) {
-    content = (
-      <>
-        <p className="text-navy/75">
-          Request sent to {firstName}. You’ll see their answer on your dashboard.
-        </p>
-        <div className="mt-6 flex flex-wrap gap-3">
-          <Link href="/dashboard" className="rounded-full bg-navy px-6 py-3 text-sm font-semibold text-cream">
-            Go to my dashboard
-          </Link>
-          <button type="button" onClick={onClose} className="rounded-full border-2 border-navy px-6 py-3 text-sm font-semibold text-navy">
-            Keep browsing
-          </button>
-        </div>
-      </>
-    );
-  } else {
-    content = (
-      <form onSubmit={submit} className="flex flex-col gap-4">
-        {error ? <p role="alert" className="rounded-lg bg-danger-soft p-3 text-sm text-danger">{error}</p> : null}
-        <div className="grid gap-4 sm:grid-cols-2">
-          <label className="flex flex-col gap-1.5 text-sm font-semibold text-navy/70">
-            Instrument
-            <select
-              required
-              value={form.instrument}
-              onChange={(e) => setForm({ ...form, instrument: e.target.value })}
-              className="rounded-lg border border-navy/15 bg-white p-2.5 font-normal text-navy"
-            >
-              {mentor.instruments.map((instrument) => <option key={instrument}>{instrument}</option>)}
-            </select>
-          </label>
-          <label className="flex flex-col gap-1.5 text-sm font-semibold text-navy/70">
-            Student’s first name
-            <input
-              required
-              value={form.firstName}
-              onChange={(e) => setForm({ ...form, firstName: e.target.value })}
-              className="rounded-lg border border-navy/15 bg-white p-2.5 font-normal text-navy"
-            />
-          </label>
-          <label className="flex flex-col gap-1.5 text-sm font-semibold text-navy/70">
-            Student’s age
-            <select
-              required
-              value={form.ageGroup}
-              onChange={(e) => setForm({ ...form, ageGroup: e.target.value })}
-              className="rounded-lg border border-navy/15 bg-white p-2.5 font-normal text-navy"
-            >
-              <option value="">Choose…</option>
-              {(options?.ageGroups ?? []).map((value) => <option key={value}>{value}</option>)}
-            </select>
-          </label>
-          <label className="flex flex-col gap-1.5 text-sm font-semibold text-navy/70">
-            Experience
-            <select
-              value={form.experienceLevel}
-              onChange={(e) => setForm({ ...form, experienceLevel: e.target.value })}
-              className="rounded-lg border border-navy/15 bg-white p-2.5 font-normal text-navy"
-            >
-              {(options?.experienceLevels ?? ['Beginner']).map((value) => <option key={value}>{value}</option>)}
-            </select>
-          </label>
-        </div>
-
-        <fieldset>
-          <legend className="text-sm font-semibold text-navy/70">When suits you? (optional)</legend>
-          <div className="mt-2 flex flex-wrap gap-2">
-            {(options?.availabilityDays ?? []).map((value) => (
-              <ChoiceChip key={value} label={value} on={form.preferredDays.includes(value)} onClick={() => toggle('preferredDays', value)} />
-            ))}
-            {(options?.availabilityTimes ?? []).map((value) => (
-              <ChoiceChip key={value} label={value} on={form.preferredTimes.includes(value)} onClick={() => toggle('preferredTimes', value)} />
-            ))}
-          </div>
-        </fieldset>
-
-        <label className="flex flex-col gap-1.5 text-sm font-semibold text-navy/70">
-          Message (optional)
-          <textarea
-            rows={3}
-            maxLength={1000}
-            value={form.message}
-            onChange={(e) => setForm({ ...form, message: e.target.value })}
-            placeholder={`Anything ${firstName} should know, like what you’d like to learn.`}
-            className="rounded-lg border border-navy/15 bg-white p-2.5 font-normal text-navy"
-          />
-        </label>
-
-        <div className="flex flex-wrap gap-3 pt-2">
-          <button
-            type="submit"
-            disabled={busy || !form.ageGroup}
-            className="rounded-full bg-navy px-6 py-3 text-sm font-semibold text-cream disabled:opacity-50"
-          >
-            {busy ? 'Sending…' : `Send request to ${firstName}`}
-          </button>
-          <button type="button" onClick={onClose} className="rounded-full px-4 py-3 text-sm font-semibold text-navy/70 hover:text-navy">
-            Cancel
-          </button>
-        </div>
-      </form>
-    );
-  }
-
-  return (
-    <div
-      role="dialog"
-      aria-modal="true"
-      aria-labelledby="request-title"
-      className="fixed inset-0 z-50 flex items-end justify-center bg-navy/50 p-0 sm:items-center sm:p-6"
-      onClick={(event) => event.target === event.currentTarget && onClose()}
-    >
-      <div className="max-h-[90vh] w-full max-w-lg overflow-y-auto rounded-t-3xl bg-cream p-6 shadow-2xl sm:rounded-3xl sm:p-8">
-        <div className="mb-5 flex items-start justify-between gap-4">
-          <h2 id="request-title" className="font-display text-2xl font-bold text-navy">
-            Request {firstName}
-            {mentor.isTest ? <span className="ml-2 rounded-md bg-gold px-2 py-0.5 align-middle text-xs">Test</span> : null}
-          </h2>
-          <button type="button" aria-label="Close" onClick={onClose} className="rounded-full p-1 text-navy/60 hover:bg-navy/10 hover:text-navy">
-            <Icon name="close" className="size-5" />
-          </button>
-        </div>
-        {content}
+        <MentorAction mentor={mentor} standing={standing} />
       </div>
-    </div>
-  );
-}
-
-function ChoiceChip({ label, on, onClick }: { label: string; on: boolean; onClick: () => void }) {
-  return (
-    <button
-      type="button"
-      aria-pressed={on}
-      onClick={onClick}
-      className={cx(
-        'rounded-full border px-3 py-1.5 text-sm',
-        on ? 'border-navy bg-navy text-cream' : 'border-navy/20 bg-white text-navy hover:border-navy/50',
-      )}
-    >
-      {label}
-    </button>
+    </article>
   );
 }

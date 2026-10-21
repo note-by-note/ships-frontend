@@ -69,7 +69,7 @@ function initialValues(profile: MentorProfile | null, staff: boolean): MentorPro
 }
 
 /** Toggleable chips for a multi-choice field. */
-function Chips({
+export function Chips({
   label,
   options,
   value,
@@ -111,7 +111,7 @@ function Chips({
   );
 }
 
-function Toggle({ label, help, checked, onChange }: { label: string; help?: string; checked: boolean; onChange: (v: boolean) => void }) {
+export function Toggle({ label, help, checked, onChange }: { label: string; help?: string; checked: boolean; onChange: (v: boolean) => void }) {
   return (
     <label className="flex items-start gap-3">
       <input type="checkbox" checked={checked} onChange={(e) => onChange(e.target.checked)} className="mt-1 size-4 accent-accent" />
