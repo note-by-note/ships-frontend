@@ -9,6 +9,7 @@
 
 import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import Link from 'next/link';
+import { usePathname, useRouter } from 'next/navigation';
 import { ApiError, api } from '@/lib/api';
 import {
   fromAnswerList,
@@ -36,8 +37,10 @@ type Step =
 
 const AUTOSAVE_DELAY = 1200;
 
-export function ApplicationWizard({ slug }: { slug: string }) {
+export function ApplicationWizard({ slug, mentor }: { slug: string; mentor?: string }) {
   const { user, loading: authLoading } = useAuth();
+  const router = useRouter();
+  const pathname = usePathname();
 
   const [form, setForm] = useState<ApplicationForm | null>(null);
   const [application, setApplication] = useState<Application | null>(null);
@@ -51,8 +54,12 @@ export function ApplicationWizard({ slug }: { slug: string }) {
   const [submitted, setSubmitted] = useState<{ message: string } | null>(null);
   const [loading, setLoading] = useState(true);
 
+  const [mentorError, setMentorError] = useState<string | null>(null);
+  const [mentorPreview, setMentorPreview] = useState<string | null>(null);
+
   const headingRef = useRef<HTMLDivElement>(null);
   const dirtyRef = useRef(false);
+  const mentorAppliedRef = useRef(false);
 
   // --- Load the form ---------------------------------------------------------
 
@@ -116,6 +123,43 @@ export function ApplicationWizard({ slug }: { slug: string }) {
     // eslint-disable-next-line react-hooks/set-state-in-effect
     if (user && form && !application) void startApplication();
   }, [user, form, application, startApplication]);
+
+  // --- The mentor a student asked for -----------------------------------------
+
+  // Before sign-in there's no application to put the mentor on yet, so show
+  // whose name will go on it.
+  useEffect(() => {
+    if (!mentor || form?.kind !== 'mentee') return;
+    api
+      .get<{ data: { name: string } }>(`/mentors/${encodeURIComponent(mentor)}`)
+      .then((body) => setMentorPreview(body.data.name))
+      .catch(() => setMentorPreview(null));
+  }, [mentor, form?.kind]);
+
+  const chooseMentor = useCallback(
+    async (choice: string | null) => {
+      if (!application) return;
+      setMentorError(null);
+      try {
+        const body = await api.patch<{ data: Application }>(`/applications/${application.id}/mentor`, { mentor: choice });
+        setApplication(body.data);
+      } catch (err) {
+        setMentorError(err instanceof ApiError ? err.message : 'We could not update your mentor choice.');
+      }
+    },
+    [application],
+  );
+
+  // Arriving from "Apply to learn with…": put that mentor on the application
+  // once it exists, then drop the parameter so a reload doesn't redo it.
+  useEffect(() => {
+    if (!mentor || !application || form?.kind !== 'mentee' || mentorAppliedRef.current) return;
+    mentorAppliedRef.current = true;
+    router.replace(pathname, { scroll: false });
+    // chooseMentor only sets state after its request resolves.
+    // eslint-disable-next-line react-hooks/set-state-in-effect
+    if (application.requestedMentor?.slug !== mentor && !application.mentorRequestSent) void chooseMentor(mentor);
+  }, [mentor, application, form?.kind, chooseMentor, router, pathname]);
 
   // --- Steps -----------------------------------------------------------------
 
@@ -282,6 +326,11 @@ export function ApplicationWizard({ slug }: { slug: string }) {
           <p className="mx-auto mt-3 max-w-lg text-ink-soft">
             {submitted.message || 'Thank you. A person will read your application and be in touch.'}
           </p>
+          {form.kind === 'mentee' ? (
+            <div className="mx-auto mt-6 max-w-lg text-left">
+              <MentorChoice application={application} preview={mentorPreview} error={mentorError} onClear={() => chooseMentor(null)} />
+            </div>
+          ) : null}
           <div className="mt-8 flex justify-center gap-3">
             <ButtonLink href="/applications" variant="secondary">
               My applications
@@ -320,6 +369,11 @@ export function ApplicationWizard({ slug }: { slug: string }) {
         <p className="text-sm font-medium text-accent">{kindLabel(form.kind)}</p>
         <h1 className="mt-1 text-3xl font-semibold tracking-tight text-ink">{form.title}</h1>
         {form.description ? <p className="mt-3 max-w-2xl text-ink-soft">{form.description}</p> : null}
+        {form.kind === 'mentee' ? (
+          <div className="mt-6 max-w-2xl">
+            <MentorChoice application={application} preview={mentorPreview} error={mentorError} onClear={() => chooseMentor(null)} />
+          </div>
+        ) : null}
       </div>
 
       <div className="grid gap-8 lg:grid-cols-[240px_1fr]">
@@ -385,6 +439,67 @@ export function ApplicationWizard({ slug }: { slug: string }) {
         </div>
       </div>
     </Shell>
+  );
+}
+
+/**
+ * Which mentor this student application asks for, if any. Choosing happens on
+ * Find a Mentor; this shows the choice and lets the student remove it.
+ */
+function MentorChoice({
+  application,
+  preview,
+  error,
+  onClear,
+}: {
+  application: Application | null;
+  preview: string | null;
+  error: string | null;
+  onClear: () => void;
+}) {
+  const chosen = application?.requestedMentor?.name ?? (application ? null : preview);
+  const sent = Boolean(application?.mentorRequestSent);
+  const decided = application ? ['accepted', 'rejected', 'withdrawn'].includes(application.status) : false;
+
+  if (!chosen) {
+    if (decided) return null;
+    return (
+      <p className="rounded-xl border border-dashed border-line-strong px-4 py-3 text-sm text-ink-soft">
+        Have a mentor in mind?{' '}
+        <Link href="/find-a-mentor" className="font-medium text-accent underline underline-offset-2">
+          Choose one on Find a Mentor
+        </Link>
+        . This is optional. If you don’t choose one, we’ll match you.
+      </p>
+    );
+  }
+
+  return (
+    <div className="rounded-xl border border-accent/30 bg-accent-soft px-4 py-3 text-sm">
+      <p className="text-ink">
+        {sent ? (
+          <>
+            Your application went to <strong>{chosen}</strong>. You’ll see their answer on your dashboard.
+          </>
+        ) : (
+          <>
+            You’re asking to learn with <strong>{chosen}</strong>. They’ll see your application once our team
+            approves it.
+          </>
+        )}
+      </p>
+      {!sent && !decided && application ? (
+        <p className="mt-2 flex flex-wrap gap-x-4 gap-y-1">
+          <Link href="/find-a-mentor" className="font-medium text-accent underline underline-offset-2">
+            Choose someone else
+          </Link>
+          <button type="button" onClick={onClear} className="font-medium text-ink-soft underline underline-offset-2">
+            Remove
+          </button>
+        </p>
+      ) : null}
+      {error ? <p className="mt-2 text-danger">{error}</p> : null}
+    </div>
   );
 }
 

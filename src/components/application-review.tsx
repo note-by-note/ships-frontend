@@ -28,6 +28,7 @@ export function ApplicationReview({ id }: { id: string }) {
   const [reason, setReason] = useState('');
   const [note, setNote] = useState('');
   const [busy, setBusy] = useState<string | null>(null);
+  const [mentorNotice, setMentorNotice] = useState<string | null>(null);
 
   useEffect(() => {
     api
@@ -48,11 +49,17 @@ export function ApplicationReview({ id }: { id: string }) {
     setError(null);
 
     try {
-      const body = await api.patch<{ data: ApplicationDetail }>(`/applications/${application.id}/decision`, {
-        status,
-        reason,
-      });
+      const body = await api.patch<{
+        data: ApplicationDetail;
+        meta?: { mentorRequest?: { sent: boolean; reason?: string } };
+      }>(`/applications/${application.id}/decision`, { status, reason });
       setApplication(body.data);
+      const mentorRequest = body.meta?.mentorRequest;
+      setMentorNotice(
+        mentorRequest && !mentorRequest.sent
+          ? `Accepted, but the request didn’t go to ${body.data.requestedMentor?.name ?? 'the mentor'}: ${mentorRequest.reason ?? 'unknown reason'}. Match them from the Mentors area instead.`
+          : null,
+      );
     } catch (err) {
       setError(err instanceof ApiError ? err.message : 'We could not record that decision.');
     } finally {
@@ -166,6 +173,23 @@ export function ApplicationReview({ id }: { id: string }) {
         </div>
 
         <div className="space-y-6">
+          {application.requestedMentor ? (
+            <Card className="p-5">
+              <h2 className="font-medium text-ink">Requested mentor</h2>
+              <p className="mt-1 text-sm text-ink">{application.requestedMentor.name}</p>
+              <p className="mt-2 text-sm text-ink-soft">
+                {application.mentorRequestSent
+                  ? 'Sent to the mentor when this was accepted. They accept or decline from their dashboard.'
+                  : 'Accepting this application sends the student’s request to this mentor: first name, age group, instrument, level, availability and goals. Their contact details are not shared until the mentor accepts.'}
+              </p>
+              {mentorNotice ? (
+                <div className="mt-3">
+                  <Alert tone="warn">{mentorNotice}</Alert>
+                </div>
+              ) : null}
+            </Card>
+          ) : null}
+
           <Card className="p-5">
             <h2 className="font-medium text-ink">Decision</h2>
 
