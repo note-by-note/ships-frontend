@@ -70,6 +70,13 @@ function StudentDashboard() {
                           ? `Sent ${new Date(application.submittedAt).toLocaleDateString()}`
                           : `Saved ${new Date(application.updatedAt).toLocaleDateString()} (not sent yet)`}
                       </p>
+                      {application.requestedMentor ? (
+                        <p className="mt-0.5 text-xs text-ink-soft">
+                          {application.mentorRequestSent
+                            ? `Passed to ${application.requestedMentor.name}. Waiting for their answer.`
+                            : `Asking to learn with ${application.requestedMentor.name}`}
+                        </p>
+                      ) : null}
                     </div>
                     <div className="flex items-center gap-3">
                       <StatusBadge status={application.status} />
@@ -263,7 +270,14 @@ function MentorDashboard() {
                   <li key={request.id} className="rounded-xl border border-line p-4">
                     <div className="flex flex-wrap items-start justify-between gap-3">
                       <div>
-                        <p className="font-semibold text-ink">{request.student?.firstName || 'A student'}</p>
+                        <p className="flex flex-wrap items-center gap-2 font-semibold text-ink">
+                          {request.student?.firstName || 'A student'}
+                          {request.application ? (
+                            <span className="rounded-md bg-ok-soft px-2 py-0.5 text-xs font-semibold text-ok">
+                              Application approved
+                            </span>
+                          ) : null}
+                        </p>
                         <p className="text-sm text-ink-soft">
                           {request.instrument} · {request.student?.experienceLevel ?? 'Level not given'} · ages {request.student?.ageGroup ?? 'not given'}
                         </p>

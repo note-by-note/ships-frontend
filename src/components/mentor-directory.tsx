@@ -1,8 +1,12 @@
 'use client';
 
 // Find a Mentor: published mentor profiles from the API, filterable by
-// instrument family and language. "Request" sends a match request to that
-// mentor, which they answer from their dashboard.
+// instrument family and language.
+//
+// Students who haven't been accepted yet apply to learn with a mentor: the
+// card opens the student application with that mentor named on it, and the
+// mentor hears about them once staff accept it. Students already accepted
+// skip straight to a request, which the mentor answers from their dashboard.
 //
 // Staff and test accounts also see test profiles (the API decides), marked
 // "Test", so the whole flow can be tried without the public seeing them.
@@ -12,7 +16,7 @@ import { useEffect, useId, useMemo, useState, type FormEvent, type ReactNode } f
 import { usePathname } from 'next/navigation';
 import { ApiError, api } from '@/lib/api';
 import { APPLY_LINKS, INSTRUMENT_FAMILIES, type InstrumentFamily } from '@/lib/site';
-import type { Options } from '@/lib/types';
+import type { Application, Options } from '@/lib/types';
 import { useAuth } from './auth-provider';
 import { Icon } from './marketing';
 import { cx } from './ui';
@@ -49,6 +53,7 @@ export function MentorDirectory() {
   const [query, setQuery] = useState('');
   const [family, setFamily] = useState<InstrumentFamily | null>(null);
   const [language, setLanguage] = useState('');
+  const [applications, setApplications] = useState<Application[]>([]);
   const { user, loading: authLoading } = useAuth();
   const searchId = useId();
   const languageId = useId();
@@ -61,6 +66,20 @@ export function MentorDirectory() {
       .then((body) => setMentors(body.data))
       .catch(() => setFailed(true));
   }, [authLoading, user?.id]);
+
+  // A student's own applications decide whether a card applies or requests.
+  useEffect(() => {
+    if (!user || user.isStaff) return;
+    api
+      .get<{ data: Application[] }>('/applications/mine')
+      .then((body) => setApplications(body.data))
+      .catch(() => setApplications([]));
+  }, [user]);
+
+  const studentApplication = user && !user.isStaff
+    ? applications.find((application) => application.formKind === 'mentee' && application.status !== 'withdrawn')
+    : undefined;
+  const accepted = studentApplication?.status === 'accepted';
 
   const languages = useMemo(
     () => [...new Set((mentors ?? []).flatMap((mentor) => mentor.languages))].sort(),
@@ -194,7 +213,15 @@ export function MentorDirectory() {
         <ul className="grid gap-8 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4">
           {results.map((mentor, index) => (
             <li key={mentor.id}>
-              <MentorCard mentor={mentor} index={index} onRequest={() => setRequesting(mentor)} />
+              <MentorCard
+                mentor={mentor}
+                index={index}
+                onRequest={() => setRequesting(mentor)}
+                applyHref={
+                  user?.isStaff || accepted ? undefined : `${APPLY_LINKS.student}?mentor=${encodeURIComponent(mentor.slug)}`
+                }
+                chosen={!accepted && studentApplication?.requestedMentor?.slug === mentor.slug}
+              />
             </li>
           ))}
         </ul>
@@ -234,12 +261,30 @@ function EmptyPanel({ title, body }: { title: string; body: string }) {
   );
 }
 
+function firstNameOf(name: string): string {
+  return name.replace(/\s*\(test\)$/, '').split(' ')[0];
+}
+
 function describeAvailability(mentor: DirectoryMentor): string {
   const parts = [...(mentor.availability?.days ?? []), ...(mentor.availability?.times ?? [])];
   return parts.length ? parts.join(', ') : 'Ask when you request';
 }
 
-function MentorCard({ mentor, index, onRequest }: { mentor: DirectoryMentor; index: number; onRequest: () => void }) {
+function MentorCard({
+  mentor,
+  index,
+  onRequest,
+  applyHref,
+  chosen,
+}: {
+  mentor: DirectoryMentor;
+  index: number;
+  onRequest: () => void;
+  /** Set for anyone who still needs to apply: the card links to the application instead of requesting. */
+  applyHref?: string;
+  /** This is the mentor named on the student's application. */
+  chosen?: boolean;
+}) {
   const initials = mentor.name
     .replace(/\s*\(test\)$/, '')
     .split(' ')
@@ -303,14 +348,37 @@ function MentorCard({ mentor, index, onRequest }: { mentor: DirectoryMentor; ind
         <div className="flex-1" />
       )}
 
-      <button
-        type="button"
-        onClick={onRequest}
-        disabled={!accepting}
-        className="flex w-full items-center justify-center rounded-xl bg-navy py-3 text-sm font-semibold text-cream transition-colors hover:bg-navy/90 disabled:cursor-not-allowed disabled:bg-navy/30"
-      >
-        {accepting ? `Request ${mentor.name.split(' ')[0]}` : 'Not taking new students'}
-      </button>
+      {!accepting ? (
+        <button
+          type="button"
+          disabled
+          className="flex w-full cursor-not-allowed items-center justify-center rounded-xl bg-navy/30 py-3 text-sm font-semibold text-cream"
+        >
+          Not taking new students
+        </button>
+      ) : chosen && applyHref ? (
+        <Link
+          href={applyHref}
+          className="flex w-full items-center justify-center gap-2 rounded-xl border-2 border-navy py-2.5 text-sm font-semibold text-navy transition-colors hover:bg-navy/5"
+        >
+          <span aria-hidden>✓</span> On your application
+        </Link>
+      ) : applyHref ? (
+        <Link
+          href={applyHref}
+          className="flex w-full items-center justify-center rounded-xl bg-navy py-3 text-sm font-semibold text-cream transition-colors hover:bg-navy/90"
+        >
+          Apply to learn with {firstNameOf(mentor.name)}
+        </Link>
+      ) : (
+        <button
+          type="button"
+          onClick={onRequest}
+          className="flex w-full items-center justify-center rounded-xl bg-navy py-3 text-sm font-semibold text-cream transition-colors hover:bg-navy/90"
+        >
+          Request {firstNameOf(mentor.name)}
+        </button>
+      )}
     </article>
   );
 }

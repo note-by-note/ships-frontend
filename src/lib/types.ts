@@ -132,6 +132,10 @@ export interface Application {
   answers: Answer[];
   lastSectionKey: string | null;
   submittedAt: string | null;
+  /** Student applications: the mentor the student asked to learn with. */
+  requestedMentor: { id: string; name: string; slug: string } | null;
+  /** True once staff accepted the application and the request went to that mentor. */
+  mentorRequestSent: boolean;
   updatedAt: string;
   createdAt: string;
 }
@@ -188,6 +192,7 @@ export interface ApplicationListing {
   updatedAt: string;
   noteCount: number;
   isTest?: boolean;
+  requestedMentorName?: string | null;
 }
 
 export type StaffRole = 'admin' | 'tech' | 'outreach' | 'marketing';
@@ -284,6 +289,8 @@ export interface MentorListing {
 
 export interface MatchRequest {
   id: string;
+  /** Set when it came from an accepted student application. */
+  application?: string | null;
   status: 'pending' | 'accepted' | 'declined' | 'withdrawn';
   instrument: string;
   format?: string;

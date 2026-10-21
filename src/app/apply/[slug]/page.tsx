@@ -8,7 +8,9 @@ export async function generateMetadata({ params }: PageProps<'/apply/[slug]'>): 
   return { title: `Apply · ${slug.replace(/-/g, ' ')}` };
 }
 
-export default async function ApplyPage({ params }: PageProps<'/apply/[slug]'>) {
+export default async function ApplyPage({ params, searchParams }: PageProps<'/apply/[slug]'>) {
   const { slug } = await params;
-  return <ApplicationWizard slug={slug} />;
+  // `?mentor=<slug>` comes from "Apply to learn with…" on Find a Mentor.
+  const { mentor } = await searchParams;
+  return <ApplicationWizard slug={slug} mentor={typeof mentor === 'string' ? mentor : undefined} />;
 }

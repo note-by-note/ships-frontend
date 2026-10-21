@@ -197,6 +197,9 @@ export function ReviewQueue() {
                         </Badge>
                       ) : null}
                       <p className="text-xs text-ink-faint">{application.applicantEmail}</p>
+                      {application.requestedMentorName ? (
+                        <p className="text-xs text-ink-soft">Asks for {application.requestedMentorName}</p>
+                      ) : null}
                     </td>
                     <td className="hidden px-4 py-3 text-ink-soft sm:table-cell">
                       <Badge>{application.formKind}</Badge>
