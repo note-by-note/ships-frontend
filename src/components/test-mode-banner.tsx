@@ -13,7 +13,7 @@ export function TestModeBanner() {
   if (!user?.isTest) return null;
 
   return (
-    <div role="status" className="bg-gold text-navy">
+    <div role="status" className="bg-gold text-navy print:hidden">
       <div className="mx-auto flex max-w-7xl flex-wrap items-center justify-between gap-3 px-5 py-2.5 text-sm md:px-8">
         <p>
           <strong>Test mode.</strong> You’re viewing the site as <strong>{user.name}</strong> ({user.role}). Anything

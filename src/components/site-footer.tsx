@@ -4,7 +4,7 @@ import { ContactEmail, Container, Icon } from './marketing';
 
 export function SiteFooter() {
   return (
-    <footer className="bg-navy text-cream">
+    <footer className="bg-navy text-cream print:hidden">
       <Container className="grid gap-10 py-14 md:grid-cols-[1.4fr_repeat(3,1fr)]">
         <div className="flex max-w-xs flex-col gap-4">
           <Link href="/" className="inline-flex items-center gap-2 font-display text-xl font-bold">

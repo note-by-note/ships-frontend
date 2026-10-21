@@ -208,7 +208,10 @@ export type Permission =
   | 'forms.manage'
   | 'applications.review'
   | 'stats.view'
-  | 'testing.use';
+  | 'testing.use'
+  | 'messages.review'
+  | 'resources.manage'
+  | 'hours.approve';
 
 export const STAFF_ROLES: StaffRole[] = ['admin', 'tech', 'outreach', 'marketing'];
 
@@ -267,6 +270,9 @@ export interface MentorProfile {
   about?: string;
   whatToExpect?: string[];
   pageTheme?: PageTheme;
+  photoPath?: string | null;
+  pendingPhoto?: boolean;
+  photoDeclinedReason?: string | null;
   favoriteMusic?: string;
   sampleUrl?: string;
   responseTime?: string;
@@ -365,6 +371,114 @@ export interface StaffOverview {
   matchRequests: Record<string, number>;
   /** Whether the API has SMTP settings, i.e. absence emails actually go out. */
   emailConfigured: boolean;
+  /** What's waiting for staff: photos to approve, hours to approve, reported messages. */
+  waiting?: { photos: number; hours: number; reports: number };
+}
+
+// --- Photos ------------------------------------------------------------------------------
+
+export interface PhotoState {
+  /** The approved photo, relative to the API root (use apiUrl), or null. */
+  photoPath: string | null;
+  pendingPhoto: boolean;
+  photoDeclinedReason: string | null;
+}
+
+export interface PendingPhoto {
+  mentorId: string;
+  name: string;
+  slug: string;
+  isTest: boolean;
+  uploadedAt: string | null;
+  replacesPhoto: boolean;
+}
+
+// --- Messages ----------------------------------------------------------------------------
+
+export interface ChatMessage {
+  id: string;
+  senderSide: 'mentor' | 'student';
+  mine: boolean;
+  body: string;
+  createdAt: string;
+  readAt: string | null;
+  reported: boolean;
+  report?: { reason: string; at: string; resolvedAt: string | null } | null;
+}
+
+export interface Conversation {
+  pairingId: string;
+  side: 'mentor' | 'student';
+  instrument: string;
+  with: string;
+  withPhotoPath: string | null;
+  lastMessage: ChatMessage | null;
+  unread: number;
+}
+
+export interface ConversationThread {
+  pairingId: string;
+  side: 'mentor' | 'student';
+  with: string;
+  withPhotoPath: string | null;
+  messages: ChatMessage[];
+  hasMore: boolean;
+}
+
+export interface ReviewedConversation {
+  pairingId: string;
+  mentor: string;
+  student: string;
+  instrument: string;
+  messages: number;
+  lastMessageAt: string;
+  openReports: number;
+}
+
+// --- Resources ---------------------------------------------------------------------------
+
+export interface SharedResource {
+  id: string;
+  title: string;
+  note: string;
+  kind: 'file' | 'link';
+  url: string | null;
+  file: { name: string; size: number; contentType: string } | null;
+  scope: 'pairing' | 'team';
+  createdBy: string;
+  mine: boolean;
+  canDelete: boolean;
+  sharedWith: { pairingId: string; mentor: string; student: string }[];
+  createdAt: string;
+}
+
+// --- Lesson notes ------------------------------------------------------------------------
+
+export interface LessonNote {
+  id: string;
+  date: string;
+  summary: string;
+  practice: { id: string; text: string; done: boolean }[];
+  createdAt: string;
+  updatedAt: string;
+}
+
+// --- Volunteer hours ---------------------------------------------------------------------
+
+export type HoursStatus = 'pending' | 'approved' | 'declined';
+
+export interface HoursEntry {
+  id: string;
+  userName: string;
+  date: string;
+  minutes: number;
+  activity: string;
+  description: string;
+  status: HoursStatus;
+  reviewerName: string | null;
+  reviewedAt: string | null;
+  reviewNote: string;
+  createdAt: string;
 }
 
 export interface Paged<T> {
@@ -428,4 +542,6 @@ export interface Pairing {
   lesson: LessonSlot | null;
   proposal: LessonSlot | null;
   absences: AbsenceNotice[];
+  /** The video call link the mentor set, or null. */
+  meetingUrl: string | null;
 }

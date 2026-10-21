@@ -17,6 +17,8 @@ export interface ShellLink {
   icon: IconName;
   /** Match only the exact path, for an overview page whose children have their own links. */
   exact?: boolean;
+  /** A count to show beside the label, e.g. unread messages. Hidden at 0. */
+  badge?: number;
 }
 
 export function DashboardShell({
@@ -36,7 +38,7 @@ export function DashboardShell({
 
   return (
     <div className="flex min-h-[calc(100vh-4rem)] flex-col bg-cream lg:flex-row">
-      <aside className="shrink-0 bg-navy text-cream lg:w-64">
+      <aside className="shrink-0 bg-navy text-cream lg:w-64 print:hidden">
         <div className="hidden px-6 pt-8 pb-4 lg:block">
           <p className="font-display text-lg font-bold">{title}</p>
           {subtitle ? <p className="mt-1 text-xs text-cream/60">{subtitle}</p> : null}
@@ -56,6 +58,13 @@ export function DashboardShell({
               >
                 <Icon name={link.icon} className="size-4" />
                 {link.label}
+                {link.badge ? (
+                  <span className="ml-auto rounded-full bg-gold px-2 py-0.5 text-xs font-bold text-navy">
+                    <span className="sr-only">, </span>
+                    {link.badge}
+                    <span className="sr-only"> new</span>
+                  </span>
+                ) : null}
               </Link>
             );
           })}

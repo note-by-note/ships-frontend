@@ -9,6 +9,7 @@ import { ApiError, api } from '@/lib/api';
 interface Settings {
   email: string;
   absenceEmails: boolean;
+  messageEmails: boolean;
   emailEnabled: boolean;
 }
 
@@ -55,25 +56,20 @@ export default function SettingsPage() {
             Sent to <strong className="text-ink">{settings.email}</strong>.
           </p>
 
-          <label className="flex items-start justify-between gap-6 rounded-xl border border-line p-4">
-            <span>
-              <span className="block font-medium text-ink">Missed lessons</span>
-              <span className="block text-sm text-ink-soft">
-                Email me when {other} says they can’t make a lesson, or that they can make it after all.
-              </span>
-            </span>
-            <span className="relative inline-flex shrink-0 items-center">
-              <input
-                type="checkbox"
-                role="switch"
-                checked={settings.absenceEmails}
-                onChange={(event) => update({ absenceEmails: event.target.checked })}
-                className="peer sr-only"
-              />
-              <span className="h-6 w-11 rounded-full bg-line-strong transition-colors peer-checked:bg-sage peer-focus-visible:ring-2 peer-focus-visible:ring-navy" />
-              <span className="absolute left-0.5 size-5 rounded-full bg-white shadow transition-transform peer-checked:translate-x-5" />
-            </span>
-          </label>
+          <div className="flex flex-col gap-3">
+            <EmailSwitch
+              title="Missed lessons"
+              body={`Email me when ${other} says they can’t make a lesson, or that they can make it after all.`}
+              checked={settings.absenceEmails}
+              onChange={(value) => update({ absenceEmails: value })}
+            />
+            <EmailSwitch
+              title="New messages"
+              body={`Email me when ${other} sends a message I haven’t read. The email doesn’t include the message itself.`}
+              checked={settings.messageEmails}
+              onChange={(value) => update({ messageEmails: value })}
+            />
+          </div>
 
           {saved ? <p className="mt-3 text-sm text-ok">Saved.</p> : null}
 
@@ -86,5 +82,37 @@ export default function SettingsPage() {
         </Panel>
       ) : null}
     </>
+  );
+}
+
+function EmailSwitch({
+  title,
+  body,
+  checked,
+  onChange,
+}: {
+  title: string;
+  body: string;
+  checked: boolean;
+  onChange: (value: boolean) => void;
+}) {
+  return (
+    <label className="flex items-start justify-between gap-6 rounded-xl border border-line p-4">
+      <span>
+        <span className="block font-medium text-ink">{title}</span>
+        <span className="block text-sm text-ink-soft">{body}</span>
+      </span>
+      <span className="relative inline-flex shrink-0 items-center">
+        <input
+          type="checkbox"
+          role="switch"
+          checked={checked}
+          onChange={(event) => onChange(event.target.checked)}
+          className="peer sr-only"
+        />
+        <span className="h-6 w-11 rounded-full bg-line-strong transition-colors peer-checked:bg-sage peer-focus-visible:ring-2 peer-focus-visible:ring-navy" />
+        <span className="absolute left-0.5 size-5 rounded-full bg-white shadow transition-transform peer-checked:translate-x-5" />
+      </span>
+    </label>
   );
 }

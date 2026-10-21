@@ -16,6 +16,7 @@ import { useEffect, useId, useMemo, useState } from 'react';
 import { api } from '@/lib/api';
 import { APPLY_LINKS, INSTRUMENT_FAMILIES, type InstrumentFamily } from '@/lib/site';
 import { useAuth } from './auth-provider';
+import { Avatar } from './avatar';
 import { Icon } from './marketing';
 import { MentorAction, firstNameOf, useStudentStanding, type StudentStanding } from './mentor-request';
 import { cx } from './ui';
@@ -34,6 +35,7 @@ interface DirectoryMentor {
   verified?: boolean;
   acceptingStudents?: boolean;
   isTest?: boolean;
+  photoPath?: string | null;
 }
 
 // Cards alternate tilt like the Figma "Meet our mentors" row, and straighten on
@@ -243,12 +245,6 @@ function describeAvailability(mentor: DirectoryMentor): string {
 }
 
 function MentorCard({ mentor, index, standing }: { mentor: DirectoryMentor; index: number; standing: StudentStanding }) {
-  const initials = mentor.name
-    .replace(/\s*\(test\)$/, '')
-    .split(' ')
-    .map((part) => part[0])
-    .join('')
-    .slice(0, 2);
   const experience =
     mentor.experienceHeadline ||
     (mentor.yearsTeaching ? `${mentor.yearsTeaching} year${mentor.yearsTeaching === 1 ? '' : 's'} teaching` : 'Volunteer mentor');
@@ -263,15 +259,12 @@ function MentorCard({ mentor, index, standing }: { mentor: DirectoryMentor; inde
       )}
     >
       <div className="flex items-center gap-4">
-        <div
-          aria-hidden
-          className={cx(
-            'flex size-16 shrink-0 items-center justify-center rounded-full font-display text-xl font-bold text-navy',
-            AVATAR_TONES[index % AVATAR_TONES.length],
-          )}
-        >
-          {initials}
-        </div>
+        <Avatar
+          name={mentor.name}
+          photoPath={mentor.photoPath}
+          tone={AVATAR_TONES[index % AVATAR_TONES.length]}
+          className="size-16 text-xl"
+        />
         <div className="flex min-w-0 flex-col items-start gap-1">
           <h3 className="font-display text-xl font-bold text-navy">
             <Link href={`/find-a-mentor/${mentor.slug}`} className="hover:underline hover:underline-offset-4">

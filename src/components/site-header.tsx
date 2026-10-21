@@ -42,7 +42,7 @@ export function SiteHeader() {
   }
 
   return (
-    <header className="sticky top-0 z-40 bg-navy text-cream">
+    <header className="sticky top-0 z-40 bg-navy text-cream print:hidden">
       <div className="mx-auto flex h-16 max-w-7xl items-center gap-6 px-5 md:px-8">
         <Link href="/" className="inline-flex shrink-0 items-center gap-2 font-display text-xl font-bold">
           <Icon name="music" className="size-5" />
