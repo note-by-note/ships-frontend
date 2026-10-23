@@ -12,7 +12,7 @@ export const SITE = {
    * of the form's endpoint, https://formspree.io/f/<this part>. While null,
    * the contact page shows no form.
    */
-  formspreeFormId: null as string | null,
+  formspreeFormId: 'xoeeqooo' as string | null,
   /** Google Analytics 4 measurement ID. Set to null to turn Google Analytics off. */
   googleAnalyticsId: 'G-HGJBD8MB3Q' as string | null,
 };
