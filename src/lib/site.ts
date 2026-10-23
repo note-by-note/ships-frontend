@@ -7,6 +7,12 @@ export const SITE = {
   tagline: 'Free online music tutoring, run by students.',
   /** Not confirmed yet. Set this and every "Email us" link on the site goes live. */
   contactEmail: null as string | null,
+  /**
+   * The Formspree form the contact page sends messages to: the ID at the end
+   * of the form's endpoint, https://formspree.io/f/<this part>. While null,
+   * the contact page shows no form.
+   */
+  formspreeFormId: null as string | null,
   /** Google Analytics 4 measurement ID. Set to null to turn Google Analytics off. */
   googleAnalyticsId: 'G-HGJBD8MB3Q' as string | null,
 };

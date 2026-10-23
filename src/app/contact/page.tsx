@@ -1,16 +1,17 @@
 import type { Metadata } from 'next';
 import Link from 'next/link';
+import { ContactForm } from '@/components/contact-form';
 import { ContactEmail, Container, Heading, Icon, IconBadge, Section, StickyNote, type IconName } from '@/components/marketing';
+import { SITE } from '@/lib/site';
 
 export const metadata: Metadata = {
   title: 'Contact',
   description: 'Get in touch with the Note by Note team.',
 };
 
-// Layout follows "contact-page-desktop": hero, "what can we help with" tiles and
-// direct details. The design's enquiry form is left out until there is
-// somewhere for it to send messages — a form that goes nowhere is worse than an
-// email address.
+// Layout follows "contact-page-desktop": hero, "what can we help with" tiles,
+// the message form (sent through Formspree, shown once SITE.formspreeFormId is
+// set) and direct details.
 
 const TOPICS: { icon: IconName; title: string; body: string; href: string; cta: string }[] = [
   { icon: 'music', title: 'Learning', body: 'Questions about lessons or applying as a student.', href: '/faq', cta: 'Student FAQ' },
@@ -18,7 +19,9 @@ const TOPICS: { icon: IconName; title: string; body: string; href: string; cta: 
   { icon: 'code', title: 'Volunteering', body: 'Tech, marketing and outreach teams.', href: '/for-mentors#other-teams', cta: 'See the teams' },
   { icon: 'school', title: 'Schools & partners', body: 'Working with your school or organization.', href: '/partners', cta: 'Partnerships' },
   { icon: 'file', title: 'Your application', body: 'Check the status of something you’ve sent.', href: '/applications', cta: 'My applications' },
-  { icon: 'help', title: 'Something else', body: 'Anything that doesn’t fit above.', href: '#email', cta: 'Email us' },
+  SITE.formspreeFormId
+    ? { icon: 'help', title: 'Something else', body: 'Anything that doesn’t fit above.', href: '#message', cta: 'Send a message' }
+    : { icon: 'help', title: 'Something else', body: 'Anything that doesn’t fit above.', href: '#email', cta: 'Email us' },
 ];
 
 export default function ContactPage() {
@@ -56,6 +59,12 @@ export default function ContactPage() {
               </li>
             ))}
           </ul>
+
+          {SITE.formspreeFormId ? (
+            <div id="message" className="mt-12 max-w-3xl scroll-mt-24">
+              <ContactForm />
+            </div>
+          ) : null}
 
           <div
             id="email"
