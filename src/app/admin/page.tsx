@@ -93,6 +93,26 @@ export default function StaffOverviewPage() {
             </Panel>
           </div>
 
+          <Panel
+            title="Students by school"
+            action={can('forms.manage') ? <Link href="/admin/schools" className="text-sm font-semibold text-coral">Partner schools</Link> : null}
+          >
+            {overview.studentsBySchool?.length ? (
+              <ul className="grid gap-x-8 gap-y-2 text-sm sm:grid-cols-2">
+                {overview.studentsBySchool.map((row) => (
+                  <li key={row.school} className="flex justify-between gap-4">
+                    <span className="text-navy/70">{row.school}</span>
+                    <strong>{row.count}</strong>
+                  </li>
+                ))}
+              </ul>
+            ) : (
+              <p className="text-sm text-ink-soft">
+                No student applications with a school yet. Students choose their school at the start of the application.
+              </p>
+            )}
+          </Panel>
+
           {shortcuts.length ? (
             <div>
               <h2 className="mb-4 font-display text-xl font-bold text-navy">Shortcuts</h2>

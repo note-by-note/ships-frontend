@@ -1,11 +1,20 @@
 'use client';
 
 // The filterable instrument grid on /instruments, after "instruments-page-desktop":
-// a row of family tabs over a grid of cards.
+// a row of family tabs over a grid of cards. Each card says how many published
+// mentors teach it (from the API), and you can show only instruments that
+// have a mentor. Until any mentor is published, the counts stay hidden.
 
-import { useState } from 'react';
+import Link from 'next/link';
+import { useEffect, useState } from 'react';
+import { api } from '@/lib/api';
 import { INSTRUMENT_FAMILIES, type InstrumentFamily } from '@/lib/site';
 import { cx } from './ui';
+
+interface Facets {
+  data: { instruments: { value: string; count: number }[] };
+  meta: { totalMentors: number };
+}
 
 const TONES: Record<InstrumentFamily, string> = {
   Keys: 'bg-sky/50',
@@ -18,8 +27,25 @@ const TONES: Record<InstrumentFamily, string> = {
 
 export function InstrumentExplorer() {
   const [family, setFamily] = useState<InstrumentFamily | 'All'>('All');
+  const [counts, setCounts] = useState<Map<string, number> | null>(null);
+  const [onlyTaught, setOnlyTaught] = useState(false);
 
-  const visible = INSTRUMENT_FAMILIES.filter((group) => family === 'All' || group.family === family);
+  useEffect(() => {
+    api
+      .get<Facets>('/filters')
+      .then((body) =>
+        setCounts(body.meta.totalMentors ? new Map(body.data.instruments.map((entry) => [entry.value, entry.count])) : null),
+      )
+      .catch(() => setCounts(null));
+  }, []);
+
+  const taught = (instrument: string) => (counts?.get(instrument) ?? 0) > 0;
+  const visible = INSTRUMENT_FAMILIES.filter((group) => family === 'All' || group.family === family)
+    .map((group) => ({
+      ...group,
+      instruments: onlyTaught && counts ? group.instruments.filter(taught) : group.instruments,
+    }))
+    .filter((group) => group.instruments.length);
 
   return (
     <div>
@@ -40,7 +66,20 @@ export function InstrumentExplorer() {
             {option}
           </button>
         ))}
+        {counts ? (
+          <label className="ml-auto flex items-center gap-2 text-sm text-navy/75">
+            <input type="checkbox" checked={onlyTaught} onChange={(event) => setOnlyTaught(event.target.checked)} className="size-4 accent-navy" />
+            Only instruments with a mentor
+          </label>
+        ) : null}
       </div>
+
+      {!visible.length ? (
+        <p className="rounded-2xl bg-white/60 p-6 text-center text-navy/70">
+          No mentors teach these yet. Try another family, or{' '}
+          <Link href="/apply" className="font-semibold underline">apply</Link> and tell us what you&apos;d like to learn.
+        </p>
+      ) : null}
 
       <div className="flex flex-col gap-12">
         {visible.map((group) => (
@@ -65,9 +104,22 @@ export function InstrumentExplorer() {
                   </div>
                   <div className="flex min-w-0 flex-col items-start gap-1.5 px-1 pt-3 pb-1">
                     <span className="font-display text-base font-bold break-words">{instrument}</span>
-                    <span className="rounded-full bg-white px-2 py-0.5 text-[11px] font-medium text-navy/70">
-                      Beginners welcome
-                    </span>
+                    {counts ? (
+                      <span
+                        className={cx(
+                          'rounded-full px-2 py-0.5 text-[11px] font-medium',
+                          taught(instrument) ? 'bg-sage/40 text-navy' : 'bg-white text-navy/50',
+                        )}
+                      >
+                        {taught(instrument)
+                          ? `${counts.get(instrument)} mentor${counts.get(instrument) === 1 ? '' : 's'}`
+                          : 'No mentor yet'}
+                      </span>
+                    ) : (
+                      <span className="rounded-full bg-white px-2 py-0.5 text-[11px] font-medium text-navy/70">
+                        Beginners welcome
+                      </span>
+                    )}
                   </div>
                 </li>
               ))}

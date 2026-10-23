@@ -107,7 +107,10 @@ export function ApplicationWizard({ slug, mentor }: { slug: string; mentor?: str
         }
       }
 
-      if (body.data.status !== 'draft') {
+      if (body.data.status === 'withdrawn') {
+        // Withdrawn, and the form is closed, so it can't be reopened yet.
+        setLoadError('You withdrew this application. It can be reopened once applications are open again.');
+      } else if (body.data.status !== 'draft') {
         // Already submitted, from a previous visit. There is nothing to fill in.
         setSubmitted({ message: form.settings.successMessage });
       }

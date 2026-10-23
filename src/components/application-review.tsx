@@ -29,6 +29,7 @@ export function ApplicationReview({ id }: { id: string }) {
   const [note, setNote] = useState('');
   const [busy, setBusy] = useState<string | null>(null);
   const [mentorNotice, setMentorNotice] = useState<string | null>(null);
+  const [setupNotice, setSetupNotice] = useState<{ tone: 'ok' | 'warn'; text: string } | null>(null);
 
   useEffect(() => {
     api
@@ -51,7 +52,10 @@ export function ApplicationReview({ id }: { id: string }) {
     try {
       const body = await api.patch<{
         data: ApplicationDetail;
-        meta?: { mentorRequest?: { sent: boolean; reason?: string } };
+        meta?: {
+          mentorRequest?: { sent: boolean; reason?: string };
+          mentorSetup?: { status: 'created'; slug: string } | { status: 'already-linked' } | { status: 'skipped'; reason: string };
+        };
       }>(`/applications/${application.id}/decision`, { status, reason });
       setApplication(body.data);
       const mentorRequest = body.meta?.mentorRequest;
@@ -59,6 +63,16 @@ export function ApplicationReview({ id }: { id: string }) {
         mentorRequest && !mentorRequest.sent
           ? `Accepted, but the request didn’t go to ${body.data.requestedMentor?.name ?? 'the mentor'}: ${mentorRequest.reason ?? 'unknown reason'}. Match them from the Mentors area instead.`
           : null,
+      );
+      const setup = body.meta?.mentorSetup;
+      setSetupNotice(
+        !setup
+          ? null
+          : setup.status === 'created'
+            ? { tone: 'ok', text: 'Accepted. Their account is now a mentor’s, with a hidden mentor page filled in from these answers. Publish it from Mentors once they’ve set it up.' }
+            : setup.status === 'already-linked'
+              ? { tone: 'ok', text: 'Accepted. They already have a mentor page.' }
+              : { tone: 'warn', text: `Accepted, but their mentor page wasn’t set up: ${setup.reason}. Add it from Mentors → Add a mentor.` },
       );
     } catch (err) {
       setError(err instanceof ApiError ? err.message : 'We could not record that decision.');
@@ -192,6 +206,15 @@ export function ApplicationReview({ id }: { id: string }) {
 
           <Card className="p-5">
             <h2 className="font-medium text-ink">Decision</h2>
+            {setupNotice ? (
+              <div className="mt-3">
+                <Alert tone={setupNotice.tone}>{setupNotice.text}</Alert>
+              </div>
+            ) : application.formKind === 'mentor' && application.status !== 'accepted' ? (
+              <p className="mt-1 text-sm text-ink-soft">
+                Accepting makes their account a mentor’s and sets up a hidden mentor page from these answers.
+              </p>
+            ) : null}
 
             {application.decision.decidedAt ? (
               <p className="mt-1 text-sm text-ink-soft">

@@ -39,7 +39,9 @@ const QUESTION_TYPES: { value: QuestionType; label: string }[] = [
 
 const PRESETS: { value: OptionPreset | ''; label: string }[] = [
   { value: '', label: 'Custom options' },
-  { value: 'instruments', label: 'Instruments' },
+  { value: 'instruments', label: 'Instruments (all)' },
+  { value: 'mentor_instruments', label: 'Instruments mentors teach (live)' },
+  { value: 'partner_schools', label: 'Partner schools (live)' },
   { value: 'experience_levels', label: 'Experience levels' },
   { value: 'age_groups', label: 'Age groups' },
   { value: 'languages', label: 'Languages' },
