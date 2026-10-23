@@ -213,7 +213,8 @@ export type Permission =
   | 'testing.use'
   | 'messages.review'
   | 'resources.manage'
-  | 'hours.approve';
+  | 'hours.approve'
+  | 'team.manage';
 
 export const STAFF_ROLES: StaffRole[] = ['admin', 'tech', 'outreach', 'marketing'];
 
@@ -377,6 +378,17 @@ export interface StaffOverview {
   waiting?: { photos: number; hours: number; reports: number };
   /** Sent student applications per school picked on the form. */
   studentsBySchool?: { school: string; count: number }[];
+}
+
+/** Someone under "Meet the team" on the About page. */
+export interface TeamMember {
+  id: string;
+  name: string;
+  role: string;
+  about: string;
+  /** Their picture, relative to the API root (use apiUrl), or null for initials. */
+  photoPath: string | null;
+  order: number;
 }
 
 export interface PartnerSchool {

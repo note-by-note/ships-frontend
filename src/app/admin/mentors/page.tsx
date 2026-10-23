@@ -5,6 +5,7 @@ import { useEffect, useState } from 'react';
 import { RequirePermission } from '@/components/admin-guard';
 import { useAuth } from '@/components/auth-provider';
 import { DashboardHeading } from '@/components/dashboard-shell';
+import { MentorTabs } from '@/components/staff-shell';
 import { Badge, ButtonLink, Card, EmptyState, Spinner } from '@/components/ui';
 import { TextInput } from '@/components/ui/fields';
 import { api } from '@/lib/api';
@@ -31,6 +32,7 @@ export default function StaffMentorsPage() {
 
   return (
     <RequirePermission anyOf={['mentors.view', 'mentors.manage']}>
+      <MentorTabs />
       <DashboardHeading
         title="Mentors"
         description="Every mentor profile, including unpublished ones. A profile becomes someone’s once it’s linked to their account."

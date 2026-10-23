@@ -7,7 +7,7 @@
 
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
-import type { ReactNode } from 'react';
+import { Fragment, type ReactNode } from 'react';
 import { Icon, type IconName } from './marketing';
 import { cx } from './ui';
 
@@ -19,6 +19,10 @@ export interface ShellLink {
   exact?: boolean;
   /** A count to show beside the label, e.g. unread messages. Hidden at 0. */
   badge?: number;
+  /** A heading the link sits under in the sidebar (wide screens only). */
+  group?: string;
+  /** Other paths that belong to this section, e.g. pages reached through its tabs. */
+  also?: string[];
 }
 
 export function DashboardShell({
@@ -33,8 +37,9 @@ export function DashboardShell({
   children: ReactNode;
 }) {
   const pathname = usePathname();
+  const under = (href: string) => pathname === href || pathname.startsWith(`${href}/`);
   const isActive = (link: ShellLink) =>
-    link.exact ? pathname === link.href : pathname === link.href || pathname.startsWith(`${link.href}/`);
+    link.exact ? pathname === link.href : under(link.href) || Boolean(link.also?.some(under));
 
   return (
     <div className="flex min-h-[calc(100vh-4rem)] flex-col bg-cream lg:flex-row">
@@ -44,11 +49,17 @@ export function DashboardShell({
           {subtitle ? <p className="mt-1 text-xs text-cream/60">{subtitle}</p> : null}
         </div>
         <nav aria-label={title} className="flex gap-1 overflow-x-auto px-3 py-3 lg:flex-col lg:overflow-visible lg:py-2">
-          {links.map((link) => {
+          {links.map((link, index) => {
             const active = isActive(link);
+            const heading = link.group && link.group !== links[index - 1]?.group ? link.group : null;
             return (
+              <Fragment key={link.href}>
+              {heading ? (
+                <p className="hidden px-3 pt-5 pb-1 text-[11px] font-semibold tracking-widest text-cream/45 uppercase lg:block">
+                  {heading}
+                </p>
+              ) : null}
               <Link
-                key={link.href}
                 href={link.href}
                 aria-current={active ? 'page' : undefined}
                 className={cx(
@@ -66,6 +77,7 @@ export function DashboardShell({
                   </span>
                 ) : null}
               </Link>
+              </Fragment>
             );
           })}
         </nav>
@@ -127,6 +139,41 @@ export function StatTile({ label, value, hint }: { label: string; value: ReactNo
       <p className="text-xs font-semibold tracking-wider text-navy/60 uppercase">{label}</p>
       <p className="mt-2 font-display text-3xl font-bold text-navy">{value}</p>
       {hint ? <p className="mt-1 text-xs text-navy/55">{hint}</p> : null}
+    </div>
+  );
+}
+
+/**
+ * Tabs between closely related pages of one section (e.g. Mentors and the
+ * photos waiting for approval), so the sidebar stays short. Hidden when
+ * there's only one tab to show.
+ */
+export function PageTabs({ tabs }: { tabs: { href: string; label: string; badge?: number }[] }) {
+  const pathname = usePathname();
+  if (tabs.length < 2) return null;
+  return (
+    <div className="mb-6 border-b border-navy/10">
+    <nav aria-label="Section" className="-mb-px flex gap-1 overflow-x-auto [scrollbar-width:none]">
+      {tabs.map((tab) => {
+        const active = pathname === tab.href || pathname.startsWith(`${tab.href}/`);
+        return (
+          <Link
+            key={tab.href}
+            href={tab.href}
+            aria-current={active ? 'page' : undefined}
+            className={cx(
+              'flex shrink-0 items-center gap-2 border-b-2 px-3 py-2.5 text-sm whitespace-nowrap transition-colors',
+              active ? 'border-navy font-semibold text-navy' : 'border-transparent text-navy/60 hover:text-navy',
+            )}
+          >
+            {tab.label}
+            {tab.badge ? (
+              <span className="rounded-full bg-gold px-2 py-0.5 text-xs font-bold text-navy">{tab.badge}</span>
+            ) : null}
+          </Link>
+        );
+      })}
+    </nav>
     </div>
   );
 }

@@ -6,6 +6,7 @@ import { useCallback, useEffect, useState } from 'react';
 import { RequirePermission } from '@/components/admin-guard';
 import { useAuth } from '@/components/auth-provider';
 import { DashboardHeading } from '@/components/dashboard-shell';
+import { HoursTabs } from '@/components/staff-shell';
 import { formatMinutes } from '@/components/hours-log';
 import { Alert, Button, Spinner, cx } from '@/components/ui';
 import { ApiError, api } from '@/lib/api';
@@ -41,9 +42,10 @@ export default function HoursReviewPage() {
 
   return (
     <RequirePermission anyOf={['hours.approve']}>
+      <HoursTabs />
       <DashboardHeading
-        title="Volunteer hours"
-        description="Approve the time mentors and team members log. Approved hours appear on the summary they print for school."
+        title="Hours to approve"
+        description="Time mentors and team members logged. Approved hours appear on the summary they print for school."
       />
 
       <div className="mb-6 flex flex-wrap items-center justify-between gap-3">

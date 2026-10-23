@@ -7,6 +7,7 @@
 import { useCallback, useEffect, useState, type FormEvent } from 'react';
 import { RequirePermission } from '@/components/admin-guard';
 import { DashboardHeading, Panel } from '@/components/dashboard-shell';
+import { FormTabs } from '@/components/staff-shell';
 import { Alert, Badge, Button, Spinner } from '@/components/ui';
 import { TextInput } from '@/components/ui/fields';
 import { ApiError, api } from '@/lib/api';
@@ -60,6 +61,7 @@ export default function PartnerSchoolsPage() {
 
   return (
     <RequirePermission anyOf={['forms.manage']}>
+      <FormTabs />
       <DashboardHeading
         title="Partner schools"
         description="The first question on the student application asks which of these schools a student comes from. “Another school” and “Not in school or homeschooled” are always offered too."

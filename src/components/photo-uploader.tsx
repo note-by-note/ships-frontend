@@ -15,7 +15,7 @@ import { Button } from './ui';
 const SIZE = 640;
 
 /** Centre-crop to a square and re-encode as JPEG. */
-async function squareJpeg(file: File): Promise<Blob> {
+export async function squareJpeg(file: File): Promise<Blob> {
   const url = URL.createObjectURL(file);
   try {
     const image = await new Promise<HTMLImageElement>((resolve, reject) => {

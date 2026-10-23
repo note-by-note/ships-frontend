@@ -4,22 +4,15 @@ import Link from 'next/link';
 import { useEffect, useState } from 'react';
 import { RequirePermission } from '@/components/admin-guard';
 import { useAuth } from '@/components/auth-provider';
-import { DashboardHeading, Panel, StatTile } from '@/components/dashboard-shell';
+import { DashboardHeading, Panel } from '@/components/dashboard-shell';
 import { Icon } from '@/components/marketing';
-import { Alert, Spinner, humanize } from '@/components/ui';
+import { Alert, Spinner, cx } from '@/components/ui';
 import { api } from '@/lib/api';
-import { ROLE_LABELS, type Permission, type StaffOverview, type UserRole } from '@/lib/types';
+import { ROLE_LABELS, type Permission, type StaffOverview } from '@/lib/types';
 
-// The staff home. Counts only — every staff role can read it, marketing
-// included, so nothing here identifies anyone.
-
-const SHORTCUTS: { href: string; label: string; body: string; anyOf: Permission[] }[] = [
-  { href: '/admin/applications', label: 'Review applications', body: 'Read, add notes and decide.', anyOf: ['applications.review'] },
-  { href: '/admin/mentors/new', label: 'Add a mentor', body: 'Create a profile and link it to an account.', anyOf: ['mentors.manage'] },
-  { href: '/admin/people', label: 'People & roles', body: 'Accounts, roles and access.', anyOf: ['users.view'] },
-  { href: '/admin/forms', label: 'Edit forms', body: 'Questions, publishing and closing.', anyOf: ['forms.manage'] },
-  { href: '/admin/testing', label: 'Test mode', body: 'Try the site as a test student or mentor.', anyOf: ['testing.use'] },
-];
+// The staff home: what needs someone now, then the numbers at a glance.
+// Counts only. Every staff role can read it, marketing included, so nothing
+// here identifies anyone.
 
 export default function StaffOverviewPage() {
   const { user, can } = useAuth();
@@ -34,105 +27,36 @@ export default function StaffOverviewPage() {
       .catch(() => setError(true));
   }, [can]);
 
-  const shortcuts = SHORTCUTS.filter((shortcut) => shortcut.anyOf.some((permission) => can(permission)));
-  const submitted = (status: string) => overview?.applications.byStatus[status] ?? 0;
-
   return (
     <RequirePermission anyOf={['stats.view']}>
       <DashboardHeading
         title={`Welcome back, ${user?.name.split(' ')[0] ?? ''}!`}
-        description={`You’re signed in as ${user ? ROLE_LABELS[user.role] : ''}. Here’s where things stand.`}
+        description={`Signed in as ${user ? ROLE_LABELS[user.role] : ''}.`}
       />
 
       {error ? <Alert>We could not load the overview.</Alert> : null}
       {!overview && !error ? <Spinner /> : null}
 
       {overview ? (
-        <div className="flex flex-col gap-8">
-          {!overview.emailConfigured ? (
-            <Alert tone="warn">
-              Email isn’t set up yet, so absence and message notifications are only shown on dashboards, not emailed. Add the
-              SMTP settings to the API’s <code>.env</code> (see <code>.env.example</code>) to turn email on.
-            </Alert>
-          ) : null}
-          {overview.waiting ? <Waiting waiting={overview.waiting} can={can} /> : null}
-          <div className="grid gap-4 sm:grid-cols-2 xl:grid-cols-4">
-            <StatTile label="Waiting for review" value={submitted('submitted')} hint="Submitted, not yet looked at" />
-            <StatTile label="Under review" value={submitted('under_review')} />
-            <StatTile label="Accepted" value={submitted('accepted')} />
-            <StatTile label="Open forms" value={overview.openForms} />
-          </div>
-
-          <div className="grid gap-6 lg:grid-cols-3">
-            <Panel title="Applications by type">
-              <ul className="flex flex-col gap-2 text-sm">
-                {(['mentee', 'mentor', 'job'] as const).map((kind) => (
-                  <li key={kind} className="flex justify-between">
-                    <span className="text-navy/70">{kind === 'job' ? 'Volunteer' : humanize(kind)}</span>
-                    <strong>{overview.applications.byKind[kind] ?? 0}</strong>
-                  </li>
-                ))}
-              </ul>
-            </Panel>
-            <Panel title="Mentor profiles">
-              <ul className="flex flex-col gap-2 text-sm">
-                <li className="flex justify-between"><span className="text-navy/70">Total</span><strong>{overview.mentors.total}</strong></li>
-                <li className="flex justify-between"><span className="text-navy/70">Published</span><strong>{overview.mentors.published}</strong></li>
-                <li className="flex justify-between"><span className="text-navy/70">Accepting students</span><strong>{overview.mentors.accepting}</strong></li>
-              </ul>
-            </Panel>
-            <Panel title="Active accounts">
-              <ul className="flex flex-col gap-2 text-sm">
-                {(Object.keys(ROLE_LABELS) as UserRole[]).map((role) => (
-                  <li key={role} className="flex justify-between">
-                    <span className="text-navy/70">{ROLE_LABELS[role]}</span>
-                    <strong>{overview.accounts[role] ?? 0}</strong>
-                  </li>
-                ))}
-              </ul>
-            </Panel>
-          </div>
-
-          <Panel
-            title="Students by school"
-            action={can('forms.manage') ? <Link href="/admin/schools" className="text-sm font-semibold text-coral">Partner schools</Link> : null}
-          >
-            {overview.studentsBySchool?.length ? (
-              <ul className="grid gap-x-8 gap-y-2 text-sm sm:grid-cols-2">
+        <div className="flex max-w-4xl flex-col gap-6">
+          <NeedsAttention overview={overview} can={can} />
+          <AtAGlance overview={overview} />
+          {overview.studentsBySchool?.length ? (
+            <Panel title="Students by school">
+              <ul className="grid gap-x-10 gap-y-2 text-sm sm:grid-cols-2">
                 {overview.studentsBySchool.map((row) => (
                   <li key={row.school} className="flex justify-between gap-4">
                     <span className="text-navy/70">{row.school}</span>
-                    <strong>{row.count}</strong>
+                    <strong className="tabular-nums">{row.count}</strong>
                   </li>
                 ))}
               </ul>
-            ) : (
-              <p className="text-sm text-ink-soft">
-                No student applications with a school yet. Students choose their school at the start of the application.
-              </p>
-            )}
-          </Panel>
-
-          {shortcuts.length ? (
-            <div>
-              <h2 className="mb-4 font-display text-xl font-bold text-navy">Shortcuts</h2>
-              <ul className="grid gap-4 sm:grid-cols-2 xl:grid-cols-3">
-                {shortcuts.map((shortcut) => (
-                  <li key={shortcut.href}>
-                    <Link
-                      href={shortcut.href}
-                      className="group flex h-full items-start justify-between gap-3 rounded-2xl bg-white p-5 shadow-[0_4px_16px_rgba(30,42,68,0.06)] hover:ring-2 hover:ring-navy/20"
-                    >
-                      <span>
-                        <span className="block font-semibold text-navy">{shortcut.label}</span>
-                        <span className="text-sm text-navy/65">{shortcut.body}</span>
-                      </span>
-                      <Icon name="arrow" className="mt-1 size-4 shrink-0 text-navy/50 group-hover:text-navy" />
-                    </Link>
-                  </li>
-                ))}
-              </ul>
-            </div>
+            </Panel>
+          ) : null}
+          {!overview.emailConfigured ? (
+            <p className="text-xs text-navy/50">
+              Email isn’t set up yet, so missed-lesson and message notices only show on dashboards.
+            </p>
           ) : null}
         </div>
       ) : null}
@@ -140,38 +64,69 @@ export default function StaffOverviewPage() {
   );
 }
 
-/** Things staff need to act on: photos, hours and reported messages. Only the ones this role can act on are links. */
-function Waiting({
-  waiting,
-  can,
-}: {
-  waiting: NonNullable<StaffOverview['waiting']>;
-  can: (permission: Permission) => boolean;
-}) {
-  const items = [
+function NeedsAttention({ overview, can }: { overview: StaffOverview; can: (permission: Permission) => boolean }) {
+  const waiting = overview.waiting ?? { photos: 0, hours: 0, reports: 0 };
+  const rows = [
     { count: waiting.reports, label: ['reported message', 'reported messages'], href: '/admin/messages', permission: 'messages.review' as Permission, urgent: true },
+    { count: overview.applications.byStatus.submitted ?? 0, label: ['application to review', 'applications to review'], href: '/admin/applications', permission: 'applications.review' as Permission, urgent: false },
     { count: waiting.photos, label: ['mentor photo to approve', 'mentor photos to approve'], href: '/admin/photos', permission: 'mentors.manage' as Permission, urgent: false },
-    { count: waiting.hours, label: ['volunteer hours entry to approve', 'volunteer hours entries to approve'], href: '/admin/hours', permission: 'hours.approve' as Permission, urgent: false },
-  ].filter((item) => item.count > 0);
-  if (!items.length) return null;
+    { count: waiting.hours, label: ['hours entry to approve', 'hours entries to approve'], href: '/admin/hours', permission: 'hours.approve' as Permission, urgent: false },
+  ].filter((row) => row.count > 0 && can(row.permission));
 
   return (
-    <ul className="flex flex-wrap gap-3">
-      {items.map((item) => {
-        const text = `${item.count} ${item.label[item.count === 1 ? 0 : 1]}`;
-        const style = item.urgent ? 'bg-danger-soft text-danger' : 'bg-gold/25 text-navy';
-        return (
-          <li key={item.href}>
-            {can(item.permission) ? (
-              <Link href={item.href} className={`inline-block rounded-full px-4 py-2 text-sm font-semibold ${style} hover:underline`}>
-                {text}
+    <Panel title="Needs attention">
+      {!rows.length ? (
+        <p className="flex items-center gap-2 text-sm text-ok">
+          <Icon name="check" className="size-4" />
+          You’re all caught up.
+        </p>
+      ) : (
+        <ul className="divide-y divide-line">
+          {rows.map((row) => (
+            <li key={row.href}>
+              <Link href={row.href} className="group flex items-center gap-4 py-3">
+                <span
+                  className={cx(
+                    'flex h-8 min-w-8 items-center justify-center rounded-full px-2 text-sm font-bold tabular-nums',
+                    row.urgent ? 'bg-danger-soft text-danger' : 'bg-gold/30 text-navy',
+                  )}
+                >
+                  {row.count}
+                </span>
+                <span className="flex-1 text-sm font-medium text-navy">{row.label[row.count === 1 ? 0 : 1]}</span>
+                <Icon name="arrow" className="size-4 text-navy/40 transition-transform group-hover:translate-x-0.5 group-hover:text-navy" />
               </Link>
-            ) : (
-              <span className={`inline-block rounded-full px-4 py-2 text-sm font-semibold ${style}`}>{text}</span>
-            )}
-          </li>
-        );
-      })}
-    </ul>
+            </li>
+          ))}
+        </ul>
+      )}
+    </Panel>
+  );
+}
+
+function AtAGlance({ overview }: { overview: StaffOverview }) {
+  const status = (key: string) => overview.applications.byStatus[key] ?? 0;
+  const stats: [string, string | number][] = [
+    ['Under review', status('under_review')],
+    ['Accepted', status('accepted')],
+    ['Open forms', overview.openForms],
+    ['Mentors live', `${overview.mentors.published} of ${overview.mentors.total}`],
+    ['Taking students', overview.mentors.accepting],
+    ['Student accounts', overview.accounts.student ?? 0],
+    ['Mentor accounts', overview.accounts.mentor ?? 0],
+    ['Matched pairs', overview.matchRequests.accepted ?? 0],
+  ];
+
+  return (
+    <Panel title="At a glance">
+      <dl className="grid grid-cols-2 gap-x-6 gap-y-5 sm:grid-cols-4">
+        {stats.map(([label, value]) => (
+          <div key={label}>
+            <dt className="text-xs text-navy/55">{label}</dt>
+            <dd className="mt-0.5 font-display text-2xl font-bold text-navy tabular-nums">{value}</dd>
+          </div>
+        ))}
+      </dl>
+    </Panel>
   );
 }

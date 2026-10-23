@@ -7,6 +7,7 @@ import Link from 'next/link';
 import { useCallback, useEffect, useState } from 'react';
 import { RequirePermission } from '@/components/admin-guard';
 import { DashboardHeading } from '@/components/dashboard-shell';
+import { MentorTabs } from '@/components/staff-shell';
 import { Alert, Badge, Button, Spinner } from '@/components/ui';
 import { ApiError, api } from '@/lib/api';
 import type { PendingPhoto } from '@/lib/types';
@@ -26,6 +27,7 @@ export default function PhotoQueuePage() {
 
   return (
     <RequirePermission anyOf={['mentors.manage']}>
+      <MentorTabs />
       <DashboardHeading
         title="Mentor photos"
         description="Check each photo before it goes on a public page: a clear photo of the mentor, on their own, and nothing a family wouldn't expect to see."

@@ -1,10 +1,12 @@
-// "Meet the team" on the About page: one polaroid per person from TEAM in
-// lib/site.ts. A picture is optional; without one the polaroid shows their
-// initials on a colour from the site's palette. A server component, so no
-// helpers from the client-only ui module (cx).
+'use client';
 
-import Image from 'next/image';
-import type { TeamMember } from '@/lib/site';
+// "Meet the team" on the About page: one polaroid per person, from the team
+// staff edit in the staff area (Team page). A picture is optional; without one
+// the polaroid shows their initials on a colour from the site's palette.
+
+import { useEffect, useState } from 'react';
+import { api, apiUrl } from '@/lib/api';
+import type { TeamMember } from '@/lib/types';
 import { Polaroid } from './marketing';
 
 const TONES = ['bg-sky/60', 'bg-gold/60', 'bg-sage/60', 'bg-coral/45'];
@@ -19,22 +21,35 @@ function initials(name: string): string {
     .toUpperCase();
 }
 
-export function TeamGrid({ members }: { members: TeamMember[] }) {
+export function TeamSection() {
+  const [members, setMembers] = useState<TeamMember[] | null>(null);
+
+  useEffect(() => {
+    api
+      .get<{ data: TeamMember[] }>('/team')
+      .then((body) => setMembers(body.data))
+      .catch(() => setMembers([]));
+  }, []);
+
+  // Nothing while it loads, so the "coming soon" box doesn't flash first.
+  if (!members) return <div className="min-h-40" aria-busy="true" />;
+
+  if (!members.length) {
+    return (
+      <div className="mx-auto max-w-xl rounded-2xl border-2 border-dashed border-navy/25 px-6 py-12 text-center text-navy/60">
+        Team profiles are coming soon.
+      </div>
+    );
+  }
+
   return (
     <ul className="grid gap-x-8 gap-y-12 sm:grid-cols-2 lg:grid-cols-3">
       {members.map((member, index) => (
-        <li key={member.name} className="flex flex-col items-center text-center">
+        <li key={member.id} className="flex flex-col items-center text-center">
           <Polaroid caption={member.name} tilt={TILTS[index % TILTS.length]} className="w-60">
-            {member.photo ? (
-              <div className="relative size-full">
-                <Image
-                  src={`/team/${member.photo}`}
-                  alt={`Picture of ${member.name}`}
-                  fill
-                  sizes="240px"
-                  className="object-cover"
-                />
-              </div>
+            {member.photoPath ? (
+              // eslint-disable-next-line @next/next/no-img-element -- served by the API on another origin
+              <img src={apiUrl(member.photoPath)} alt={`Picture of ${member.name}`} className="size-full object-cover" loading="lazy" />
             ) : (
               <div
                 aria-hidden
