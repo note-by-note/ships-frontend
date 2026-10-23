@@ -22,6 +22,8 @@ export type QuestionType =
 
 export type OptionPreset =
   | 'instruments'
+  | 'mentor_instruments'
+  | 'partner_schools'
   | 'experience_levels'
   | 'age_groups'
   | 'languages'
@@ -373,6 +375,14 @@ export interface StaffOverview {
   emailConfigured: boolean;
   /** What's waiting for staff: photos to approve, hours to approve, reported messages. */
   waiting?: { photos: number; hours: number; reports: number };
+  /** Sent student applications per school picked on the form. */
+  studentsBySchool?: { school: string; count: number }[];
+}
+
+export interface PartnerSchool {
+  id: string;
+  name: string;
+  active: boolean;
 }
 
 // --- Photos ------------------------------------------------------------------------------

@@ -16,6 +16,7 @@ import {
   useLessonsAndMessages,
 } from '@/components/dashboard-widgets';
 import { Icon } from '@/components/marketing';
+import { NextSteps } from '@/components/next-steps';
 import { Alert, Button, ButtonLink, Spinner, StatusBadge, humanize } from '@/components/ui';
 import { ApiError, api } from '@/lib/api';
 import type { Application, MatchRequest, MentorProfile, OwnMatchRequest, ScheduleDay } from '@/lib/types';
@@ -62,7 +63,9 @@ function StudentDashboard() {
 
       <div className="grid gap-6 xl:grid-cols-[1fr_340px]">
         <div className="flex flex-col gap-6">
-          {!matched ? (
+          {studentApplication?.status === 'accepted' ? (
+            <NextSteps application={studentApplication} hideWhenDone />
+          ) : !matched ? (
             <NextStep application={studentApplication} loading={!applications || !requests || !pairings} />
           ) : null}
           <NextLessons pairings={pairings} />
@@ -177,8 +180,8 @@ function NextStep({ application, loading }: { application?: Application; loading
     ? { title: 'Start your application', body: 'Tell us which instrument you’d like to learn and when you’re free.', href: APPLY_LINKS.student }
     : application.status === 'draft'
       ? { title: 'Finish your application', body: 'Your answers are saved. Send it when you’re ready.', href: `/apply/${application.formSlug}` }
-      : application.status === 'accepted'
-        ? { title: 'Accepted!', body: 'We’re finding you a mentor. You’ll see them here once you’re matched.', href: null }
+      : application.status === 'withdrawn'
+        ? { title: 'Apply again', body: 'You withdrew your application. Your answers are saved if you’d like to apply again.', href: `/apply/${application.formSlug}` }
         : { title: `Application ${humanize(application.status).toLowerCase()}`, body: 'Someone on the team will be in touch by email.', href: null };
 
   return (
@@ -207,7 +210,15 @@ function MentorDashboard() {
   const [profile, setProfile] = useState<OwnProfile | null | 'none'>(null);
   const [requests, setRequests] = useState<MatchRequest[] | null>(null);
   const [error, setError] = useState<string | null>(null);
+  const [mentorApplication, setMentorApplication] = useState<Application | null>(null);
   const { pairings, conversations } = useLessonsAndMessages();
+
+  useEffect(() => {
+    api
+      .get<{ data: Application[] }>('/applications/mine')
+      .then((body) => setMentorApplication(body.data.find((entry) => entry.formKind === 'mentor' && entry.status === 'accepted') ?? null))
+      .catch(() => setMentorApplication(null));
+  }, []);
 
   const load = useCallback(() => {
     api
@@ -247,6 +258,7 @@ function MentorDashboard() {
     return (
       <>
         {heading}
+        {mentorApplication ? <NextSteps application={mentorApplication} className="mb-6" /> : null}
         <Panel>
           <p className="text-ink-soft">
             Your account isn’t linked to a mentor profile yet. Once your mentor application is accepted, the team will
@@ -266,6 +278,7 @@ function MentorDashboard() {
     <>
       {heading}
       {error ? <div className="mb-4"><Alert>{error}</Alert></div> : null}
+      {mentorApplication ? <NextSteps application={mentorApplication} hideWhenDone className="mb-6" /> : null}
 
       <div className="mb-6 grid gap-4 sm:grid-cols-2 xl:grid-cols-4">
         <StatTile label="New requests" value={pending.length} />

@@ -17,6 +17,7 @@ const SECTIONS: (ShellLink & { anyOf: Permission[] | 'all' })[] = [
   { href: '/admin/resources', label: 'Team resources', icon: 'book', anyOf: ['resources.manage'] },
   { href: '/admin/people', label: 'People & roles', icon: 'users', anyOf: ['users.view'] },
   { href: '/admin/forms', label: 'Forms', icon: 'file', anyOf: ['forms.manage'] },
+  { href: '/admin/schools', label: 'Partner schools', icon: 'school', anyOf: ['forms.manage'] },
   { href: '/admin/testing', label: 'Test mode', icon: 'code', anyOf: ['testing.use'] },
   { href: '/admin/my-hours', label: 'My volunteer hours', icon: 'heart', anyOf: 'all' },
 ];
