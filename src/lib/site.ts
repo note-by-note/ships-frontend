@@ -103,3 +103,24 @@ export const INSTRUMENT_FAMILIES: { family: InstrumentFamily; blurb: string; ins
   { family: 'Percussion', blurb: 'Rhythm first, then everything else.', instruments: ['Percussion', 'Xylophone'] },
   { family: 'Theory', blurb: 'How music works, for any instrument.', instruments: ['Music Theory'] },
 ];
+
+export interface TeamMember {
+  /** As they'd like it shown. First name and last initial is fine. */
+  name: string;
+  /** e.g. 'Founder', 'Tech lead', 'Outreach' */
+  role: string;
+  /** One or two sentences, optional. */
+  about?: string;
+  /**
+   * Optional. A photo, or any picture they'd like (a drawing, an avatar):
+   * put the file in `public/team/` and give its name here, e.g. 'gerald.jpg'.
+   * Leave it out and their initials show instead.
+   */
+  photo?: string;
+}
+
+/**
+ * The people running Note by Note, shown under "Meet the team" on the About
+ * page in this order. While it's empty the page says profiles are coming soon.
+ */
+export const TEAM: TeamMember[] = [];

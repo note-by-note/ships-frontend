@@ -12,7 +12,8 @@ import {
   SectionIntro,
   type IconName,
 } from '@/components/marketing';
-import { APPLY_LINKS } from '@/lib/site';
+import { TeamGrid } from '@/components/team-grid';
+import { APPLY_LINKS, TEAM } from '@/lib/site';
 
 export const metadata: Metadata = {
   title: 'About',
@@ -105,9 +106,13 @@ export default function AboutPage() {
             title={<Heading before="Meet the" accent="team" />}
             description="The students organizing and running Note by Note."
           />
-          <div className="mx-auto max-w-xl rounded-2xl border-2 border-dashed border-navy/25 px-6 py-12 text-center text-navy/60">
-            Team profiles are coming soon.
-          </div>
+          {TEAM.length ? (
+            <TeamGrid members={TEAM} />
+          ) : (
+            <div className="mx-auto max-w-xl rounded-2xl border-2 border-dashed border-navy/25 px-6 py-12 text-center text-navy/60">
+              Team profiles are coming soon.
+            </div>
+          )}
         </Container>
       </Section>
 
