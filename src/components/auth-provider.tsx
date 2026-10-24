@@ -11,6 +11,7 @@ import {
   restoreSession,
   setSession,
   signOut as clearSession,
+  wakeApi,
 } from '@/lib/api';
 import type { AccountUser, Permission } from '@/lib/types';
 
@@ -56,6 +57,8 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
 
   useEffect(() => {
     let cancelled = false;
+    // Signed-in visitors wake it by renewing their session just below.
+    if (!getRefreshToken()) wakeApi();
 
     (async () => {
       const restored = await restoreSession();

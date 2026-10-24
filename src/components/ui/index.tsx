@@ -5,7 +5,7 @@
 // couple of variants, not a component framework.
 
 import Link from 'next/link';
-import type { ComponentProps, ReactNode } from 'react';
+import { useEffect, useState, type ComponentProps, type ReactNode } from 'react';
 
 export function cx(...parts: (string | false | null | undefined)[]): string {
   return parts.filter(Boolean).join(' ');
@@ -162,12 +162,36 @@ export function Alert({ tone = 'danger', children }: { tone?: Tone; children: Re
 
 export function Spinner({ label = 'Loading' }: { label?: string }) {
   return (
-    <div className="flex items-center justify-center gap-3 py-16 text-sm text-ink-faint">
-      <span
-        aria-hidden
-        className="size-4 animate-spin rounded-full border-2 border-line-strong border-t-accent"
-      />
-      <span>{label}…</span>
+    <div className="flex flex-col items-center py-16 text-sm text-ink-faint">
+      <div className="flex items-center justify-center gap-3">
+        <span
+          aria-hidden
+          className="size-4 animate-spin rounded-full border-2 border-line-strong border-t-accent"
+        />
+        <span>{label}…</span>
+      </div>
+      <SlowNotice />
     </div>
+  );
+}
+
+/**
+ * Shown under a loading message that has taken a while. The API's free
+ * hosting sleeps when the site is quiet, and the first visit after that waits
+ * for it to wake up.
+ */
+export function SlowNotice({ after = 5000 }: { after?: number }) {
+  const [shown, setShown] = useState(false);
+
+  useEffect(() => {
+    const timer = window.setTimeout(() => setShown(true), after);
+    return () => window.clearTimeout(timer);
+  }, [after]);
+
+  if (!shown) return null;
+  return (
+    <p role="status" className="mt-3 max-w-xs text-center text-xs text-ink-faint">
+      Still loading. If the site has been quiet for a while, it takes up to a minute to wake up.
+    </p>
   );
 }

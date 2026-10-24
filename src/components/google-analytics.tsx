@@ -56,5 +56,7 @@ export function GoogleAnalytics() {
   }, [enabled, id, pathname]);
 
   if (!enabled) return null;
-  return <Script src={`https://www.googletagmanager.com/gtag/js?id=${id}`} strategy="afterInteractive" />;
+  // gtag.js is bigger than the rest of the page's code put together, so it
+  // loads once the page is idle. Page views queued before then still count.
+  return <Script src={`https://www.googletagmanager.com/gtag/js?id=${id}`} strategy="lazyOnload" />;
 }

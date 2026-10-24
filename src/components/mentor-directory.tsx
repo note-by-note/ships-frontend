@@ -19,7 +19,7 @@ import { useAuth } from './auth-provider';
 import { Avatar } from './avatar';
 import { Icon } from './marketing';
 import { MentorAction, firstNameOf, useStudentStanding, type StudentStanding } from './mentor-request';
-import { cx } from './ui';
+import { SlowNotice, cx } from './ui';
 
 /** The card fields `GET /api/mentors` returns. */
 interface DirectoryMentor {
@@ -110,7 +110,12 @@ export function MentorDirectory() {
   }
 
   if (!mentors) {
-    return <p className="py-16 text-center text-navy/60">Loading mentors…</p>;
+    return (
+      <div className="flex flex-col items-center py-16 text-navy/60">
+        <p>Loading mentors…</p>
+        <SlowNotice />
+      </div>
+    );
   }
 
   if (!mentors.length) {

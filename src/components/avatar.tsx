@@ -37,6 +37,7 @@ export function Avatar({
         alt=""
         className={cx('shrink-0 rounded-full object-cover', className)}
         loading="lazy"
+        decoding="async"
       />
     );
   }

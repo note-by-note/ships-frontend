@@ -232,6 +232,19 @@ async function send<T>(path: string, options: RequestOptions): Promise<T> {
   return (await response.json()) as T;
 }
 
+let woken = false;
+
+/**
+ * Nudge the API awake as soon as someone arrives. Its hosting sleeps when the
+ * site is quiet, so this starts the wake-up while they read the page instead
+ * of when they first click something that needs it.
+ */
+export function wakeApi() {
+  if (woken || typeof window === 'undefined') return;
+  woken = true;
+  fetch(`${BASE_URL}/health`).catch(() => undefined);
+}
+
 /** Where a path on the API lives, for <img src> on public files like approved photos. */
 export function apiUrl(path: string): string {
   return `${BASE_URL}${path}`;
