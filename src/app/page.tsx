@@ -16,6 +16,8 @@ import {
   StickyNote,
   type IconName,
 } from '@/components/marketing';
+import { Suspense } from 'react';
+import { SignedInHome } from '@/components/signed-in-home';
 import { APPLY_LINKS } from '@/lib/site';
 
 // Layout follows "note-by-note-homepage-desktop" in the Figma file. Copy is
@@ -95,6 +97,10 @@ const PATHWAYS = [
 export default function HomePage() {
   return (
     <div className="bg-cream text-navy">
+      {/* useSearchParams needs a Suspense boundary to keep the page static. */}
+      <Suspense fallback={null}>
+        <SignedInHome />
+      </Suspense>
       {/* Hero */}
       <section>
         <Container className="grid items-center gap-14 py-14 md:py-20 lg:grid-cols-[1.15fr_1fr]">

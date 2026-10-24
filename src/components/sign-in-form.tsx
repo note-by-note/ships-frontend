@@ -4,7 +4,7 @@ import { useEffect, useState } from 'react';
 import Link from 'next/link';
 import { useRouter, useSearchParams } from 'next/navigation';
 import { ApiError } from '@/lib/api';
-import { useAuth } from './auth-provider';
+import { accountHome, useAuth } from './auth-provider';
 import { Alert, Button, Card } from './ui';
 import { Field, TextInput } from './ui/fields';
 
@@ -15,8 +15,9 @@ export function SignInForm() {
 
   // Only ever a path on this site: an attacker-supplied absolute URL here would
   // turn the sign-in page into an open redirect.
-  const raw = searchParams.get('next') ?? '/';
-  const next = raw.startsWith('/') && !raw.startsWith('//') ? raw : '/';
+  // No `next` (or just the front page) means: go to your dashboard.
+  const raw = searchParams.get('next') ?? '';
+  const next = raw.startsWith('/') && !raw.startsWith('//') && raw !== '/' ? raw : null;
 
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
@@ -24,7 +25,7 @@ export function SignInForm() {
   const [busy, setBusy] = useState(false);
 
   useEffect(() => {
-    if (user) router.replace(next);
+    if (user) router.replace(next ?? accountHome(user));
   }, [user, next, router]);
 
   async function submit(event: React.FormEvent) {
@@ -34,7 +35,7 @@ export function SignInForm() {
 
     try {
       const account = await signIn(email, password);
-      router.replace(account.role === 'admin' && next === '/' ? '/admin/applications' : next);
+      router.replace(next ?? accountHome(account));
     } catch (err) {
       setError(err instanceof ApiError ? err.message : 'Something went wrong. Please try again.');
       setBusy(false);

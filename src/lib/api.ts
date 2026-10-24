@@ -70,6 +70,21 @@ export function hasStoredSession(): boolean {
   return Boolean(accessToken || getRefreshToken());
 }
 
+/** Whether this tab already has a working sign-in pass (not just a saved token). */
+export function hasAccessToken(): boolean {
+  return Boolean(accessToken);
+}
+
+// Signing out in one tab signs out the others; signing in is picked up by
+// them on their next request (AuthProvider listens for the change).
+if (typeof window !== 'undefined') {
+  window.addEventListener('storage', (event) => {
+    if (event.key !== REFRESH_KEY && event.key !== null) return;
+    if (!event.newValue) accessToken = null;
+    notify();
+  });
+}
+
 export class ApiError extends Error {
   constructor(
     public status: number,
@@ -106,24 +121,69 @@ async function parseError(response: Response): Promise<ApiError> {
   return new ApiError(response.status, message, details);
 }
 
-async function refreshSession(): Promise<boolean> {
+const wait = (ms: number) => new Promise((resolve) => setTimeout(resolve, ms));
+
+/**
+ * Trade the saved refresh token for a fresh pair.
+ *
+ * Staying signed in is the point, so the saved token is only forgotten when
+ * the API says it's no good (401). A network hiccup, a server error or the
+ * API waking up from sleep keeps it, so the next try (or the next visit)
+ * still works.
+ */
+async function refreshWithSavedToken(attempt = 0): Promise<boolean> {
+  // Read it fresh every time: another tab may have just renewed it.
   const token = getRefreshToken();
   if (!token) return false;
 
-  const response = await fetch(`${BASE_URL}/auth/refresh`, {
-    method: 'POST',
-    headers: { 'Content-Type': 'application/json' },
-    body: JSON.stringify({ refreshToken: token }),
-  });
+  let response: Response;
+  try {
+    response = await fetch(`${BASE_URL}/auth/refresh`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ refreshToken: token }),
+    });
+  } catch {
+    if (attempt < 2) {
+      await wait(1500 * (attempt + 1));
+      return refreshWithSavedToken(attempt + 1);
+    }
+    return false;
+  }
 
-  if (!response.ok) {
+  if (response.status === 409 && attempt < 3) {
+    // Renewed a moment ago in another tab: give it time to save the new token, then use that.
+    await wait(400);
+    return refreshWithSavedToken(attempt + 1);
+  }
+  if (response.status === 401 || response.status === 409) {
     setSession(null);
+    return false;
+  }
+  if (!response.ok) {
+    if (response.status >= 500 && attempt < 2) {
+      await wait(1500 * (attempt + 1));
+      return refreshWithSavedToken(attempt + 1);
+    }
     return false;
   }
 
   const body = await response.json();
   setSession({ accessToken: body.data.accessToken, refreshToken: body.data.refreshToken });
   return true;
+}
+
+/**
+ * Tabs take turns. Every tab shares the one saved token, and the API retires
+ * a token as soon as it's used, so two tabs renewing at once would trip its
+ * theft check. A browser lock makes the second tab wait and then use the
+ * token the first one saved.
+ */
+async function refreshSession(): Promise<boolean> {
+  if (typeof navigator !== 'undefined' && navigator.locks?.request) {
+    return navigator.locks.request('nbn-refresh', () => refreshWithSavedToken());
+  }
+  return refreshWithSavedToken();
 }
 
 function refreshOnce(): Promise<boolean> {

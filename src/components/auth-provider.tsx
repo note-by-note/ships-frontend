@@ -5,6 +5,8 @@ import {
   api,
   beginTestSession,
   endTestSession,
+  getRefreshToken,
+  hasAccessToken,
   onAuthChange,
   restoreSession,
   setSession,
@@ -34,6 +36,11 @@ interface AuthValue {
 
 const AuthContext = createContext<AuthValue | null>(null);
 
+/** Where someone's home is once signed in: the staff area for staff, the dashboard for everyone else. */
+export function accountHome(user: Pick<AccountUser, 'isStaff'>): string {
+  return user.isStaff ? '/admin' : '/dashboard';
+}
+
 export function AuthProvider({ children }: { children: React.ReactNode }) {
   const [user, setUser] = useState<AccountUser | null>(null);
   const [loading, setLoading] = useState(true);
@@ -57,11 +64,15 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
       if (!cancelled) setLoading(false);
     })();
 
-    // The client clears the session on its own when a refresh fails; without
-    // this the UI would keep showing a signed-in header over 401s.
+    // The client clears the session on its own when a refresh fails, and
+    // other tabs sign in and out too. Without this the header would show the
+    // wrong state until a reload.
     const unsubscribe = onAuthChange(() => {
-      if (typeof window !== 'undefined' && !window.localStorage.getItem('nbn.refresh')) {
+      if (!getRefreshToken()) {
         setUser(null);
+      } else if (!hasAccessToken()) {
+        // Signed in from another tab: pick that session up here too.
+        void restoreSession().then((ok) => (ok ? loadUser() : undefined));
       }
     });
 
