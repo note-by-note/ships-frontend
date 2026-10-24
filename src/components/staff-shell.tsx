@@ -15,12 +15,12 @@ import { DashboardShell, PageTabs, type ShellLink } from './dashboard-shell';
 
 type Waiting = NonNullable<StaffOverview['waiting']>;
 
-const WaitingContext = createContext<Waiting>({ photos: 0, hours: 0, reports: 0 });
+const WaitingContext = createContext<Waiting>({ photos: 0, hours: 0, reports: 0, toMatch: 0 });
 
 /** Every staff section and the permissions that unlock it ('all' = every staff role). */
 const SECTIONS: (ShellLink & { anyOf: Permission[] | 'all'; count?: keyof Waiting })[] = [
   { href: '/admin', label: 'Overview', icon: 'star', exact: true, anyOf: ['stats.view'] },
-  { group: 'Program', href: '/admin/applications', label: 'Applications', icon: 'file', anyOf: ['applications.review'] },
+  { group: 'Program', href: '/admin/applications', also: ['/admin/matching'], label: 'Applications', icon: 'file', anyOf: ['applications.review'], count: 'toMatch' },
   { group: 'Program', href: '/admin/mentors', also: ['/admin/photos'], label: 'Mentors', icon: 'music', anyOf: ['mentors.view', 'mentors.manage'], count: 'photos' },
   { group: 'Program', href: '/admin/messages', label: 'Messages', icon: 'message', anyOf: ['messages.review'], count: 'reports' },
   { group: 'Program', href: '/admin/my-hours', also: ['/admin/hours'], label: 'Volunteer hours', icon: 'heart', anyOf: 'all', count: 'hours' },
@@ -33,6 +33,7 @@ const SECTIONS: (ShellLink & { anyOf: Permission[] | 'all'; count?: keyof Waitin
 
 /** Which counts each role can act on, so nobody sees a badge for work they can't do. */
 const COUNT_PERMISSION: Record<keyof Waiting, Permission> = {
+  toMatch: 'applications.review',
   photos: 'mentors.manage',
   reports: 'messages.review',
   hours: 'hours.approve',
@@ -41,7 +42,7 @@ const COUNT_PERMISSION: Record<keyof Waiting, Permission> = {
 function StaffFrame({ children }: { children: ReactNode }) {
   const { user, can } = useAuth();
   const pathname = usePathname();
-  const [waiting, setWaiting] = useState<Waiting>({ photos: 0, hours: 0, reports: 0 });
+  const [waiting, setWaiting] = useState<Waiting>({ photos: 0, hours: 0, reports: 0, toMatch: 0 });
 
   // Refreshed on every page change, so a badge clears after the work is done.
   useEffect(() => {
@@ -81,6 +82,18 @@ export function StaffShell({ children }: { children: ReactNode }) {
 }
 
 // --- Tabs for sections with more than one page ------------------------------------------
+
+export function ApplicationTabs() {
+  const waiting = useContext(WaitingContext);
+  return (
+    <PageTabs
+      tabs={[
+        { href: '/admin/applications', label: 'Applications' },
+        { href: '/admin/matching', label: 'Matching', badge: waiting.toMatch },
+      ]}
+    />
+  );
+}
 
 export function MentorTabs() {
   const { can } = useAuth();

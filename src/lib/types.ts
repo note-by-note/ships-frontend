@@ -321,6 +321,8 @@ export interface MatchRequest {
   id: string;
   /** Set when it came from an accepted student application. */
   application?: string | null;
+  /** Set when staff suggested this match from the Matching page. */
+  matchedBy?: string | null;
   status: 'pending' | 'accepted' | 'declined' | 'withdrawn';
   instrument: string;
   format?: string;
@@ -375,7 +377,7 @@ export interface StaffOverview {
   /** Whether the API has SMTP settings, i.e. absence emails actually go out. */
   emailConfigured: boolean;
   /** What's waiting for staff: photos to approve, hours to approve, reported messages. */
-  waiting?: { photos: number; hours: number; reports: number };
+  waiting?: { photos: number; hours: number; reports: number; toMatch?: number };
   /** Sent student applications per school picked on the form. */
   studentsBySchool?: { school: string; count: number }[];
 }
@@ -389,6 +391,34 @@ export interface TeamMember {
   /** Their picture, relative to the API root (use apiUrl), or null for initials. */
   photoPath: string | null;
   order: number;
+}
+
+// --- Matching (staff) ---------------------------------------------------------------
+
+export interface MatchingStudent {
+  applicationId: string;
+  name: string;
+  instrument: string | null;
+  experienceLevel: string | null;
+  ageGroup: string | null;
+  availability: string[];
+  languages: string[];
+  school: string;
+  goals: string;
+  acceptedAt: string;
+  isTest: boolean;
+}
+
+export interface MentorSuggestion {
+  mentorId: string;
+  name: string;
+  slug: string;
+  reasons: string[];
+}
+
+export interface MatchingBoard {
+  needsMentor: (MatchingStudent & { declined: string[]; suggestions: MentorSuggestion[] })[];
+  waiting: (MatchingStudent & { requestId: string; mentor: string; since: string; byStaff: boolean })[];
 }
 
 export interface PartnerSchool {

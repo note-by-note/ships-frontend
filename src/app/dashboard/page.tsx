@@ -302,7 +302,11 @@ function MentorDashboard() {
                       <div>
                         <p className="flex flex-wrap items-center gap-2 font-semibold text-ink">
                           {request.student?.firstName || 'A student'}
-                          {request.application ? (
+                          {request.matchedBy ? (
+                            <span className="rounded-md bg-sky/40 px-2 py-0.5 text-xs font-semibold text-navy">
+                              Suggested by the Note by Note team
+                            </span>
+                          ) : request.application ? (
                             <span className="rounded-md bg-ok-soft px-2 py-0.5 text-xs font-semibold text-ok">
                               Application approved
                             </span>

@@ -65,8 +65,11 @@ export function ApplicationReview({ id }: { id: string }) {
           : null,
       );
       const setup = body.meta?.mentorSetup;
+      const needsMatch = status === 'accepted' && body.data.formKind === 'mentee' && !body.data.requestedMentor;
       setSetupNotice(
-        !setup
+        needsMatch
+          ? { tone: 'ok', text: 'Accepted. Find them a mentor on the Matching tab (Applications → Matching).' }
+          : !setup
           ? null
           : setup.status === 'created'
             ? { tone: 'ok', text: 'Accepted. Their account is now a mentor’s, with a hidden mentor page filled in from these answers. Publish it from Mentors once they’ve set it up.' }
