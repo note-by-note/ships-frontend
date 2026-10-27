@@ -74,6 +74,16 @@ export type InstrumentFamily = 'Keys' | 'Strings' | 'Woodwinds' | 'Brass' | 'Per
  * Mirrors the API's instrument list (`ships-api/src/schema/enums.ts`), so what
  * the site advertises matches what the application forms accept.
  */
+/** A few words under instruments whose name doesn't say what's included. */
+export const INSTRUMENT_HINTS: Record<string, string> = {
+  Percussion: 'All-round school band percussion',
+  'Drum Set': 'Drum kit',
+  Glockenspiel: 'Bells',
+  'Hand Drums': 'Cajón, congas, bongos, djembe',
+  'Auxiliary Percussion': 'Tambourine, triangle, cymbals, bass drum',
+  'Music Theory': 'For any instrument',
+};
+
 export const INSTRUMENT_FAMILIES: { family: InstrumentFamily; blurb: string; instruments: string[] }[] = [
   { family: 'Keys', blurb: 'A great place to start reading music.', instruments: ['Piano'] },
   {
@@ -100,6 +110,21 @@ export const INSTRUMENT_FAMILIES: { family: InstrumentFamily; blurb: string; ins
     blurb: 'Bright, bold and at the heart of most school bands.',
     instruments: ['Trumpet', 'French Horn', 'Trombone', 'Euphonium', 'Tuba'],
   },
-  { family: 'Percussion', blurb: 'Rhythm first, then everything else.', instruments: ['Percussion', 'Xylophone'] },
+  {
+    family: 'Percussion',
+    blurb: 'Rhythm first, then everything else: drums, mallets and more.',
+    instruments: [
+      'Percussion',
+      'Drum Set',
+      'Snare Drum',
+      'Timpani',
+      'Xylophone',
+      'Marimba',
+      'Vibraphone',
+      'Glockenspiel',
+      'Hand Drums',
+      'Auxiliary Percussion',
+    ],
+  },
   { family: 'Theory', blurb: 'How music works, for any instrument.', instruments: ['Music Theory'] },
 ];

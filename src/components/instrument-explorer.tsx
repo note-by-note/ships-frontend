@@ -8,7 +8,7 @@
 import Link from 'next/link';
 import { useEffect, useState } from 'react';
 import { api } from '@/lib/api';
-import { INSTRUMENT_FAMILIES, type InstrumentFamily } from '@/lib/site';
+import { INSTRUMENT_FAMILIES, INSTRUMENT_HINTS, type InstrumentFamily } from '@/lib/site';
 import { cx } from './ui';
 
 interface Facets {
@@ -104,6 +104,9 @@ export function InstrumentExplorer() {
                   </div>
                   <div className="flex min-w-0 flex-col items-start gap-1.5 px-1 pt-3 pb-1">
                     <span className="font-display text-base font-bold break-words">{instrument}</span>
+                    {INSTRUMENT_HINTS[instrument] ? (
+                      <span className="text-xs text-navy/60">{INSTRUMENT_HINTS[instrument]}</span>
+                    ) : null}
                     {counts ? (
                       <span
                         className={cx(
