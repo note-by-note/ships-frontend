@@ -10,8 +10,8 @@ import { Select } from '@/components/ui/fields';
 import { ApiError, api } from '@/lib/api';
 import type { TestAccount } from '@/lib/types';
 
-// Test accounts: staff create pretend students and mentors and switch into them
-// to see their pages exactly as they would. Only test accounts can be entered —
+// Test accounts: staff create pretend students, mentors and mentors who take
+// lessons too, and switch into them to see their pages exactly as they would. Only test accounts can be entered —
 // there is no way to sign in as a real person from here.
 
 export default function TestingPage() {
@@ -59,14 +59,14 @@ export default function TestingPage() {
     }
   }
 
-  const students = (accounts ?? []).filter((account) => account.role === 'student');
+  const students = (accounts ?? []).filter((account) => account.role === 'student' || account.alsoStudent);
   const mentors = (accounts ?? []).filter((account) => account.role === 'mentor');
 
   return (
     <RequirePermission anyOf={['testing.use']}>
       <DashboardHeading
         title="Test mode"
-        description="Make test students and mentors, then switch into them to try their pages. Everything a test account does is labelled as test data and kept out of the real review queue and numbers."
+        description="Make test students, mentors and mentor-students (mentors who take lessons too), then switch into them to try their pages. Everything a test account does is labelled as test data and kept out of the real review queue and numbers."
         actions={
           <>
             <Button disabled={busy !== null} onClick={() => run('new-student', () => api.post('/testing/accounts', { kind: 'student' }), 'Test student created.')}>
@@ -78,6 +78,15 @@ export default function TestingPage() {
               onClick={() => run('new-mentor', () => api.post('/testing/accounts', { kind: 'mentor' }), 'Test mentor created, with a hidden test profile.')}
             >
               + Test mentor
+            </Button>
+            <Button
+              variant="secondary"
+              disabled={busy !== null}
+              onClick={() =>
+                run('new-both', () => api.post('/testing/accounts', { kind: 'both' }), 'Test mentor-student created: a test mentor who can also apply for lessons and ask other mentors.')
+              }
+            >
+              + Mentor-student
             </Button>
           </>
         }
@@ -106,12 +115,15 @@ export default function TestingPage() {
                   <tr key={account.id}>
                     <td className="px-4 py-3">
                       <p className="font-medium text-ink">
-                        {account.name} <Badge tone="warn" className="ml-1">{account.role}</Badge>
+                        {account.name}{' '}
+                        <Badge tone="warn" className="ml-1">{account.alsoStudent ? 'mentor + student' : account.role}</Badge>
                       </p>
                       <p className="text-xs text-ink-faint">{account.email}</p>
                     </td>
                     <td className="px-4 py-3 text-ink-soft">
-                      {account.role === 'mentor'
+                      {account.alsoStudent
+                        ? `${account.matchRequestCount} received, ${account.requestsSent} sent, ${account.applicationCount} application${account.applicationCount === 1 ? '' : 's'}`
+                        : account.role === 'mentor'
                         ? `${account.matchRequestCount} request${account.matchRequestCount === 1 ? '' : 's'} received`
                         : `${account.applicationCount} application${account.applicationCount === 1 ? '' : 's'}, ${account.matchRequestCount} request${account.matchRequestCount === 1 ? '' : 's'} sent`}
                     </td>

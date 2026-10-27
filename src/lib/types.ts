@@ -237,6 +237,8 @@ export interface AccountUser {
   isStaff: boolean;
   permissions: Permission[];
   isTest: boolean;
+  /** A mentor who takes lessons too: the dashboard shows both sides. */
+  alsoStudent?: boolean;
   mentorProfile?: { id: string; name: string; slug: string } | null;
 }
 
@@ -350,9 +352,12 @@ export interface TestAccount {
   name: string;
   email: string;
   role: 'student' | 'mentor';
+  alsoStudent: boolean;
   mentorProfile: { id: string; name: string; slug: string } | null;
   applicationCount: number;
+  /** Received, for a mentor; sent, for a student. */
   matchRequestCount: number;
+  requestsSent: number;
   createdAt: string;
 }
 

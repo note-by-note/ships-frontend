@@ -79,13 +79,21 @@ export function MentorAction({
   standing: StudentStanding;
   className?: string;
 }) {
+  const { user } = useAuth();
   const [open, setOpen] = useState(false);
   const applyHref = standing.applyHref(mentor.slug);
   const base = 'flex w-full items-center justify-center gap-2 rounded-xl py-3 text-sm font-semibold transition-colors';
   const solid = 'bg-navy text-cream hover:bg-navy/90';
 
   let action: ReactNode;
-  if (mentor.acceptingStudents === false) {
+  if (user?.mentorProfile?.id === mentor.id) {
+    // Mentors can ask other mentors for lessons, never themselves.
+    action = (
+      <Link href="/dashboard/profile" className={cx(base, 'border-2 border-navy py-2.5 text-navy hover:bg-navy/5', className)}>
+        This is you: edit your page
+      </Link>
+    );
+  } else if (mentor.acceptingStudents === false) {
     action = (
       <button type="button" disabled className={cx(base, 'cursor-not-allowed bg-navy/30 text-cream', className)}>
         Not taking new students
@@ -121,7 +129,7 @@ export function MentorAction({
 
 /** Sends a match request to one mentor. Signs people in first if needed. */
 export function RequestDialog({ mentor, onClose }: { mentor: RequestableMentor; onClose: () => void }) {
-  const { user } = useAuth();
+  const { user, refreshUser } = useAuth();
   const pathname = usePathname();
   const [options, setOptions] = useState<Options | null>(null);
   const [form, setForm] = useState({
@@ -167,6 +175,8 @@ export function RequestDialog({ mentor, onClose }: { mentor: RequestableMentor; 
         student: { firstName: form.firstName.trim(), ageGroup: form.ageGroup, experienceLevel: form.experienceLevel },
       });
       setSent(true);
+      // A mentor asking for lessons now has a student side to their dashboard.
+      if (user?.role === 'mentor' && !user.alsoStudent) void refreshUser();
     } catch (err) {
       // A 422 carries per-field reasons; show those rather than a bare "Validation failed".
       const details = err instanceof ApiError && err.details && typeof err.details === 'object'

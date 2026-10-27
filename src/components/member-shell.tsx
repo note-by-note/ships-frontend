@@ -33,6 +33,11 @@ const MENTOR_LINKS: ShellLink[] = [
   { href: '/faq', label: 'Help', icon: 'help' },
 ];
 
+/** A mentor who takes lessons too: the mentor tools, plus applying as a student. */
+const MENTOR_STUDENT_LINKS: ShellLink[] = MENTOR_LINKS.flatMap((link) =>
+  link.href === '/applications' ? [link, { href: '/apply', label: 'Apply', icon: 'school' as const }] : [link],
+);
+
 /**
  * Unread messages for the sidebar badge. Checked on every page change and
  * once a minute while the tab is open.
@@ -92,11 +97,12 @@ export function MemberShell({ children }: { children: ReactNode }) {
     );
   }
 
+  const mentor = user.role === 'mentor';
   return (
     <DashboardShell
-      title={user.role === 'mentor' ? 'Mentor dashboard' : 'Student dashboard'}
+      title={mentor && user.alsoStudent ? 'Mentor and student' : mentor ? 'Mentor dashboard' : 'Student dashboard'}
       subtitle={user.name}
-      links={(user.role === 'mentor' ? MENTOR_LINKS : STUDENT_LINKS).map((link) =>
+      links={(mentor && user.alsoStudent ? MENTOR_STUDENT_LINKS : mentor ? MENTOR_LINKS : STUDENT_LINKS).map((link) =>
         link.href === '/dashboard/messages' ? { ...link, badge: unread } : link,
       )}
     >

@@ -17,7 +17,7 @@ import {
 } from '@/components/dashboard-widgets';
 import { Icon } from '@/components/marketing';
 import { NextSteps } from '@/components/next-steps';
-import { Alert, Button, ButtonLink, Spinner, StatusBadge, humanize } from '@/components/ui';
+import { Alert, Button, ButtonLink, Spinner, StatusBadge, cx, humanize } from '@/components/ui';
 import { ApiError, api } from '@/lib/api';
 import type { Application, MatchRequest, MentorProfile, OwnMatchRequest, ScheduleDay } from '@/lib/types';
 import { APPLY_LINKS } from '@/lib/site';
@@ -25,12 +25,80 @@ import { APPLY_LINKS } from '@/lib/site';
 // Student and mentor dashboards, after the Figma "student-dashboard" and
 // "mentor-dashboard" frames: what's next, lessons, practice, messages and
 // resources for both; requests, students, the mentor's page and volunteer
-// hours for mentors.
+// hours for mentors. A mentor who takes lessons too switches between the two.
 
 export default function DashboardPage() {
   const { user } = useAuth();
   if (!user) return null;
-  return user.role === 'mentor' ? <MentorDashboard /> : <StudentDashboard />;
+  if (user.role !== 'mentor') return <StudentDashboard />;
+  if (!user.alsoStudent) return <MentorDashboard />;
+  return <MentorAndStudentDashboard />;
+}
+
+type Side = 'mentor' | 'student';
+const VIEW_KEY = 'nbn.dashboardView';
+
+function savedView(): Side {
+  try {
+    return window.localStorage.getItem(VIEW_KEY) === 'student' ? 'student' : 'mentor';
+  } catch {
+    return 'mentor';
+  }
+}
+
+function MentorAndStudentDashboard() {
+  // Only rendered once the account has loaded, so reading storage here can't
+  // differ from the server render.
+  const [view, setView] = useState<Side>(savedView);
+
+  function choose(next: Side) {
+    setView(next);
+    try {
+      window.localStorage.setItem(VIEW_KEY, next);
+    } catch {
+      /* private mode: the choice just isn't remembered */
+    }
+  }
+
+  const tabs: { side: Side; label: string }[] = [
+    { side: 'mentor', label: 'Mentoring' },
+    { side: 'student', label: 'My lessons' },
+  ];
+
+  return (
+    <>
+      <div className="mb-6 border-b border-navy/10">
+        <div role="tablist" aria-label="Dashboard" className="-mb-px flex gap-1">
+          {tabs.map((tab) => (
+            <button
+              key={tab.side}
+              type="button"
+              role="tab"
+              aria-selected={view === tab.side}
+              onClick={() => choose(tab.side)}
+              className={cx(
+                'border-b-2 px-3 py-2.5 text-sm whitespace-nowrap transition-colors',
+                view === tab.side ? 'border-navy font-semibold text-navy' : 'border-transparent text-navy/60 hover:text-navy',
+              )}
+            >
+              {tab.label}
+            </button>
+          ))}
+        </div>
+      </div>
+      {view === 'mentor' ? <MentorDashboard /> : <StudentDashboard />}
+    </>
+  );
+}
+
+/** Only the pairings (and their conversations) where this account is on one side. */
+function useSide(side: Side) {
+  const { pairings, conversations } = useLessonsAndMessages();
+  const mine = pairings?.filter((pairing) => pairing.side === side) ?? null;
+  return {
+    pairings: mine,
+    conversations: conversations?.filter((conversation) => conversation.side === side) ?? null,
+  };
 }
 
 function firstName(name: string) {
@@ -43,7 +111,7 @@ function StudentDashboard() {
   const { user } = useAuth();
   const [applications, setApplications] = useState<Application[] | null>(null);
   const [requests, setRequests] = useState<OwnMatchRequest[] | null>(null);
-  const { pairings, conversations } = useLessonsAndMessages();
+  const { pairings, conversations } = useSide('student');
 
   useEffect(() => {
     api.get<{ data: Application[] }>('/applications/mine').then((b) => setApplications(b.data)).catch(() => setApplications([]));
@@ -211,7 +279,7 @@ function MentorDashboard() {
   const [requests, setRequests] = useState<MatchRequest[] | null>(null);
   const [error, setError] = useState<string | null>(null);
   const [mentorApplication, setMentorApplication] = useState<Application | null>(null);
-  const { pairings, conversations } = useLessonsAndMessages();
+  const { pairings, conversations } = useSide('mentor');
 
   useEffect(() => {
     api
@@ -384,6 +452,16 @@ function MentorDashboard() {
           <PageChecklist profile={profile} />
           <HoursPanel />
           <ResourcesPanel scope="team" title="From the Note by Note team" />
+          {user!.alsoStudent ? null : (
+            <Panel title="Want lessons too?">
+              <p className="text-sm text-ink-soft">
+                Mentors can learn another instrument here as well. Apply as a student and your dashboard will show both.
+              </p>
+              <div className="mt-3">
+                <ButtonLink href={APPLY_LINKS.student} size="sm" variant="secondary">Apply as a student</ButtonLink>
+              </div>
+            </Panel>
+          )}
           <HelpPanel />
         </div>
       </div>

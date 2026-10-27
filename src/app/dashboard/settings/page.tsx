@@ -42,7 +42,7 @@ export default function SettingsPage() {
     }
   }
 
-  const other = user?.role === 'mentor' ? 'a student' : 'your mentor';
+  const other = user?.role === 'mentor' ? (user.alsoStudent ? 'a student or your mentor' : 'a student') : 'your mentor';
 
   return (
     <>

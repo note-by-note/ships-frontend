@@ -38,7 +38,7 @@ type Step =
 const AUTOSAVE_DELAY = 1200;
 
 export function ApplicationWizard({ slug, mentor }: { slug: string; mentor?: string }) {
-  const { user, loading: authLoading } = useAuth();
+  const { user, loading: authLoading, refreshUser } = useAuth();
   const router = useRouter();
   const pathname = usePathname();
 
@@ -278,6 +278,8 @@ export function ApplicationWizard({ slug, mentor }: { slug: string; mentor?: str
       );
       setApplication(body.data);
       setSubmitted({ message: body.meta.successMessage || form.settings.successMessage });
+      // A mentor applying for lessons now has a student side to their dashboard.
+      if (user?.role === 'mentor' && !user.alsoStudent && body.data.formKind === 'mentee') void refreshUser();
       window.scrollTo({ top: 0, behavior: 'smooth' });
     } catch (err) {
       if (err instanceof ApiError && err.status === 422) {

@@ -16,7 +16,7 @@ export function TestModeBanner() {
     <div role="status" className="bg-gold text-navy print:hidden">
       <div className="mx-auto flex max-w-7xl flex-wrap items-center justify-between gap-3 px-5 py-2.5 text-sm md:px-8">
         <p>
-          <strong>Test mode.</strong> You’re viewing the site as <strong>{user.name}</strong> ({user.role}). Anything
+          <strong>Test mode.</strong> You’re viewing the site as <strong>{user.name}</strong> ({user.alsoStudent ? 'mentor and student' : user.role}). Anything
           you do is marked as test data.
         </p>
         <button
