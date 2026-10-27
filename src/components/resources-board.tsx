@@ -5,15 +5,15 @@
 //   member mode (dashboard): what your mentor or students shared with you,
 //     what you shared, and (for mentors) the team library. Share a file or a
 //     link with your students, or with your mentor.
-//   team mode (staff area): the team library that every mentor and
-//     volunteer sees, e.g. training guides and safety policies.
+//   team mode (staff area): the team library, e.g. training guides and
+//     safety policies, each for everyone on the team or only picked teams.
 //
 // Files are fetched with the signed-in session and opened from memory, since
 // they aren't public.
 
 import { useCallback, useEffect, useMemo, useState, type FormEvent, type ReactNode } from 'react';
 import { ApiError, api } from '@/lib/api';
-import type { Pairing, SharedResource } from '@/lib/types';
+import type { Pairing, ResourceTeam, SharedResource } from '@/lib/types';
 import { Icon, type IconName } from './marketing';
 import { Alert, Button, Spinner, cx } from './ui';
 import { Field, TextArea, TextInput } from './ui/fields';
@@ -60,6 +60,46 @@ async function openFile(resource: SharedResource, download: boolean) {
     tab?.close();
     throw err;
   }
+}
+
+/** Who a team resource can be for. None picked means everyone on the team. */
+const TEAMS: { key: ResourceTeam; label: string }[] = [
+  { key: 'mentors', label: 'Mentors' },
+  { key: 'admin', label: 'Admin' },
+  { key: 'tech', label: 'Tech' },
+  { key: 'outreach', label: 'Outreach' },
+  { key: 'marketing', label: 'Marketing' },
+];
+
+function teamsLabel(teams: ResourceTeam[]): string {
+  if (!teams.length) return 'Everyone on the team';
+  return TEAMS.filter((team) => teams.includes(team.key)).map((team) => team.label).join(', ');
+}
+
+function TeamPicker({ value, onChange }: { value: ResourceTeam[]; onChange: (next: ResourceTeam[]) => void }) {
+  const chip = (on: boolean) =>
+    cx('rounded-full border px-3 py-1 text-sm', on ? 'border-navy bg-navy text-cream' : 'border-line-strong bg-white text-ink-soft');
+  function toggle(key: ResourceTeam) {
+    const next = value.includes(key) ? value.filter((entry) => entry !== key) : [...value, key];
+    // Every team picked is the same as everyone.
+    onChange(next.length === TEAMS.length ? [] : next);
+  }
+  return (
+    <fieldset>
+      <legend className="mb-2 text-sm font-medium text-ink">Who can see it</legend>
+      <div className="flex flex-wrap gap-2">
+        <button type="button" aria-pressed={!value.length} onClick={() => onChange([])} className={chip(!value.length)}>
+          Everyone on the team
+        </button>
+        {TEAMS.map((team) => (
+          <button key={team.key} type="button" aria-pressed={value.includes(team.key)} onClick={() => toggle(team.key)} className={chip(value.includes(team.key))}>
+            {team.label}
+          </button>
+        ))}
+      </div>
+      <p className="mt-2 text-xs text-ink-faint">Students never see team resources. Admins can see all of them.</p>
+    </fieldset>
+  );
 }
 
 export function ResourcesBoard({ mode }: { mode: 'member' | 'team' }) {
@@ -131,7 +171,13 @@ export function ResourcesBoard({ mode }: { mode: 'member' | 'team' }) {
           {group.items.length ? (
             <ul className="grid gap-3 md:grid-cols-2">
               {group.items.map((resource) => (
-                <ResourceCard key={resource.id} resource={resource} showAudience={mode === 'member' && resource.mine} onDeleted={load} />
+                <ResourceCard
+                  key={resource.id}
+                  resource={resource}
+                  showAudience={mode === 'member' && resource.mine}
+                  teamMode={mode === 'team'}
+                  onDeleted={load}
+                />
               ))}
             </ul>
           ) : (
@@ -146,14 +192,19 @@ export function ResourcesBoard({ mode }: { mode: 'member' | 'team' }) {
 function ResourceCard({
   resource,
   showAudience,
+  teamMode,
   onDeleted,
 }: {
   resource: SharedResource;
   showAudience: boolean;
+  /** In the staff library: show which teams see it, and let managers change that. */
+  teamMode: boolean;
   onDeleted: () => void;
 }) {
   const [busy, setBusy] = useState<string | null>(null);
   const [error, setError] = useState<string | null>(null);
+  const [teams, setTeams] = useState<ResourceTeam[]>(resource.teams ?? []);
+  const [editingTeams, setEditingTeams] = useState<ResourceTeam[] | null>(null);
 
   async function run(label: string, action: () => Promise<unknown>) {
     setBusy(label);
@@ -191,6 +242,40 @@ function ResourceCard({
           {resource.file ? ` · ${sizeLabel(resource.file.size)}` : ''}
           {showAudience && audience ? ` · Shared with ${resource.sharedWith.length > 1 ? audience : audience.split(' ')[0]}` : ''}
         </p>
+        {teamMode && resource.scope === 'team' ? (
+          editingTeams ? (
+            <div className="mt-3 rounded-xl bg-paper p-3">
+              <TeamPicker value={editingTeams} onChange={setEditingTeams} />
+              <div className="mt-3 flex gap-2">
+                <Button
+                  size="sm"
+                  disabled={busy !== null}
+                  onClick={() =>
+                    run('teams', async () => {
+                      const body = await api.patch<{ data: SharedResource }>(`/resources/${resource.id}`, { teams: editingTeams });
+                      setTeams(body.data.teams ?? []);
+                      setEditingTeams(null);
+                    })
+                  }
+                >
+                  {busy === 'teams' ? 'Saving…' : 'Save'}
+                </Button>
+                <Button size="sm" variant="secondary" disabled={busy !== null} onClick={() => setEditingTeams(null)}>
+                  Cancel
+                </Button>
+              </div>
+            </div>
+          ) : (
+            <p className="mt-1 text-xs text-ink-soft">
+              Seen by: <span className="font-medium text-ink">{teamsLabel(teams)}</span>
+              {resource.canDelete ? (
+                <button type="button" onClick={() => setEditingTeams(teams)} className="ml-2 font-semibold text-navy underline underline-offset-2">
+                  Change
+                </button>
+              ) : null}
+            </p>
+          )
+        ) : null}
         {error ? <p className="mt-1 text-xs text-danger">{error}</p> : null}
         <div className="mt-3 flex flex-wrap gap-2">
           {resource.kind === 'link' && resource.url ? (
@@ -240,6 +325,7 @@ function ShareForm({
   const [url, setUrl] = useState('');
   const [file, setFile] = useState<File | null>(null);
   const [chosen, setChosen] = useState<string[]>(() => pairings.map((pairing) => pairing.id));
+  const [teams, setTeams] = useState<ResourceTeam[]>([]);
   const [busy, setBusy] = useState(false);
   const [error, setError] = useState<string | null>(null);
 
@@ -258,7 +344,7 @@ function ShareForm({
     try {
       if (kind === 'link') {
         if (!/^https:\/\/\S+$/.test(url.trim())) throw new Error('Links need to start with https://');
-        await api.post('/resources', { title: title.trim(), note: note.trim(), url: url.trim(), share });
+        await api.post('/resources', { title: title.trim(), note: note.trim(), url: url.trim(), share, ...(mode === 'team' ? { teams } : {}) });
       } else {
         if (!file) throw new Error('Choose a file.');
         if (file.size > MAX_BYTES) throw new Error('Files can be up to 10 MB.');
@@ -267,6 +353,7 @@ function ShareForm({
           note: note.trim(),
           name: file.name,
           share: Array.isArray(share) ? share.join(',') : share,
+          ...(mode === 'team' && teams.length ? { teams: teams.join(',') } : {}),
         });
         await api.upload(`/resources/upload?${query.toString()}`, file);
       }
@@ -360,7 +447,7 @@ function ShareForm({
       </Field>
 
       {audience}
-      {mode === 'team' ? <p className="text-sm text-ink-soft">Every mentor and team member will see this. Students won&apos;t.</p> : null}
+      {mode === 'team' ? <TeamPicker value={teams} onChange={setTeams} /> : null}
       {error ? <Alert>{error}</Alert> : null}
 
       <div className="flex gap-2">

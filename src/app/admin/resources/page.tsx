@@ -9,7 +9,7 @@ export default function TeamResourcesPage() {
     <RequirePermission anyOf={['resources.manage']}>
       <DashboardHeading
         title="Team resources"
-        description="Guides, policies and teaching material for every mentor and volunteer. Students don't see these."
+        description="Guides, policies and teaching material for the team: everyone, or only the teams you pick. Students don't see these."
       />
       <ResourcesBoard mode="team" />
     </RequirePermission>

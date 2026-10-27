@@ -6,13 +6,15 @@
 //     (the student application opens with the mentor named on it)
 //   - an accepted student sends a request straight away (RequestDialog)
 //   - staff are pointed to Test mode, since staff aren't students
+//   - someone already learning with the mentor, or waiting on their answer,
+//     sees that instead of being asked to apply again
 
 import Link from 'next/link';
 import { useEffect, useMemo, useState, type FormEvent, type ReactNode } from 'react';
 import { usePathname } from 'next/navigation';
 import { ApiError, api } from '@/lib/api';
 import { APPLY_LINKS } from '@/lib/site';
-import type { Application, Options } from '@/lib/types';
+import type { Application, Options, OwnMatchRequest } from '@/lib/types';
 import { useAuth } from './auth-provider';
 import { Icon } from './marketing';
 import { cx } from './ui';
@@ -36,12 +38,15 @@ export interface StudentStanding {
   applyHref: (slug: string) => string | undefined;
   /** Whether this mentor is the one named on the student's application. */
   chosen: (slug: string) => boolean;
+  /** This person's lessons with the mentor: already learning, waiting on an answer, or neither. */
+  withMentor: (slug: string) => 'accepted' | 'pending' | null;
 }
 
 /** Load the signed-in student's applications once, for every mentor on the page. */
 export function useStudentStanding(): StudentStanding {
   const { user } = useAuth();
   const [applications, setApplications] = useState<Application[]>([]);
+  const [requests, setRequests] = useState<OwnMatchRequest[]>([]);
 
   useEffect(() => {
     if (!user || user.isStaff) return;
@@ -49,6 +54,10 @@ export function useStudentStanding(): StudentStanding {
       .get<{ data: Application[] }>('/applications/mine')
       .then((body) => setApplications(body.data))
       .catch(() => setApplications([]));
+    api
+      .get<{ data: OwnMatchRequest[] }>('/me/match-requests')
+      .then((body) => setRequests(body.data))
+      .catch(() => setRequests([]));
   }, [user]);
 
   const studentApplication =
@@ -64,8 +73,14 @@ export function useStudentStanding(): StudentStanding {
       applyHref: (slug: string) =>
         staff || accepted ? undefined : `${APPLY_LINKS.student}?mentor=${encodeURIComponent(slug)}`,
       chosen: (slug: string) => chosenSlug === slug,
+      withMentor: (slug: string) => {
+        const mine = requests.filter((request) => request.mentor?.slug === slug);
+        if (mine.some((request) => request.status === 'accepted')) return 'accepted';
+        if (mine.some((request) => request.status === 'pending')) return 'pending';
+        return null;
+      },
     }),
-    [staff, accepted, chosenSlug],
+    [staff, accepted, chosenSlug, requests],
   );
 }
 
@@ -82,6 +97,7 @@ export function MentorAction({
   const { user } = useAuth();
   const [open, setOpen] = useState(false);
   const applyHref = standing.applyHref(mentor.slug);
+  const already = standing.withMentor(mentor.slug);
   const base = 'flex w-full items-center justify-center gap-2 rounded-xl py-3 text-sm font-semibold transition-colors';
   const solid = 'bg-navy text-cream hover:bg-navy/90';
 
@@ -91,6 +107,18 @@ export function MentorAction({
     action = (
       <Link href="/dashboard/profile" className={cx(base, 'border-2 border-navy py-2.5 text-navy hover:bg-navy/5', className)}>
         This is you: edit your page
+      </Link>
+    );
+  } else if (already === 'accepted') {
+    action = (
+      <Link href="/dashboard/lessons" className={cx(base, 'border-2 border-navy py-2.5 text-navy hover:bg-navy/5', className)}>
+        <span aria-hidden>✓</span> Your mentor: see your lessons
+      </Link>
+    );
+  } else if (already === 'pending') {
+    action = (
+      <Link href="/dashboard" className={cx(base, 'border-2 border-navy py-2.5 text-navy hover:bg-navy/5', className)}>
+        Request sent: waiting for {firstNameOf(mentor.name)}
       </Link>
     );
   } else if (mentor.acceptingStudents === false) {

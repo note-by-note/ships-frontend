@@ -494,6 +494,8 @@ export interface ReviewedConversation {
 
 // --- Resources ---------------------------------------------------------------------------
 
+export type ResourceTeam = 'mentors' | 'admin' | 'tech' | 'outreach' | 'marketing';
+
 export interface SharedResource {
   id: string;
   title: string;
@@ -502,6 +504,8 @@ export interface SharedResource {
   url: string | null;
   file: { name: string; size: number; contentType: string } | null;
   scope: 'pairing' | 'team';
+  /** For a team resource, the teams that see it. Empty = everyone on the team. */
+  teams?: ResourceTeam[];
   createdBy: string;
   mine: boolean;
   canDelete: boolean;
