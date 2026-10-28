@@ -135,6 +135,10 @@ function AccountLink({
       ) : (
         <div className="flex flex-col gap-3 text-sm">
           <p className="text-ink-soft">Not linked yet. Nobody can edit this profile except staff.</p>
+          <p className="text-xs text-ink-faint">
+            A volunteer on the team can mentor too: link their account and they keep their team role. Only an admin can link
+            a staff account.
+          </p>
           {editable ? (
             <form
               className="flex flex-col gap-2"

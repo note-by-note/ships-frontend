@@ -12,6 +12,10 @@ import { ROLE_LABELS, STAFF_ROLES, type DirectoryUser, type Paged, type UserRole
 // Accounts and roles. Admins can give any role; tech can switch people between
 // student and mentor and deactivate non-staff accounts. The API enforces the
 // same rules — the controls here just don't offer what would be refused.
+//
+// One person can be several things: a role (a volunteer team, or mentor),
+// plus a linked mentor page, plus "Takes lessons". A tech volunteer who
+// mentors and learns has the Tech role, a mentor page and lessons ticked.
 
 const ROLE_HELP: Record<UserRole, string> = {
   student: 'Applies for lessons.',
@@ -77,8 +81,13 @@ export default function PeoplePage() {
             </li>
           ))}
         </ul>
+        <p className="mt-3 text-ink-soft">
+          <strong>Being more than one thing.</strong> Someone can be on a volunteer team, mentor and take lessons all at
+          once. Give them their team as their role, link their mentor page (Mentors → their page → linked account, or
+          accept their mentor application), and tick <em>Takes lessons</em>. Applying as a student ticks it for them.
+        </p>
         {!canGiveStaffRoles ? (
-          <p className="mt-3 text-xs text-ink-faint">Only admins can give or change staff roles.</p>
+          <p className="mt-3 text-xs text-ink-faint">Only admins can give or change staff roles, or change a staff account.</p>
         ) : null}
       </details>
 
@@ -114,7 +123,8 @@ export default function PeoplePage() {
               <tr>
                 <th scope="col" className="px-4 py-3 font-medium">Person</th>
                 <th scope="col" className="px-4 py-3 font-medium">Role</th>
-                <th scope="col" className="px-4 py-3 font-medium">Mentor profile</th>
+                <th scope="col" className="px-4 py-3 font-medium">Mentor page</th>
+                <th scope="col" className="px-4 py-3 font-medium">Takes lessons</th>
                 <th scope="col" className="px-4 py-3 font-medium">Status</th>
               </tr>
             </thead>
@@ -153,6 +163,29 @@ export default function PeoplePage() {
                     </td>
                     <td className="px-4 py-3 text-ink-soft">
                       {person.mentorProfile ? person.mentorProfile.name : person.role === 'mentor' ? <span className="text-ink-faint">Not linked</span> : <span className="text-ink-faint">None</span>}
+                    </td>
+                    <td className="px-4 py-3">
+                      {person.role === 'student' ? (
+                        <span className="text-ink-faint">Yes (student)</span>
+                      ) : locked ? (
+                        <span className={person.alsoStudent ? 'text-ink' : 'text-ink-faint'}>{person.alsoStudent ? 'Yes' : 'No'}</span>
+                      ) : (
+                        <label className="flex items-center gap-2 text-ink-soft">
+                          <input
+                            type="checkbox"
+                            className="size-4 accent-navy"
+                            checked={Boolean(person.alsoStudent)}
+                            onChange={(e) => {
+                              const next = e.target.checked;
+                              const message = next
+                                ? `Let ${person.name} take lessons too? Their dashboard will show a student side. They will be signed out.`
+                                : `Remove ${person.name}'s student side? Their lessons stay, but their dashboard won't show them. They will be signed out.`;
+                              if (window.confirm(message)) void update(person, { alsoStudent: next });
+                            }}
+                          />
+                          {person.alsoStudent ? 'Yes' : 'No'}
+                        </label>
+                      )}
                     </td>
                     <td className="px-4 py-3">
                       <div className="flex items-center gap-2">

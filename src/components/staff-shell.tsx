@@ -10,7 +10,7 @@ import { createContext, useContext, useEffect, useState, type ReactNode } from '
 import { api } from '@/lib/api';
 import { ROLE_LABELS, type Permission, type StaffOverview } from '@/lib/types';
 import { AdminGuard } from './admin-guard';
-import { useAuth } from './auth-provider';
+import { sidesOf, useAuth } from './auth-provider';
 import { DashboardShell, PageTabs, type ShellLink } from './dashboard-shell';
 
 type Waiting = NonNullable<StaffOverview['waiting']>;
@@ -53,12 +53,16 @@ function StaffFrame({ children }: { children: ReactNode }) {
       .catch(() => undefined);
   }, [can, pathname]);
 
-  const links = SECTIONS.filter(
+  const links: ShellLink[] = SECTIONS.filter(
     (section) => section.anyOf === 'all' || section.anyOf.some((permission) => can(permission)),
   ).map(({ count, ...link }) => ({
     ...link,
     badge: count && can(COUNT_PERMISSION[count]) ? waiting[count] : undefined,
   }));
+  // Volunteers who also mentor or take lessons reach their own dashboard from here.
+  if (user && sidesOf(user).any) {
+    links.push({ group: 'You', href: '/dashboard', label: 'My lessons & mentoring', icon: 'calendar' });
+  }
 
   return (
     <WaitingContext.Provider value={waiting}>

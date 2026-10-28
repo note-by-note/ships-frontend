@@ -8,7 +8,7 @@ import { useEffect, useRef, useState, type ReactNode } from 'react';
 import Link from 'next/link';
 import { usePathname, useRouter } from 'next/navigation';
 import { NAV_LINKS, SITE } from '@/lib/site';
-import { accountHome, useAuth } from './auth-provider';
+import { accountHome, sidesOf, useAuth } from './auth-provider';
 import { Icon } from './marketing';
 import { cx } from './ui';
 
@@ -41,7 +41,14 @@ export function SiteHeader() {
   const [menuOpen, setMenuOpen] = useState(false);
 
   const home = user ? accountHome(user) : '/';
-  const accountLinks = user ? (user.isStaff ? STAFF_LINKS : MEMBER_LINKS) : [];
+  const accountLinks = user
+    ? user.isStaff
+      ? // Volunteers who also mentor or take lessons get their dashboard too.
+        sidesOf(user).any
+        ? [...STAFF_LINKS, { href: '/dashboard', label: 'My lessons & mentoring' }]
+        : STAFF_LINKS
+      : MEMBER_LINKS
+    : [];
   const exploreLinks = [FRONT_PAGE, ...NAV_LINKS.filter((link) => link.href !== SIGNED_IN_KEEP), { href: '/faq', label: 'FAQ' }];
   const barLinks = user
     ? [{ href: home, label: 'Dashboard' }, ...NAV_LINKS.filter((link) => link.href === SIGNED_IN_KEEP)]

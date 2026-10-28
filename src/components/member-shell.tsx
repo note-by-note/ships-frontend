@@ -4,7 +4,7 @@ import { useEffect, useState, type ReactNode } from 'react';
 import Link from 'next/link';
 import { usePathname, useRouter } from 'next/navigation';
 import { api } from '@/lib/api';
-import { useAuth } from './auth-provider';
+import { sidesOf, useAuth } from './auth-provider';
 import { DashboardShell, type ShellLink } from './dashboard-shell';
 import { MESSAGES_CHANGED } from './messages';
 import { EmptyState, Spinner } from './ui';
@@ -66,12 +66,17 @@ function useUnreadMessages(enabled: boolean, pathname: string): number {
   return enabled ? unread : 0;
 }
 
-/** The signed-in frame for students and mentors. Staff are pointed to the staff area. */
+/**
+ * The signed-in frame for students and mentors. Staff who also mentor or take
+ * lessons use it too (with a way back to the staff area); other staff are
+ * pointed to the staff area.
+ */
 export function MemberShell({ children }: { children: ReactNode }) {
   const { user, loading } = useAuth();
   const router = useRouter();
   const pathname = usePathname();
-  const unread = useUnreadMessages(Boolean(user && !user.isStaff), pathname);
+  const sides = user ? sidesOf(user) : { mentor: false, student: false, any: false };
+  const unread = useUnreadMessages(Boolean(user && sides.any), pathname);
 
   useEffect(() => {
     if (!loading && !user) router.replace(`/login?next=${encodeURIComponent(pathname)}`);
@@ -80,7 +85,7 @@ export function MemberShell({ children }: { children: ReactNode }) {
   if (loading) return <Spinner label="Loading your dashboard" />;
   if (!user) return <Spinner label="Redirecting to sign in" />;
 
-  if (user.isStaff) {
+  if (user.isStaff && !sides.any) {
     return (
       <div className="mx-auto max-w-lg px-6 py-16">
         <EmptyState
@@ -97,14 +102,15 @@ export function MemberShell({ children }: { children: ReactNode }) {
     );
   }
 
-  const mentor = user.role === 'mentor';
+  const base = sides.mentor && sides.student ? MENTOR_STUDENT_LINKS : sides.mentor ? MENTOR_LINKS : STUDENT_LINKS;
   return (
     <DashboardShell
-      title={mentor && user.alsoStudent ? 'Mentor and student' : mentor ? 'Mentor dashboard' : 'Student dashboard'}
+      title={sides.mentor && sides.student ? 'Mentor and student' : sides.mentor ? 'Mentor dashboard' : 'Student dashboard'}
       subtitle={user.name}
-      links={(mentor && user.alsoStudent ? MENTOR_STUDENT_LINKS : mentor ? MENTOR_LINKS : STUDENT_LINKS).map((link) =>
-        link.href === '/dashboard/messages' ? { ...link, badge: unread } : link,
-      )}
+      links={[
+        ...(user.isStaff ? [{ href: '/admin', label: 'Staff area', icon: 'shield' as const }] : []),
+        ...base.map((link) => (link.href === '/dashboard/messages' ? { ...link, badge: unread } : link)),
+      ]}
     >
       {children}
     </DashboardShell>

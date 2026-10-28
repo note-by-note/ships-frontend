@@ -1,7 +1,7 @@
 'use client';
 
 import { useEffect, useState } from 'react';
-import { useAuth } from '@/components/auth-provider';
+import { sidesOf, useAuth } from '@/components/auth-provider';
 import { DashboardHeading, Panel } from '@/components/dashboard-shell';
 import { Alert, Spinner } from '@/components/ui';
 import { ApiError, api } from '@/lib/api';
@@ -42,7 +42,8 @@ export default function SettingsPage() {
     }
   }
 
-  const other = user?.role === 'mentor' ? (user.alsoStudent ? 'a student or your mentor' : 'a student') : 'your mentor';
+  const sides = user ? sidesOf(user) : null;
+  const other = sides?.mentor ? (sides.student ? 'a student or your mentor' : 'a student') : 'your mentor';
 
   return (
     <>

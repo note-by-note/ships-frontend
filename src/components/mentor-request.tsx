@@ -15,7 +15,7 @@ import { usePathname } from 'next/navigation';
 import { ApiError, api } from '@/lib/api';
 import { APPLY_LINKS } from '@/lib/site';
 import type { Application, Options, OwnMatchRequest } from '@/lib/types';
-import { useAuth } from './auth-provider';
+import { sidesOf, useAuth } from './auth-provider';
 import { Icon } from './marketing';
 import { cx } from './ui';
 
@@ -49,7 +49,7 @@ export function useStudentStanding(): StudentStanding {
   const [requests, setRequests] = useState<OwnMatchRequest[]>([]);
 
   useEffect(() => {
-    if (!user || user.isStaff) return;
+    if (!user || (user.isStaff && !sidesOf(user).student)) return;
     api
       .get<{ data: Application[] }>('/applications/mine')
       .then((body) => setApplications(body.data))
@@ -61,12 +61,13 @@ export function useStudentStanding(): StudentStanding {
   }, [user]);
 
   const studentApplication =
-    user && !user.isStaff
+    user && !(user.isStaff && !sidesOf(user).student)
       ? applications.find((application) => application.formKind === 'mentee' && application.status !== 'withdrawn')
       : undefined;
   const accepted = studentApplication?.status === 'accepted';
   const chosenSlug = accepted ? undefined : studentApplication?.requestedMentor?.slug;
-  const staff = Boolean(user?.isStaff);
+  // Staff who don't take lessons are pointed to Test mode instead.
+  const staff = Boolean(user?.isStaff && !sidesOf(user).student);
 
   return useMemo(
     () => ({
@@ -239,10 +240,11 @@ export function RequestDialog({ mentor, onClose }: { mentor: RequestableMentor; 
         </div>
       </>
     );
-  } else if (user.isStaff) {
+  } else if (user.isStaff && !sidesOf(user).student) {
     content = (
       <p className="text-navy/75">
-        Staff accounts can’t send requests. To try this, open{' '}
+        To take lessons yourself, <Link href={APPLY_LINKS.student} className="font-semibold underline">apply as a student</Link>{' '}
+        first. To try this as a student would, open{' '}
         <Link href="/admin/testing" className="font-semibold underline">Test mode</Link>, switch to a test student and
         request a test mentor.
       </p>

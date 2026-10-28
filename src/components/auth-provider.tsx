@@ -37,6 +37,17 @@ interface AuthValue {
 
 const AuthContext = createContext<AuthValue | null>(null);
 
+/**
+ * The sides of the program someone is on, besides any staff team: a mentor
+ * (a mentor account or a linked mentor page) and a student (a student account,
+ * or anyone marked as taking lessons too). A tech volunteer can be all three.
+ */
+export function sidesOf(user: Pick<AccountUser, 'role' | 'mentorProfile' | 'alsoStudent'>) {
+  const mentor = user.role === 'mentor' || Boolean(user.mentorProfile);
+  const student = user.role === 'student' || Boolean(user.alsoStudent);
+  return { mentor, student, any: mentor || student };
+}
+
 /** Where someone's home is once signed in: the staff area for staff, the dashboard for everyone else. */
 export function accountHome(user: Pick<AccountUser, 'isStaff'>): string {
   return user.isStaff ? '/admin' : '/dashboard';

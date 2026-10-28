@@ -237,7 +237,7 @@ export interface AccountUser {
   isStaff: boolean;
   permissions: Permission[];
   isTest: boolean;
-  /** A mentor who takes lessons too: the dashboard shows both sides. */
+  /** A mentor or volunteer who takes lessons too (students always do). */
   alsoStudent?: boolean;
   mentorProfile?: { id: string; name: string; slug: string } | null;
 }
@@ -252,6 +252,8 @@ export interface DirectoryUser {
   lastLoginAt?: string | null;
   createdAt: string;
   mentorProfile: { id: string; name: string; slug: string } | null;
+  /** A mentor or volunteer who takes lessons too. */
+  alsoStudent?: boolean;
 }
 
 export interface MentorProfile {

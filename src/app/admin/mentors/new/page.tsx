@@ -31,7 +31,7 @@ export default function NewMentorPage() {
           extra={
             <Field
               label="Link to an account (optional)"
-              help="The email they registered with. Linking makes their account a mentor account and lets them edit this profile. You can also do this later."
+              help="The email they registered with. Linking lets them edit this profile; a student becomes a mentor, and a volunteer keeps their team role. You can also do this later."
             >
               {({ id }) => (
                 <TextInput id={id} type="email" value={accountEmail} onChange={(e) => setAccountEmail(e.target.value)} />

@@ -2,7 +2,7 @@
 
 import Link from 'next/link';
 import { useCallback, useEffect, useState } from 'react';
-import { useAuth } from '@/components/auth-provider';
+import { sidesOf, useAuth } from '@/components/auth-provider';
 import { Avatar } from '@/components/avatar';
 import { DashboardHeading, Panel, StatTile } from '@/components/dashboard-shell';
 import {
@@ -30,9 +30,9 @@ import { APPLY_LINKS } from '@/lib/site';
 export default function DashboardPage() {
   const { user } = useAuth();
   if (!user) return null;
-  if (user.role !== 'mentor') return <StudentDashboard />;
-  if (!user.alsoStudent) return <MentorDashboard />;
-  return <MentorAndStudentDashboard />;
+  const sides = sidesOf(user);
+  if (sides.mentor && sides.student) return <MentorAndStudentDashboard />;
+  return sides.mentor ? <MentorDashboard /> : <StudentDashboard />;
 }
 
 type Side = 'mentor' | 'student';
@@ -452,7 +452,7 @@ function MentorDashboard() {
           <PageChecklist profile={profile} />
           <HoursPanel />
           <ResourcesPanel scope="team" title="From the Note by Note team" />
-          {user!.alsoStudent ? null : (
+          {sidesOf(user!).student ? null : (
             <Panel title="Want lessons too?">
               <p className="text-sm text-ink-soft">
                 Mentors can learn another instrument here as well. Apply as a student and your dashboard will show both.
