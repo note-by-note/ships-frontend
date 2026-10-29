@@ -32,7 +32,6 @@
         }
     </script>
     <style>
-        /* Custom scrollbar for terms container */
         .custom-scrollbar::-webkit-scrollbar {
             width: 8px;
         }
@@ -63,20 +62,30 @@
                     <span class="text-xs text-slate-500 font-medium">Note by Note Platform</span>
                 </div>
             </div>
-            <div class="flex items-center gap-2">
+
+            <div class="flex items-center gap-3">
+                <!-- Direct Access Button for Modal -->
+                <button onclick="openTermsModal(event)" class="text-xs font-semibold text-slate-600 hover:text-brand-600 border border-slate-200 bg-slate-50 hover:bg-white px-3 py-1.5 rounded-lg transition-all flex items-center gap-1.5 shadow-sm">
+                    <i class="fa-solid fa-scale-balanced text-brand-600"></i>
+                    <span id="txt-nav-quickterms">Quick Terms View</span>
+                </button>
+
                 <span id="headerStatusBadge" class="hidden sm:inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-semibold bg-amber-50 text-amber-700 border border-amber-200">
                     <span class="w-2 h-2 rounded-full bg-amber-500 animate-pulse"></span>
                     <span id="txt-badge">Action Required: Acceptance Needed</span>
                 </span>
 
-                <!-- Language Selector Dropdown -->
+                <!-- 8-Language Selector Dropdown -->
                 <div class="relative ml-2">
                     <select id="langSelector" onchange="changeLanguage(this.value)" class="bg-slate-100 hover:bg-slate-200 border border-slate-300 text-slate-800 text-xs font-medium rounded-lg px-2.5 py-1.5 outline-none focus:ring-2 focus:ring-brand-500 cursor-pointer transition-colors">
                         <option value="en">🇺🇸 English</option>
+                        <option value="ko">🇰🇷 한국어</option>
+                        <option value="ja">🇯🇵 日本語</option>
+                        <option value="zh">🇨🇳 中文 (简体)</option>
                         <option value="es">🇪🇸 Español</option>
                         <option value="fr">🇫🇷 Français</option>
                         <option value="de">🇩🇪 Deutsch</option>
-                        <option value="zh">🇨🇳 中文 (简体)</option>
+                        <option value="pt">🇧🇷 Português</option>
                     </select>
                 </div>
             </div>
@@ -85,14 +94,14 @@
 
     <!-- Main Content Area -->
     <main class="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 py-8 w-full flex-grow">
-        
-        <!-- Welcome / Context Header -->
+
+        <!-- Context Header -->
         <div class="mb-8 text-center sm:text-left">
             <h1 id="txt-title" class="text-2xl sm:text-3xl font-extrabold text-slate-900 tracking-tight">Platform Standards &amp; Terms</h1>
             <p id="txt-subtitle" class="mt-2 text-slate-600 text-sm sm:text-base">Please review our Code of Conduct and Terms of Service carefully before joining our mentorship network.</p>
         </div>
 
-        <!-- Agreement Status Card (Appears after submission) -->
+        <!-- Agreement Status Card -->
         <div id="statusAlert" class="hidden mb-8 p-6 bg-emerald-50 border border-emerald-200 rounded-2xl shadow-sm transition-all duration-300">
             <div class="flex items-start gap-4">
                 <div class="w-12 h-12 rounded-full bg-emerald-100 border border-emerald-300 flex items-center justify-center text-emerald-600 shrink-0">
@@ -101,7 +110,7 @@
                 <div class="flex-1">
                     <h3 id="txt-alert-title" class="text-lg font-bold text-emerald-900">Code of Conduct Accepted</h3>
                     <p id="txt-alert-subtitle" class="text-sm text-emerald-700 mt-1">Thank you for committing to a safe and inspiring musical community.</p>
-                    
+
                     <div class="mt-4 pt-4 border-t border-emerald-200/60 grid grid-cols-1 sm:grid-cols-3 gap-3 text-xs text-emerald-800">
                         <div>
                             <span id="txt-lbl-signedby" class="text-emerald-600 font-medium block">Signed By:</span>
@@ -116,7 +125,7 @@
                             <span id="recordedRef" class="font-bold font-mono text-emerald-950">-</span>
                         </div>
                     </div>
-                    
+
                     <div class="mt-5 flex flex-wrap gap-3">
                         <button onclick="resetAgreement()" class="px-3.5 py-1.5 text-xs font-semibold text-emerald-800 bg-emerald-100 hover:bg-emerald-200 rounded-lg transition-colors border border-emerald-300">
                             <i class="fa-solid fa-rotate-left mr-1"></i> <span id="txt-btn-reset">Reset Acceptance State</span>
@@ -128,7 +137,7 @@
 
         <!-- Main Document Box -->
         <div class="bg-white border border-slate-200 rounded-2xl shadow-sm overflow-hidden mb-8">
-            
+
             <!-- Document Navigation Tabs -->
             <div class="flex border-b border-slate-200 bg-slate-50/80 px-4 pt-3 gap-2 overflow-x-auto">
                 <button id="tabConductBtn" onclick="switchTab('conduct')" class="px-4 py-2.5 text-sm font-semibold border-b-2 border-brand-600 text-brand-600 flex items-center gap-2 whitespace-nowrap transition-colors">
@@ -141,7 +150,7 @@
 
             <!-- Scrollable Content Viewport -->
             <div id="documentViewer" class="p-6 sm:p-8 max-h-[480px] overflow-y-auto custom-scrollbar text-slate-700 leading-relaxed text-sm sm:text-base space-y-6">
-                
+
                 <!-- Section 1: Code of Conduct -->
                 <div id="conductSection" class="space-y-6">
                     <div class="border-b border-slate-100 pb-4">
@@ -153,7 +162,7 @@
 
                     <div>
                         <h3 id="txt-sec1-title" class="font-bold text-slate-900 text-base mb-2 flex items-center gap-2">
-                            <i class="fa-solid fa-heart text-pink-500"></i> 1. Inclusive &amp; Respectful Community
+                            <i class="fa-solid fa-heart text-pink-500"></i> Inclusive &amp; Respectful Community
                         </h3>
                         <ul class="list-disc pl-5 space-y-1 text-slate-600 text-sm">
                             <li id="txt-sec1-p1"><strong class="text-slate-800">Zero Tolerance for Discrimination:</strong> Prohibits harassment, bigotry, or discrimination based on race, ethnicity, gender, sexual orientation, age, religion, or musical background.</li>
@@ -237,7 +246,7 @@
             <p id="txt-form-subtitle" class="text-xs sm:text-sm text-slate-500 mb-6">Complete the items below to register your acceptance.</p>
 
             <form id="agreementForm" onsubmit="handleAcceptance(event)" class="space-y-5">
-                
+
                 <!-- Checkbox 1 -->
                 <label class="flex items-start gap-3.5 group cursor-pointer select-none">
                     <span class="relative flex items-center mt-0.5">
@@ -270,7 +279,7 @@
                         Type Full Legal Name (Digital Signature) <span class="text-red-500">*</span>
                     </label>
                     <div class="relative">
-                        <input type="text" id="fullName" required placeholder="e.g. Alex M. Rivera" 
+                        <input type="text" id="fullName" required placeholder="e.g. Alex M. Rivera"
                             class="w-full px-4 py-2.5 text-sm sm:text-base border border-slate-300 rounded-xl focus:ring-2 focus:ring-brand-500 focus:border-brand-500 outline-none transition-all placeholder:text-slate-400">
                         <div class="absolute right-3 top-2.5 text-slate-400 text-sm">
                             <i class="fa-solid fa-pen-nib"></i>
@@ -287,7 +296,7 @@
                         <i class="fa-solid fa-lock text-slate-400 mr-1"></i> Your acceptance will be securely logged.
                     </span>
 
-                    <button type="submit" id="submitBtn" 
+                    <button type="submit" id="submitBtn"
                         class="w-full sm:w-auto px-6 py-3 bg-brand-600 hover:bg-brand-700 active:bg-brand-900 text-white font-semibold text-sm rounded-xl shadow-md shadow-brand-500/20 hover:shadow-lg hover:shadow-brand-500/30 transition-all flex items-center justify-center gap-2">
                         <span id="txt-btn-submit">Accept &amp; Continue</span>
                         <i class="fa-solid fa-arrow-right text-xs"></i>
@@ -298,12 +307,45 @@
         </div>
 
     </main>
-    <!-- JavaScript Logic -->
+
+    <!-- Modal Popup for Quick Terms Access -->
+    <div id="termsModal" class="hidden fixed inset-0 bg-slate-900/60 backdrop-blur-sm z-50 flex items-center justify-center p-4">
+        <div class="bg-white rounded-2xl max-w-2xl w-full max-h-[85vh] flex flex-col shadow-2xl overflow-hidden">
+            <div class="px-6 py-4 border-b border-slate-200 flex items-center justify-between bg-slate-50">
+                <h3 class="text-base font-bold text-slate-900 flex items-center gap-2">
+                    <i class="fa-solid fa-scale-balanced text-brand-600"></i>
+                    <span>Note by Note Legal Documentation</span>
+                </h3>
+                <button onclick="closeTermsModal()" class="w-8 h-8 rounded-lg bg-slate-200/60 hover:bg-slate-200 text-slate-600 flex items-center justify-center transition-colors">
+                    <i class="fa-solid fa-xmark"></i>
+                </button>
+            </div>
+            <div class="p-6 overflow-y-auto space-y-4 text-slate-700 text-sm leading-relaxed">
+                <h4 class="font-bold text-slate-900 text-base">Quick Access Summary</h4>
+                <p>You can view and read the full Code of Conduct and Terms of Service directly in the main viewer card on this page.</p>
+                <div class="flex gap-2 pt-2">
+                    <button onclick="closeTermsModal(); switchTab('conduct');" class="px-4 py-2 bg-brand-50 text-brand-600 font-medium text-xs rounded-xl hover:bg-brand-100 transition-colors">
+                        View Code of Conduct
+                    </button>
+                    <button onclick="closeTermsModal(); switchTab('terms');" class="px-4 py-2 bg-purple-50 text-purple-600 font-medium text-xs rounded-xl hover:bg-purple-100 transition-colors">
+                        View Terms of Service
+                    </button>
+                </div>
+            </div>
+            <div class="px-6 py-3 border-t border-slate-200 bg-slate-50 text-right">
+                <button onclick="closeTermsModal()" class="px-4 py-2 bg-slate-800 text-white font-medium text-xs rounded-xl hover:bg-slate-900 transition-colors">
+                    Close
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <!-- JavaScript Engine -->
     <script>
         const STORAGE_KEY = 'Note_by_Note_mentorship_agreement_v1';
         let currentLang = 'en';
 
-        // Translations Data Dictionary
+        // 8 Language Translations Dictionary
         const translations = {
             en: {
                 badgeNeeded: "Action Required: Acceptance Needed",
@@ -336,7 +378,7 @@
                 minorDesc: "Sessions involving minors require explicit parental/guardian consent. All video recordings for minor sessions are archived for safety verification purposes.",
                 tagTerms: "Legal Terms",
                 docTermsTitle: "Terms of Service & Mentorship Agreement",
-                docTermsIntro: "By accessing or using the  Note by Note platform, you agree to be bound by these legal terms and conditions.",
+                docTermsIntro: "By accessing or using the Note by Note platform, you agree to be bound by these legal terms and conditions.",
                 tos1Title: "1. Booking and Cancellation Policy",
                 tos1Desc: "Sessions may be canceled or rescheduled up to 24 hours prior to the scheduled start time without penalty. Late cancellations or missed sessions may forfeit session credits.",
                 tos2Title: "2. Mentorship Fees & Payments",
@@ -354,160 +396,109 @@
                 errSignature: "Please enter your full name to proceed.",
                 lblSecure: "<i class=\"fa-solid fa-lock text-slate-400 mr-1\"></i> Your acceptance will be securely logged.",
                 btnSubmit: "Accept & Continue",
-                btnAccepted: "Accepted",
+                btnAccepted: "Accepted"
             },
-            es: {
-                badgeNeeded: "Acción requerida: Aceptación necesaria",
-                badgeVerified: "Miembro verificado",
-                title: "Normas y Términos de la Plataforma",
-                subtitle: "Por favor, revise atentamente nuestro Código de Conducta y Términos de Servicio antes de unirse a nuestra red de mentoría.",
-                alertTitle: "Código de Conducta Aceptado",
-                alertSubtitle: "Gracias por comprometerse con una comunidad musical segura e inspiradora.",
-                lblSignedBy: "Firmado por:",
-                lblTimestamp: "Marca de tiempo:",
-                lblRef: "ID de referencia:",
-                btnReset: "Restablecer estado de aceptación",
-                tabConduct: "1. Código de Conducta",
-                tabTerms: "2. Términos de Servicio",
-                tagConduct: "Normas Comunitarias",
-                docConductTitle: "Código de Conducta para la Mentoría Musical",
-                docConductIntro: "Nuestra plataforma conecta a mentores musicales apasionados con estudiantes dedicados para fomentar el crecimiento artístico, las habilidades técnicas y la colaboración creativa. Para construir una comunidad inspiradora, inclusiva y segura, todos los miembros deben cumplir con estas directrices.",
-                sec1Title: "1. Comunidad Inclusiva y Respetuosa",
-                sec1P1: "<strong class=\"text-slate-800\">Cero tolerancia a la discriminación:</strong> Se prohíbe estrictamente el acoso o la discriminación por motivos de raza, etnia, género, orientación sexual, edad, religión o antecedentes musicales.",
-                sec1P2: "<strong class=\"text-slate-800\">Comentarios constructivos:</strong> Las críticas deben centrarse de forma constructiva en la música y la interpretación. Se prohíben los ataques personales.",
-                sec1P3: "<strong class=\"text-slate-800\">Respetar la diversidad:</strong> Respete los diversos géneros musicales, tradiciones y niveles de habilidad sin prejuicios.",
-                sec2Title: "2. Límites Profesionales y Seguridad",
-                sec2P1: "<strong class=\"text-slate-800\">Mantener relaciones profesionales:</strong> Toda comunicación debe centrarse en la música, la educación y el desarrollo artístico.",
-                sec2P2: "<strong class=\"text-slate-800\">Puntualidad y fiabilidad:</strong> Respete las citas de mentoría programadas y el tiempo de los demás músicos.",
-                sec2P3: "<strong class=\"text-slate-800\">Comunicación en la plataforma:</strong> Mantenga las sesiones de video y chats dentro de nuestra plataforma cifrada por seguridad.",
-                sec3Title: "3. Propiedad Intelectual y Confidencialidad",
-                sec3P1: "<strong class=\"text-slate-800\">Trabajo creativo confidencial:</strong> Las letras, audios y maquetas no publicados compartidos en las sesiones siguen siendo propiedad exclusiva del creador. Se prohíbe grabar sin consentimiento.",
-                sec3P2: "<strong class=\"text-slate-800\">Sin plagio:</strong> Respete siempre los derechos de autor y atribuya adecuadamente los trabajos compartidos.",
-                minorTitle: "Política de Seguridad para Menores (Menores de 18 años)",
-                minorDesc: "Las sesiones con menores requieren el consentimiento explícito de sus padres o tutores. Todas las grabaciones de video para menores se archivan por seguridad.",
-                tagTerms: "Términos Legales",
-                docTermsTitle: "Términos de Servicio y Acuerdo de Mentoría",
-                docTermsIntro: "Al acceder o utilizar la plataforma Note by Note, usted acepta quedar vinculado por estos términos y condiciones legales.",
-                tos1Title: "1. Política de Reservas y Cancelaciones",
-                tos1Desc: "Las sesiones se pueden cancelar o reprogramar hasta 24 horas antes sin penalización. Las cancelaciones tardías pueden perder sus créditos.",
-                tos2Title: "2. Tarifas de Mentoría y Pagos",
-                tos2Desc: "Todas las tarifas se procesan mediante pasarelas de pago seguras en Note by Note. Se prohíben estrictamente los pagos directos fuera de la plataforma.",
-                tos3Title: "3. Cancelación de la Cuenta",
-                tos3Desc: "Note by Note se reserva el derecho de suspender o cerrar las cuentas que violen nuestro Código de Conducta.",
-                scrollPrompt: "Desplácese hacia abajo para revisar todo el documento antes de aceptar",
-                viewed: "visto",
-                formTitle: "Confirmación y Firma",
-                formSubtitle: "Complete los siguientes campos para registrar su aceptación.",
-                checkConduct: "He leído, comprendido y acepto cumplir con el <strong class=\"text-slate-900\">Código de Conducta de Mentoría Musical</strong>. <span class=\"text-red-500\">*</span>",
-                checkTerms: "Acepto los <strong class=\"text-slate-900\">Términos de Servicio</strong> y doy mi consentimiento a las directrices de seguridad. <span class=\"text-red-500\">*</span>",
-                lblSignature: "Escriba su Nombre Legal Completo (Firma Digital) <span class=\"text-red-500\">*</span>",
-                placeholderName: "ej. Alex M. Rivera",
-                errSignature: "Por favor, introduzca su nombre completo para continuar.",
-                lblSecure: "<i class=\"fa-solid fa-lock text-slate-400 mr-1\"></i> Su aceptación se registrará de forma segura.",
-                btnSubmit: "Aceptar y Continuar",
-                btnAccepted: "Aceptado",
+            ko: {
+                badgeNeeded: "조치 필요: 동의 필요",
+                badgeVerified: "인증된 회원",
+                title: "플랫폼 표준 및 약관",
+                subtitle: "멘토링 네트워크에 참여하기 전에 행동 강령과 서비스 약관을 주의 깊게 검토해 주세요.",
+                alertTitle: "행동 강령 동의 완료",
+                alertSubtitle: "안전하고 영감을 주는 음악 커뮤니티에 참여해 주셔서 감사합니다.",
+                lblSignedBy: "서명자:",
+                lblTimestamp: "타임스탬프:",
+                lblRef: "참조 ID:",
+                btnReset: "동의 상태 초기화",
+                tabConduct: "1. 행동 강령",
+                tabTerms: "2. 서비스 약관",
+                tagConduct: "커뮤니티 표준",
+                docConductTitle: "Note by Note 행동 강령",
+                docConductIntro: "본 플랫폼은 음악 멘토와 열정적인 학습자를 연결하여 예술적 성장과 기술 향상을 돕습니다. 모두가 안전하고 포용적인 환경을 위해 다음 지침을 준수해야 합니다.",
+                sec1Title: "1. 포용적이고 존중하는 커뮤니티",
+                sec1P1: "<strong class=\"text-slate-800\">차별에 대한 무관용:</strong> 인종, 성별, 연령, 종교, 음악적 배경에 따른 괴롭힘이나 차별을 엄격히 금지합니다.",
+                sec1P2: "<strong class=\"text-slate-800\">건설적인 피드백:</strong> 비판은 음악과 연주 성능에만 집중되어야 합니다. 인격 모독은 금지됩니다.",
+                sec1P3: "<strong class=\"text-slate-800\">다양성 존중:</strong> 편견 없이 다양한 음악 장르와 실력 수준을 존중합니다.",
+                sec2Title: "2. 전문적인 경계 및 안전",
+                sec2P1: "<strong class=\"text-slate-800\">전문적 관계 유지:</strong> 모든 소통은 음악 교육 및 성장에 집중되어야 합니다.",
+                sec2P2: "<strong class=\"text-slate-800\">시간 엄수 및 신뢰성:</strong> 약속된 멘토링 시간을 준수하고 상대방의 시간을 존중합니다.",
+                sec2P3: "<strong class=\"text-slate-800\">플랫폼 내 소통:</strong> 개인정보 보호를 위해 모든 화상 세션과 채팅은 플랫폼 내부에서 진행합니다.",
+                sec3Title: "3. 지적 재산권 및 비밀 유지",
+                sec3P1: "<strong class=\"text-slate-800\">창작물 보호:</strong> 미발표 가사와 음원은 창작자에게 소유권이 있습니다. 동의 없는 녹음은 금지됩니다.",
+                sec3P2: "<strong class=\"text-slate-800\">표절 금지:</strong> 항상 저작권법을 준수하고 출처를 명확히 밝힙니다.",
+                minorTitle: "미성년자 안전 정책 (만 18세 미만)",
+                minorDesc: "미성년자 세션은 보호자의 동의가 필요하며 안전 검토를 위해 녹화 기록이 보관될 수 있습니다.",
+                tagTerms: "법적 약관",
+                docTermsTitle: "서비스 약관 및 멘토링 계약",
+                docTermsIntro: "Note by Note 플랫폼을 이용함으로써 귀하는 다음 법적 약관에 동의하게 됩니다.",
+                tos1Title: "1. 예약 및 취소 정책",
+                tos1Desc: "세션 시작 24시간 전까지는 위약금 없이 취소 및 변경이 가능합니다.",
+                tos2Title: "2. 수수료 및 결제",
+                tos2Desc: "모든 결제는 플랫폼의 안전한 결제 시스템을 통해서만 이루어져야 합니다. 외부 직거래는 엄격히 금지됩니다.",
+                tos3Title: "3. 계정 해지",
+                tos3Desc: "행동 강령을 위반한 계정은 정지되거나 해지될 수 있습니다.",
+                scrollPrompt: "동의하기 전에 문서 전체를 끝까지 스크롤하여 확인하세요.",
+                viewed: "확인됨",
+                formTitle: "확인 및 서명",
+                formSubtitle: "동의를 등록하려면 아래 항목을 작성해 주세요.",
+                checkConduct: "본인은 <strong class=\"text-slate-900\">Note by Note 행동 강령</strong>을 읽고 동의합니다. <span class=\"text-red-500\">*</span>",
+                checkTerms: "<strong class=\"text-slate-900\">서비스 약관</strong> 및 안전 지침에 동의합니다. <span class=\"text-red-500\">*</span>",
+                lblSignature: "성명 작성 (디지털 서명) <span class=\"text-red-500\">*</span>",
+                placeholderName: "예: 홍길동",
+                errSignature: "진행하려면 성명을 입력해 주세요.",
+                lblSecure: "<i class=\"fa-solid fa-lock text-slate-400 mr-1\"></i> 동의 내역이 안전하게 기록됩니다.",
+                btnSubmit: "동의 및 계속하기",
+                btnAccepted: "동의 완료"
             },
-            fr: {
-                badgeNeeded: "Action requise : Acceptation nécessaire",
-                badgeVerified: "Membre Vérifié",
-                title: "Normes et Conditions de la Plateforme",
-                subtitle: "Veuillez lire attentivement notre Code de Conduite et nos Conditions d'Utilisation avant de rejoindre notre réseau de mentorat.",
-                alertTitle: "Code de Conduite Accepté",
-                alertSubtitle: "Merci de vous engager pour une communauté musicale sûre et inspirante.",
-                lblSignedBy: "Signé par :",
-                lblTimestamp: "Horodatage :",
-                lblRef: "ID de référence :",
-                btnReset: "Réinitialiser l'état d'acceptation",
-                tabConduct: "1. Code de Conduite",
-                tabTerms: "2. Conditions d'Utilisation",
-                tagConduct: "Normes de la Communauté",
-                docConductTitle: "Code de Conduite de la Plateforme de Mentorat Musical",
-                docConductIntro: "Notre plateforme connecte des mentors passionnés à des apprenants motivés pour favoriser le développement artistique et la collaboration. Tous les membres doivent respecter ces directives.",
-                sec1Title: "1. Communauté Inclusive et Respectueuse",
-                sec1P1: "<strong class=\"text-slate-800\">Zéro tolérance pour la discrimination :</strong> Interdiction stricte de tout harcèlement ou discrimination fondé sur la race, le genre, l'orientation sexuelle, l'âge ou la religion.",
-                sec1P2: "<strong class=\"text-slate-800\">Commentaires constructifs :</strong> Les critiques doivent se concentrer de manière constructive sur la musique. Les attaques personnelles sont interdites.",
-                sec1P3: "<strong class=\"text-slate-800\">Respect de la diversité :</strong> Honorez les divers genres musicaux, traditions et niveaux de compétence sans préjugés.",
-                sec2Title: "2. Limites Professionnelles et Sécurité",
-                sec2P1: "<strong class=\"text-slate-800\">Maintenir des relations professionnelles :</strong> Toutes les communications doivent rester axées sur la musique et l'apprentissage.",
-                sec2P2: "<strong class=\"text-slate-800\">Ponctualité et fiabilité :</strong> Honorez vos rendez-vous et respectez le temps des autres musiciens.",
-                sec2P3: "<strong class=\"text-slate-800\">Communication sur la plateforme :</strong> Conservez toutes les sessions vidéo et discussions au sein de notre plateforme sécurisée.",
-                sec3Title: "3. Propriété Intellectuelle et Confidentialité",
-                sec3P1: "<strong class=\"text-slate-800\">Travail créatif confidentiel :</strong> Les paroles et morceaux non publiés partagés pendant les sessions restent la propriété exclusive du créateur.",
-                sec3P2: "<strong class=\"text-slate-800\">Pas de plagiat :</strong> Respectez toujours le droit d'auteur et attribuez correctement les œuvres.",
-                minorTitle: "Sécurité des Mineurs (Moins de 18 ans)",
-                minorDesc: "Les sessions impliquant des mineurs nécessitent le consentement parental explicite. Toutes les vidéos sont archivées pour contrôle de sécurité.",
-                tagTerms: "Conditions Légales",
-                docTermsTitle: "Conditions d'Utilisation et Accord de Mentorat",
-                docTermsIntro: "En accédant à la plateforme Note by Note, vous acceptez d'être lié par ces conditions légales.",
-                tos1Title: "1. Politique de Réservation et d'Annulation",
-                tos1Desc: "Les sessions peuvent être annulées ou reportées jusqu'à 24 heures avant l'heure prévue sans pénalité.",
-                tos2Title: "2. Frais de Mentorat et Paiements",
-                tos2Desc: "Tous les frais sont traités via des passerelles de paiement sécurisées sur Note by Note. Les paiements directs hors plateforme sont interdits.",
-                tos3Title: "3. Résiliation de Compte",
-                tos3Desc: "Note by Note se réserve le droit de suspendre ou de fermer les comptes qui violent notre Code de Conduite.",
-                scrollPrompt: "Faites défiler vers le bas pour lire l'intégralité du document avant d'accepter",
-                viewed: "vu",
-                formTitle: "Confirmation et Signature",
-                formSubtitle: "Remplissez les champs ci-dessous pour enregistrer votre acceptation.",
-                checkConduct: "J'ai lu, compris et accepte de respecter le <strong class=\"text-slate-900\">Code de Conduite de Mentorat Musical</strong>. <span class=\"text-red-500\">*</span>",
-                checkTerms: "J'accepte les <strong class=\"text-slate-900\">Conditions d'Utilisation</strong> et les consignes de sécurité. <span class=\"text-red-500\">*</span>",
-                lblSignature: "Tapez votre Nom Légal Complet (Signature Numérique) <span class=\"text-red-500\">*</span>",
-                placeholderName: "ex. Alex M. Rivera",
-                errSignature: "Veuillez entrer votre nom complet pour continuer.",
-                lblSecure: "<i class=\"fa-solid fa-lock text-slate-400 mr-1\"></i> Votre acceptation sera enregistrée en toute sécurité.",
-                btnSubmit: "Accepter et Continuer",
-                btnAccepted: "Accepté",
-            },
-            de: {
-                badgeNeeded: "Aktion erforderlich: Zustimmung erforderlich",
-                badgeVerified: "Verifiziertes Mitglied",
-                title: "Plattform-Standards & Bedingungen",
-                subtitle: "Bitte lesen Sie unseren Verhaltenskodex und die Nutzungsbedingungen sorgfältig durch, bevor Sie unserem Mentoren-Netzwerk beitreten.",
-                alertTitle: "Verhaltenskodex Akzeptiert",
-                alertSubtitle: "Vielen Dank für Ihr Engagement für eine sichere und inspirierende Musik-Community.",
-                lblSignedBy: "Unterzeichnet von:",
-                lblTimestamp: "Zeitstempel:",
-                lblRef: "Referenz-ID:",
-                btnReset: "Zustimmungsstatus zurücksetzen",
-                tabConduct: "1. Verhaltenskodex",
-                tabTerms: "2. Nutzungsbedingungen",
-                tagConduct: "Community-Standards",
-                docConductTitle: "Verhaltenskodex für die Musik-Mentoring-Plattform",
-                docConductIntro: "Unsere Plattform verbindet leidenschaftliche Musik-Mentoren mit engagierten Lernenden. Alle Mitglieder müssen sich an diese Richtlinien halten.",
-                sec1Title: "1. Inklusive & Respektvolle Gemeinschaft",
-                sec1P1: "<strong class=\"text-slate-800\">Null Toleranz für Diskriminierung:</strong> Verbot von Belästigung oder Diskriminierung aufgrund von Rasse, Geschlecht, Alter, Religion oder musikalischem Hintergrund.",
-                sec1P2: "<strong class=\"text-slate-800\">Konstruktives Feedback:</strong> Kritik muss sich konstruktiv auf Musik und Leistung konzentrieren. Persönliche Angriffe sind verboten.",
-                sec1P3: "<strong class=\"text-slate-800\">Vielfalt respektieren:</strong> Respektieren Sie verschiedene Musikgenres und Fähigkeiten ohne Vorurteile.",
-                sec2Title: "2. Professionelle Grenzen & Sicherheit",
-                sec2P1: "<strong class=\"text-slate-800\">Professionelle Beziehungen wahren:</strong> Alle Kommunikationen müssen sich auf Musik und Bildung konzentrieren.",
-                sec2P2: "<strong class=\"text-slate-800\">Pünktlichkeit & Zuverlässigkeit:</strong> Halten Sie vereinbarte Termine ein und respektieren Sie die Zeit anderer Musiker.",
-                sec2P3: "<strong class=\"text-slate-800\">Plattform-Kommunikation:</strong> Führen Sie alle Video-Sessions und Chats über unsere verschlüsselte Plattform durch.",
-                sec3Title: "3. Geistiges Eigentum & Vertraulichkeit",
-                sec3P1: "<strong class=\"text-slate-800\">Vertrauliche kreative Arbeit:</strong> Unveröffentlichte Texte und Audios bleiben das alleinige Eigentum des Urhebers.",
-                sec3P2: "<strong class=\"text-slate-800\">Kein Plagiat:</strong> Respektieren Sie stets das Urheberrecht.",
-                minorTitle: "Sicherheitsrichtlinie für Minderjährige (Unter 18)",
-                minorDesc: "Sitzungen mit Minderjährigen erfordern die ausdrückliche Zustimmung der Eltern. Alle Videoaufnahmen werden zur Überprüfung archiviert.",
-                tagTerms: "Rechtliche Bedingungen",
-                docTermsTitle: "Nutzungsbedingungen & Mentoring-Vereinbarung",
-                docTermsIntro: "Durch den Zugriff auf die Note by Note Plattform erklären Sie sich mit diesen Bedingungen einverstanden.",
-                tos1Title: "1. Buchungs- und Stornierungsbedingungen",
-                tos1Desc: "Sitzungen können bis zu 24 Stunden vor dem Start kostenfrei storniert oder verschoben werden.",
-                tos2Title: "2. Gebühren & Zahlungen",
-                tos2Desc: "Alle Gebühren werden über sichere Zahlungsgateways abgewickelt. Direktzahlungen außerhalb der Plattform sind verboten.",
-                tos3Title: "3. Kontokündigung",
-                tos3Desc: "Note by Note behält sich das Recht vor, Konten bei Verstößen gegen unseren Verhaltenskodex zu kündigen.",
-                scrollPrompt: "Scrollen Sie nach unten, um das gesamte Dokument vor der Zustimmung zu überprüfen",
-                viewed: "gesehen",
-                formTitle: "Bestätigung & Unterschrift",
-                formSubtitle: "Füllen Sie die folgenden Felder aus, um Ihre Zustimmung zu registrieren.",
-                checkConduct: "Ich habe den <strong class=\"text-slate-900\">Verhaltenskodex für Musik-Mentoring</strong> gelesen und stimme zu. <span class=\"text-red-500\">*</span>",
-                checkTerms: "Ich stimme den <strong class=\"text-slate-900\">Nutzungsbedingungen</strong> und den Sicherheitsrichtlinien zu. <span class=\"text-red-500\">*</span>",
-                lblSignature: "Vollständigen gesetzlichen Namen eingeben (Digitale Unterschrift) <span class=\"text-red-500\">*</span>",
-                placeholderName: "z.B. Alex M. Rivera",
-                errSignature: "Bitte geben Sie Ihren vollständigen Namen ein.",
-                lblSecure: "<i class=\"fa-solid fa-lock text-slate-400 mr-1\"></i> Ihre Zustimmung wird sicher protokolliert.",
-                btnSubmit: "Akzeptieren & Fortfahren",
-                btnAccepted: "Akzeptiert",
+            ja: {
+                badgeNeeded: "要対応：同意が必要です",
+                badgeVerified: "認証済みメンバー",
+                title: "プラットフォーム利用規約",
+                subtitle: "メンターシップネットワークに参加する前に、行動規範と利用規約をご確認ください。",
+                alertTitle: "行動規範に同意しました",
+                alertSubtitle: "安全で刺激的な音楽コミュニティへのご協力に感謝いたします。",
+                lblSignedBy: "署名者:",
+                lblTimestamp: "タイムスタンプ:",
+                lblRef: "参照ID:",
+                btnReset: "同意状態をリセット",
+                tabConduct: "1. 行動規範",
+                tabTerms: "2. 利用規約",
+                tagConduct: "コミュニティ標準",
+                docConductTitle: "Note by Note 行動規範",
+                docConductIntro: "当プラットフォームは情熱的な音楽メンターと学習者を結びつけ、技術向上と創造的なコラボレーションを促進します。安全な環境構築のため、以下のガイドラインに従ってください。",
+                sec1Title: "1. 包摂的で敬意あるコミュニティ",
+                sec1P1: "<strong class=\"text-slate-800\">差別ゼロポリシー:</strong> 人種、性別、年齢、宗教、音楽的背景に基づく差別やハラスメントを厳禁します。",
+                sec1P2: "<strong class=\"text-slate-800\">建設的なフィードバック:</strong> 批判は音楽とパフォーマンスに対してのみ行い、人格攻撃は禁止します。",
+                sec1P3: "<strong class=\"text-slate-800\">多様性の尊重:</strong> 偏見を持たず、多様なジャンルやスキルレベルを尊重します。",
+                sec2Title: "2. 専門的な境界と安全性",
+                sec2P1: "<strong class=\"text-slate-800\">プロフェッショナルな関係の維持:</strong> すべてのコミュニケーションは音楽と教育に集中してください。",
+                sec2P2: "<strong class=\"text-slate-800\">時間厳守と信頼性:</strong> スケジュールされた時間を尊重し、相手の時間を大切にしてください。",
+                sec2P3: "<strong class=\"text-slate-800\">プラットフォーム内通信:</strong> セキュリティのため、すべての通話・チャットは暗号化されたプラットフォーム内で行います。",
+                sec3Title: "3. 知的財産権と機密保持",
+                sec3P1: "<strong class=\"text-slate-800\">機密性の保持:</strong> 未発表の歌詞や音源の所有権は制作者にあります。無断録音・録画は禁止です。",
+                sec3P2: "<strong class=\"text-slate-800\">盗用禁止:</strong> 常に著作権法を守り、適切なクレジットを表記してください。",
+                minorTitle: "未成年者保護方針（18歳未満）",
+                minorDesc: "18歳未満が参加するセッションには保護者の同意が必要です。録画データは安全性の検証のために保管されます。",
+                tagTerms: "法的規約",
+                docTermsTitle: "利用規約およびメンターシップ合意",
+                docTermsIntro: "Note by Note プラットフォームを利用することで、本規約に同意したものとみなされます。",
+                tos1Title: "1. 予約およびキャンセル規定",
+                tos1Desc: "セッション開始の24時間前までは、ペナルティなしでキャンセル・変更が可能です。",
+                tos2Title: "2. 料金および支払い",
+                tos2Desc: "すべての支払いはプラットフォーム内の安全な決済システムを経由する必要があります。プラットフォーム外での直接取引は禁止です。",
+                tos3Title: "3. アカウント停止",
+                tos3Desc: "行動規範に違反した場合、アカウントが停止または削除されることがあります。",
+                scrollPrompt: "同意する前に文書を最後までスクロールして確認してください",
+                viewed: "確認済み",
+                formTitle: "確認および署名",
+                formSubtitle: "同意を完了するために以下の項目を入力してください。",
+                checkConduct: "<strong class=\"text-slate-900\">Note by Note 行動規範</strong>を読み、同意します。<span class=\"text-red-500\">*</span>",
+                checkTerms: "<strong class=\"text-slate-900\">利用規約</strong>および安全ガイドラインに同意します。<span class=\"text-red-500\">*</span>",
+                lblSignature: "氏名を入力（デジタル署名） <span class=\"text-red-500\">*</span>",
+                placeholderName: "例：山田 太郎",
+                errSignature: "フルネームを入力してください。",
+                lblSecure: "<i class=\"fa-solid fa-lock text-slate-400 mr-1\"></i> 同意データは安全に記録されます。",
+                btnSubmit: "同意して進む",
+                btnAccepted: "同意済み"
             },
             zh: {
                 badgeNeeded: "需要操作：需要同意",
@@ -559,97 +550,213 @@
                 lblSecure: "<i class=\"fa-solid fa-lock text-slate-400 mr-1\"></i> 您的同意已被安全记录。",
                 btnSubmit: "接受并继续",
                 btnAccepted: "已接受"
+            },
+            es: {
+                badgeNeeded: "Acción requerida: Aceptación necesaria",
+                badgeVerified: "Miembro verificado",
+                title: "Normas y Términos de la Plataforma",
+                subtitle: "Por favor, revise atentamente nuestro Código de Conducta y Términos de Servicio antes de unirse a nuestra red de mentoría.",
+                alertTitle: "Código de Conducta Aceptado",
+                alertSubtitle: "Gracias por comprometerse con una comunidad musical segura e inspiradora.",
+                lblSignedBy: "Firmado por:",
+                lblTimestamp: "Marca de tiempo:",
+                lblRef: "ID de referencia:",
+                btnReset: "Restablecer estado de aceptación",
+                tabConduct: "1. Código de Conducta",
+                tabTerms: "2. Términos de Servicio",
+                tagConduct: "Normas Comunitarias",
+                docConductTitle: "Código de Conducta de Note by Note",
+                docConductIntro: "Nuestra plataforma conecta a mentores musicales apasionados con estudiantes dedicados para fomentar el crecimiento artístico, las habilidades técnicas y la colaboración creativa.",
+                sec1Title: "1. Comunidad Inclusiva y Respetuosa",
+                sec1P1: "<strong class=\"text-slate-800\">Cero tolerancia a la discriminación:</strong> Se prohíbe estrictamente el acoso o la discriminación por motivos de raza, género, edad o religión.",
+                sec1P2: "<strong class=\"text-slate-800\">Comentarios constructivos:</strong> Las críticas deben centrarse de forma constructiva en la música y la interpretación.",
+                sec1P3: "<strong class=\"text-slate-800\">Respetar la diversidad:</strong> Respete los diversos géneros musicales y niveles de habilidad sin prejuicios.",
+                sec2Title: "2. Límites Profesionales y Seguridad",
+                sec2P1: "<strong class=\"text-slate-800\">Mantener relaciones profesionales:</strong> Toda comunicación debe centrarse en la música y la educación.",
+                sec2P2: "<strong class=\"text-slate-800\">Puntualidad y fiabilidad:</strong> Respete las citas de mentoría programadas y el tiempo de los demás.",
+                sec2P3: "<strong class=\"text-slate-800\">Comunicación en la plataforma:</strong> Mantenga las sesiones de video dentro de nuestra plataforma cifrada.",
+                sec3Title: "3. Propiedad Intelectual y Confidencialidad",
+                sec3P1: "<strong class=\"text-slate-800\">Trabajo creativo confidencial:</strong> Las letras y audios no publicados siguen siendo propiedad exclusiva del creador.",
+                sec3P2: "<strong class=\"text-slate-800\">Sin plagio:</strong> Respete siempre los derechos de autor.",
+                minorTitle: "Política de Seguridad para Menores (Menores de 18 años)",
+                minorDesc: "Las sesiones con menores requieren el consentimiento explícito de sus padres o tutores.",
+                tagTerms: "Términos Legales",
+                docTermsTitle: "Términos de Servicio y Acuerdo de Mentoría",
+                docTermsIntro: "Al acceder a la plataforma Note by Note, acepta quedar vinculado por estos términos legales.",
+                tos1Title: "1. Política de Reservas y Cancelaciones",
+                tos1Desc: "Las sesiones se pueden cancelar o reprogramar hasta 24 horas antes sin penalización.",
+                tos2Title: "2. Tarifas de Mentoría y Pagos",
+                tos2Desc: "Todas las tarifas se procesan mediante pasarelas de pago seguras en Note by Note.",
+                tos3Title: "3. Cancelación de la Cuenta",
+                tos3Desc: "Note by Note se reserva el derecho de suspender o cerrar las cuentas que violen nuestro Código de Conducta.",
+                scrollPrompt: "Desplácese hacia abajo para revisar todo el documento antes de aceptar",
+                viewed: "visto",
+                formTitle: "Confirmación y Firma",
+                formSubtitle: "Complete los siguientes campos para registrar su aceptación.",
+                checkConduct: "Acepto el <strong class=\"text-slate-900\">Código de Conducta de Note by Note</strong>. <span class=\"text-red-500\">*</span>",
+                checkTerms: "Acepto los <strong class=\"text-slate-900\">Términos de Servicio</strong> y pautas de seguridad. <span class=\"text-red-500\">*</span>",
+                lblSignature: "Nombre Legal Completo (Firma Digital) <span class=\"text-red-500\">*</span>",
+                placeholderName: "ej. Alex M. Rivera",
+                errSignature: "Por favor, introduzca su nombre completo.",
+                lblSecure: "<i class=\"fa-solid fa-lock text-slate-400 mr-1\"></i> Su aceptación se registrará de forma segura.",
+                btnSubmit: "Aceptar y Continuar",
+                btnAccepted: "Aceptado"
+            },
+            fr: {
+                badgeNeeded: "Action requise : Acceptation nécessaire",
+                badgeVerified: "Membre Vérifié",
+                title: "Normes et Conditions de la Plateforme",
+                subtitle: "Veuillez lire attentivement notre Code de Conduite et nos Conditions d'Utilisation avant de rejoindre notre réseau.",
+                alertTitle: "Code de Conduite Accepté",
+                alertSubtitle: "Merci de vous engager pour une communauté musicale sûre et inspirante.",
+                lblSignedBy: "Signé par :",
+                lblTimestamp: "Horodatage :",
+                lblRef: "ID de référence :",
+                btnReset: "Réinitialiser l'état d'acceptation",
+                tabConduct: "1. Code de Conduite",
+                tabTerms: "2. Conditions d'Utilisation",
+                tagConduct: "Normes Communautaires",
+                docConductTitle: "Code de Conduite Note by Note",
+                docConductIntro: "Notre plateforme connecte des mentors musicaux passionnés avec des apprenants dévoués afin de favoriser la croissance artistique.",
+                sec1Title: "1. Communauté Inclusive et Respectueuse",
+                sec1P1: "<strong class=\"text-slate-800\">Tolérance zéro pour la discrimination :</strong> Interdiction du harcèlement ou de la discrimination fondée sur la race, le genre ou l'origine.",
+                sec1P2: "<strong class=\"text-slate-800\">Retours constructifs :</strong> Les critiques doivent se concentrer sur la musique et la performance.",
+                sec1P3: "<strong class=\"text-slate-800\">Respect de la diversité :</strong> Honorer les différents genres musicaux et niveaux de compétence.",
+                sec2Title: "2. Limites Professionnelles et Sécurité",
+                sec2P1: "<strong class=\"text-slate-800\">Maintenir des relations professionnelles :</strong> Rester concentré sur la musique et l'éducation.",
+                sec2P2: "<strong class=\"text-slate-800\">Ponctualité et fiabilité :</strong> Respecter les rendez-vous et le temps des autres.",
+                sec2P3: "<strong class=\"text-slate-800\">Communication sur la plateforme :</strong> Utiliser l'interface chiffrée pour les sessions.",
+                sec3Title: "3. Propriété Intellectuelle et Confidentialité",
+                sec3P1: "<strong class=\"text-slate-800\">Travail créatif confidentiel :</strong> Les créations non publiées restent la propriété exclusive de leur auteur.",
+                sec3P2: "<strong class=\"text-slate-800\">Pas de plagiat :</strong> Respecter toujours les droits d'auteur.",
+                minorTitle: "Politique de Sécurité pour les Mineurs (Moins de 18 ans)",
+                minorDesc: "Les sessions avec des mineurs nécessitent le consentement parental explicite.",
+                tagTerms: "Conditions Légales",
+                docTermsTitle: "Conditions d'Utilisation et Accord de Mentorat",
+                docTermsIntro: "En accédant à la plateforme Note by Note, vous acceptez ces conditions.",
+                tos1Title: "1. Politique de Réservation et d'Annulation",
+                tos1Desc: "Les sessions peuvent être annulées jusqu'à 24 heures à l'avance sans pénalité.",
+                tos2Title: "2. Frais de Mentorat et Paiements",
+                tos2Desc: "Tous les paiements sont traités de manière sécurisée sur la plateforme.",
+                tos3Title: "3. Résiliation de Compte",
+                tos3Desc: "Note by Note se réserve le droit de suspendre les comptes en cas de violation.",
+                scrollPrompt: "Faites défiler vers le bas pour consulter l'intégralité du document",
+                viewed: "vu",
+                formTitle: "Confirmation et Signature",
+                formSubtitle: "Remplissez les champs ci-dessous pour enregistrer votre acceptation.",
+                checkConduct: "J'accepte le <strong class=\"text-slate-900\">Code de Conduite Note by Note</strong>. <span class=\"text-red-500\">*</span>",
+                checkTerms: "J'accepte les <strong class=\"text-slate-900\">Conditions d'Utilisation</strong>. <span class=\"text-red-500\">*</span>",
+                lblSignature: "Entrez votre nom légal complet (Signature numérique) <span class=\"text-red-500\">*</span>",
+                placeholderName: "ex. Alex M. Rivera",
+                errSignature: "Veuillez entrer votre nom complet.",
+                lblSecure: "<i class=\"fa-solid fa-lock text-slate-400 mr-1\"></i> Votre acceptation sera enregistrée en toute sécurité.",
+                btnSubmit: "Accepter et Continuer",
+                btnAccepted: "Accepté"
+            },
+            de: {
+                badgeNeeded: "Aktion erforderlich: Zustimmung erforderlich",
+                badgeVerified: "Verifiziertes Mitglied",
+                title: "Plattform-Standards & Bedingungen",
+                subtitle: "Bitte lesen Sie unseren Verhaltenskodex und die Nutzungsbedingungen sorgfältig durch.",
+                alertTitle: "Verhaltenskodex Akzeptiert",
+                alertSubtitle: "Vielen Dank für Ihr Engagement für eine sichere und inspirierende Musik-Community.",
+                lblSignedBy: "Unterzeichnet von:",
+                lblTimestamp: "Zeitstempel:",
+                lblRef: "Referenz-ID:",
+                btnReset: "Zustimmungsstatus zurücksetzen",
+                tabConduct: "1. Verhaltenskodex",
+                tabTerms: "2. Nutzungsbedingungen",
+                tagConduct: "Community-Standards",
+                docConductTitle: "Note by Note Verhaltenskodex",
+                docConductIntro: "Unsere Plattform verbindet leidenschaftliche Musik-Mentoren mit engagierten Lernenden.",
+                sec1Title: "1. Inklusive & Respektvolle Gemeinschaft",
+                sec1P1: "<strong class=\"text-slate-800\">Null Toleranz für Diskriminierung:</strong> Verbot von Belästigung oder Diskriminierung.",
+                sec1P2: "<strong class=\"text-slate-800\">Konstruktives Feedback:</strong> Kritik muss sich konstruktiv auf Musik und Leistung konzentrieren.",
+                sec1P3: "<strong class=\"text-slate-800\">Vielfalt respektieren:</strong> Respektieren Sie verschiedene Musikgenres und Fähigkeiten.",
+                sec2Title: "2. Professionelle Grenzen & Sicherheit",
+                sec2P1: "<strong class=\"text-slate-800\">Professionelle Beziehungen wahren:</strong> Alle Kommunikationen müssen sich auf Musik konzentrieren.",
+                sec2P2: "<strong class=\"text-slate-800\">Pünktlichkeit & Zuverlässigkeit:</strong> Halten Sie vereinbarte Termine ein.",
+                sec2P3: "<strong class=\"text-slate-800\">Plattform-Kommunikation:</strong> Führen Sie Video-Sessions über unsere verschlüsselte Plattform durch.",
+                sec3Title: "3. Geistiges Eigentum & Vertraulichkeit",
+                sec3P1: "<strong class=\"text-slate-800\">Vertrauliche kreative Arbeit:</strong> Unveröffentlichte Werke bleiben Eigentum des Urhebers.",
+                sec3P2: "<strong class=\"text-slate-800\">Kein Plagiat:</strong> Respektieren Sie stets das Urheberrecht.",
+                minorTitle: "Sicherheitsrichtlinie für Minderjährige (Unter 18)",
+                minorDesc: "Sitzungen mit Minderjährigen erfordern die ausdrückliche Zustimmung der Eltern.",
+                tagTerms: "Rechtliche Bedingungen",
+                docTermsTitle: "Nutzungsbedingungen & Mentoring-Vereinbarung",
+                docTermsIntro: "Durch den Zugriff auf die Note by Note Plattform erklären Sie sich mit diesen Bedingungen einverstanden.",
+                tos1Title: "1. Buchungs- und Stornierungsbedingungen",
+                tos1Desc: "Sitzungen können bis zu 24 Stunden vor dem Start kostenfrei storniert werden.",
+                tos2Title: "2. Gebühren & Zahlungen",
+                tos2Desc: "Alle Gebühren werden über sichere Zahlungsgateways abgewickelt.",
+                tos3Title: "3. Kontokündigung",
+                tos3Desc: "Note by Note behält sich das Recht vor, Konten bei Verstößen zu kündigen.",
+                scrollPrompt: "Scrollen Sie nach unten, um das gesamte Dokument zu überprüfen",
+                viewed: "gesehen",
+                formTitle: "Bestätigung & Unterschrift",
+                formSubtitle: "Füllen Sie die folgenden Felder aus, um Ihre Zustimmung zu registrieren.",
+                checkConduct: "Ich stimme dem <strong class=\"text-slate-900\">Note by Note Verhaltenskodex</strong> zu. <span class=\"text-red-500\">*</span>",
+                checkTerms: "Ich stimme den <strong class=\"text-slate-900\">Nutzungsbedingungen</strong> zu. <span class=\"text-red-500\">*</span>",
+                lblSignature: "Vollständigen gesetzlichen Namen eingeben <span class=\"text-red-500\">*</span>",
+                placeholderName: "z.B. Alex M. Rivera",
+                errSignature: "Bitte geben Sie Ihren vollständigen Namen ein.",
+                lblSecure: "<i class=\"fa-solid fa-lock text-slate-400 mr-1\"></i> Ihre Zustimmung wird sicher protokolliert.",
+                btnSubmit: "Akzeptieren & Fortfahren",
+                btnAccepted: "Akzeptiert"
+            },
+            pt: {
+                badgeNeeded: "Ação Necessária: Aceite Obrigatório",
+                badgeVerified: "Membro Verificado",
+                title: "Padrões da Plataforma e Termos",
+                subtitle: "Por favor, revise nosso Código de Conduta e Termos de Serviço antes de se juntar à rede.",
+                alertTitle: "Código de Conduta Aceito",
+                alertSubtitle: "Obrigado por se comprometer com uma comunidade musical segura e inspiradora.",
+                lblSignedBy: "Assinado por:",
+                lblTimestamp: "Data e Hora:",
+                lblRef: "ID de Referência:",
+                btnReset: "Redefinir Estado de Aceite",
+                tabConduct: "1. Código de Conduta",
+                tabTerms: "2. Termos de Serviço",
+                tagConduct: "Padrões da Comunidade",
+                docConductTitle: "Código de Conduta Note by Note",
+                docConductIntro: "Nossa plataforma conecta mentores de música dedicados a alunos apaixonados para incentivar o crescimento artístico.",
+                sec1Title: "1. Comunidade Inclusiva e Respeitosa",
+                sec1P1: "<strong class=\"text-slate-800\">Tolerância Zero para Discriminação:</strong> É estritamente proibido qualquer assédio ou discriminação baseada em raça, gênero ou religião.",
+                sec1P2: "<strong class=\"text-slate-800\">Feedback Construtivo:</strong> As críticas devem se concentrar construtivamente na música e na performance.",
+                sec1P3: "<strong class=\"text-slate-800\">Respeito à Diversidade:</strong> Respeite diferentes gêneros musicais e níveis de habilidade.",
+                sec2Title: "2. Limites Profissionais e Segurança",
+                sec2P1: "<strong class=\"text-slate-800\">Manter Relações Profissionais:</strong> Toda comunicação deve ser focada em música e educação.",
+                sec2P2: "<strong class=\"text-slate-800\">Pontualidade e Confiabilidade:</strong> Respeite os horários agendados e o tempo dos colegas.",
+                sec2P3: "<strong class=\"text-slate-800\">Comunicação na Plataforma:</strong> Mantenha chamadas e chats dentro da nossa plataforma criptografada.",
+                sec3Title: "3. Propriedade Intelectual e Confidencialidade",
+                sec3P1: "<strong class=\"text-slate-800\">Trabalho Criativo Confidencial:</strong> Músicas e letras não lançadas permanecem propriedade exclusiva do criador.",
+                sec3P2: "<strong class=\"text-slate-800\">Sem Plágio:</strong> Respeite sempre as leis de direitos autorais.",
+                minorTitle: "Política de Segurança para Menores (Menores de 18 anos)",
+                minorDesc: "Sessões com menores exigem autorização expressa dos pais ou responsáveis.",
+                tagTerms: "Termos Legais",
+                docTermsTitle: "Termos de Serviço e Acordo de Mentoria",
+                docTermsIntro: "Ao acessar a plataforma Note by Note, você concorda em cumprir estes termos legais.",
+                tos1Title: "1. Política de Agendamento e Cancelamento",
+                tos1Desc: "As sessões podem ser canceladas ou reagendadas com até 24 horas de antecedência sem penalidade.",
+                tos2Title: "2. Taxas de Mentoria e Pagamentos",
+                tos2Desc: "Todos os pagamentos são processados com segurança dentro da plataforma.",
+                tos3Title: "3. Encerramento de Conta",
+                tos3Desc: "Note by Note reserva-se o direito de suspender contas que violem nosso Código de Conduta.",
+                scrollPrompt: "Role até o final para revisar o documento completo",
+                viewed: "visualizado",
+                formTitle: "Confirmação e Assinatura",
+                formSubtitle: "Preencha os campos abaixo para registrar seu aceite.",
+                checkConduct: "Li e concordo com o <strong class=\"text-slate-900\">Código de Conduta Note by Note</strong>. <span class=\"text-red-500\">*</span>",
+                checkTerms: "Concordo com os <strong class=\"text-slate-900\">Termos de Serviço</strong> e diretrizes de segurança. <span class=\"text-red-500\">*</span>",
+                lblSignature: "Digite seu Nome Legal Completo (Assinatura Digital) <span class=\"text-red-500\">*</span>",
+                placeholderName: "ex. Alex M. Rivera",
+                errSignature: "Por favor, digite seu nome completo.",
+                lblSecure: "<i class=\"fa-solid fa-lock text-slate-400 mr-1\"></i> Seu aceite será registrado com segurança.",
+                btnSubmit: "Aceitar e Continuar",
+                btnAccepted: "Aceito"
             }
         };
 
-        // Switch active language and update text strings
-        function changeLanguage(langKey) {
-            if (!translations[langKey]) return;
-            currentLang = langKey;
-            const t = translations[langKey];
-
-            // Update Header & General Text
-            document.getElementById('txt-title').textContent = t.title;
-            document.getElementById('txt-subtitle').textContent = t.subtitle;
-            document.getElementById('txt-alert-title').textContent = t.alertTitle;
-            document.getElementById('txt-alert-subtitle').textContent = t.alertSubtitle;
-            document.getElementById('txt-lbl-signedby').textContent = t.lblSignedBy;
-            document.getElementById('txt-lbl-timestamp').textContent = t.lblTimestamp;
-            document.getElementById('txt-lbl-ref').textContent = t.lblRef;
-            document.getElementById('txt-btn-reset').textContent = t.btnReset;
-
-            // Tabs & Section 1: Conduct
-            document.getElementById('txt-tab-conduct').textContent = t.tabConduct;
-            document.getElementById('txt-tab-terms').textContent = t.tabTerms;
-            document.getElementById('txt-tag-conduct').textContent = t.tagConduct;
-            document.getElementById('txt-doc-conduct-title').textContent = t.docConductTitle;
-            document.getElementById('txt-doc-conduct-intro').textContent = t.docConductIntro;
-            
-            document.getElementById('txt-sec1-title').innerHTML = `<i class="fa-solid fa-heart text-pink-500"></i> ${t.sec1Title}`;
-            document.getElementById('txt-sec1-p1').innerHTML = t.sec1P1;
-            document.getElementById('txt-sec1-p2').innerHTML = t.sec1P2;
-            document.getElementById('txt-sec1-p3').innerHTML = t.sec1P3;
-
-            document.getElementById('txt-sec2-title').innerHTML = `<i class="fa-solid fa-user-check text-brand-600"></i> ${t.sec2Title}`;
-            document.getElementById('txt-sec2-p1').innerHTML = t.sec2P1;
-            document.getElementById('txt-sec2-p2').innerHTML = t.sec2P2;
-            document.getElementById('txt-sec2-p3').innerHTML = t.sec2P3;
-
-            document.getElementById('txt-sec3-title').innerHTML = `<i class="fa-solid fa-copyright text-amber-500"></i> ${t.sec3Title}`;
-            document.getElementById('txt-sec3-p1').innerHTML = t.sec3P1;
-            document.getElementById('txt-sec3-p2').innerHTML = t.sec3P2;
-
-            document.getElementById('txt-minor-title').textContent = t.minorTitle;
-            document.getElementById('txt-minor-desc').textContent = t.minorDesc;
-
-            // Section 2: Terms of Service
-            document.getElementById('txt-tag-terms').textContent = t.tagTerms;
-            document.getElementById('txt-doc-terms-title').textContent = t.docTermsTitle;
-            document.getElementById('txt-doc-terms-intro').textContent = t.docTermsIntro;
-            document.getElementById('txt-tos1-title').textContent = t.tos1Title;
-            document.getElementById('txt-tos1-desc').textContent = t.tos1Desc;
-            document.getElementById('txt-tos2-title').textContent = t.tos2Title;
-            document.getElementById('txt-tos2-desc').textContent = t.tos2Desc;
-            document.getElementById('txt-tos3-title').textContent = t.tos3Title;
-            document.getElementById('txt-tos3-desc').textContent = t.tos3Desc;
-
-            // Form, Scroll & Footer
-            document.getElementById('txt-scroll-prompt').textContent = t.scrollPrompt;
-            document.getElementById('txt-form-title').innerHTML = `<i class="fa-solid fa-signature text-brand-600"></i> ${t.formTitle}`;
-            document.getElementById('txt-form-subtitle').textContent = t.formSubtitle;
-            document.getElementById('txt-check-conduct').innerHTML = t.checkConduct;
-            document.getElementById('txt-check-terms').innerHTML = t.checkTerms;
-            document.getElementById('txt-lbl-signature').innerHTML = t.lblSignature;
-            document.getElementById('fullName').placeholder = t.placeholderName;
-            document.getElementById('txt-err-signature').textContent = t.errSignature;
-            document.getElementById('txt-lbl-secure').innerHTML = t.lblSecure;
-
-            // Update Submit/Accepted Button & Badge States
-            const submitBtn = document.getElementById('submitBtn');
-            const badge = document.getElementById('headerStatusBadge');
-            
-            if (submitBtn.disabled) {
-                submitBtn.innerHTML = `<i class="fa-solid fa-check"></i> <span>${t.btnAccepted}</span>`;
-                badge.innerHTML = `<span class="w-2 h-2 rounded-full bg-emerald-500"></span> ${t.badgeVerified}`;
-            } else {
-                submitBtn.innerHTML = `<span>${t.btnSubmit}</span> <i class="fa-solid fa-arrow-right text-xs"></i>`;
-                badge.innerHTML = `<span class="w-2 h-2 rounded-full bg-amber-500 animate-pulse"></span> ${t.badgeNeeded}`;
-            }
-
-            // Recalculate Scroll %
-            updateScrollPercentage();
-        }
-
-        // Scroll percentage calculator helper
-        function updateScrollPercentage() {
-            const scrollTop = viewer.scrollTop;
-            const scrollHeight = viewer.scrollHeight - viewer.clientHeight;
-            const scrollPercent = scrollHeight > 0 ? Math.min(100, Math.round((scrollTop / scrollHeight) * 100)) : 0;
-            const viewedWord = translations[currentLang] ? translations[currentLang].viewed : 'viewed';
-            scrollPercentLabel.textContent = scrollPercent + '% ' + viewedWord;
-        }
-
-        // Tab Switching
         function switchTab(tab) {
             const conductSec = document.getElementById('conductSection');
             const termsSec = document.getElementById('termsSection');
@@ -669,120 +776,150 @@
             }
         }
 
-        // Track Document Scroll Percentage
-        const viewer = document.getElementById('documentViewer');
-        const scrollPercentLabel = document.getElementById('scrollPercent');
+        function changeLanguage(lang) {
+            currentLang = lang;
+            const t = translations[lang];
+            if (!t) return;
 
-        viewer.addEventListener('scroll', updateScrollPercentage);
+            document.getElementById('txt-badge').innerText = t.badgeNeeded;
+            document.getElementById('txt-title').innerText = t.title;
+            document.getElementById('txt-subtitle').innerText = t.subtitle;
+            document.getElementById('txt-tab-conduct').innerText = t.tabConduct;
+            document.getElementById('txt-tab-terms').innerText = t.tabTerms;
+            document.getElementById('txt-tag-conduct').innerText = t.tagConduct;
+            document.getElementById('txt-doc-conduct-title').innerText = t.docConductTitle;
+            document.getElementById('txt-doc-conduct-intro').innerText = t.docConductIntro;
 
-        // Form Acceptance Handler
-        function handleAcceptance(e) {
-            e.preventDefault();
+            document.getElementById('txt-sec1-title').innerHTML = `<i class="fa-solid fa-heart text-pink-500"></i> ${t.sec1Title}`;
+            document.getElementById('txt-sec1-p1').innerHTML = t.sec1P1;
+            document.getElementById('txt-sec1-p2').innerHTML = t.sec1P2;
+            document.getElementById('txt-sec1-p3').innerHTML = t.sec1P3;
 
+            document.getElementById('txt-sec2-title').innerHTML = `<i class="fa-solid fa-user-check text-brand-600"></i> ${t.sec2Title}`;
+            document.getElementById('txt-sec2-p1').innerHTML = t.sec2P1;
+            document.getElementById('txt-sec2-p2').innerHTML = t.sec2P2;
+            document.getElementById('txt-sec2-p3').innerHTML = t.sec2P3;
+
+            document.getElementById('txt-sec3-title').innerHTML = `<i class="fa-solid fa-copyright text-amber-500"></i> ${t.sec3Title}`;
+            document.getElementById('txt-sec3-p1').innerHTML = t.sec3P1;
+            document.getElementById('txt-sec3-p2').innerHTML = t.sec3P2;
+
+            document.getElementById('txt-minor-title').innerText = t.minorTitle;
+            document.getElementById('txt-minor-desc').innerText = t.minorDesc;
+
+            document.getElementById('txt-tag-terms').innerText = t.tagTerms;
+            document.getElementById('txt-doc-terms-title').innerText = t.docTermsTitle;
+            document.getElementById('txt-doc-terms-intro').innerText = t.docTermsIntro;
+
+            document.getElementById('txt-tos1-title').innerText = t.tos1Title;
+            document.getElementById('txt-tos1-desc').innerText = t.tos1Desc;
+            document.getElementById('txt-tos2-title').innerText = t.tos2Title;
+            document.getElementById('txt-tos2-desc').innerText = t.tos2Desc;
+            document.getElementById('txt-tos3-title').innerText = t.tos3Title;
+            document.getElementById('txt-tos3-desc').innerText = t.tos3Desc;
+
+            document.getElementById('txt-scroll-prompt').innerText = t.scrollPrompt;
+            document.getElementById('txt-form-title').innerHTML = `<i class="fa-solid fa-signature text-brand-600"></i> ${t.formTitle}`;
+            document.getElementById('txt-form-subtitle').innerText = t.formSubtitle;
+
+            document.getElementById('txt-check-conduct').innerHTML = t.checkConduct;
+            document.getElementById('txt-check-terms').innerHTML = t.checkTerms;
+            document.getElementById('txt-lbl-signature').innerHTML = t.lblSignature;
+            document.getElementById('fullName').placeholder = t.placeholderName;
+            document.getElementById('txt-err-signature').innerText = t.errSignature;
+            document.getElementById('txt-lbl-secure').innerHTML = t.lblSecure;
+            document.getElementById('txt-btn-submit').innerText = t.btnSubmit;
+
+            document.getElementById('txt-alert-title').innerText = t.alertTitle;
+            document.getElementById('txt-alert-subtitle').innerText = t.alertSubtitle;
+            document.getElementById('txt-lbl-signedby').innerText = t.lblSignedBy;
+            document.getElementById('txt-lbl-timestamp').innerText = t.lblTimestamp;
+            document.getElementById('txt-lbl-ref').innerText = t.lblRef;
+            document.getElementById('txt-btn-reset').innerText = t.btnReset;
+        }
+
+        function handleAcceptance(event) {
+            event.preventDefault();
             const nameInput = document.getElementById('fullName');
-            const checkConduct = document.getElementById('checkConduct');
-            const checkTerms = document.getElementById('checkTerms');
             const nameError = document.getElementById('nameError');
 
             if (!nameInput.value.trim()) {
                 nameError.classList.remove('hidden');
-                nameInput.focus();
-                return;
-            } else {
-                nameError.classList.add('hidden');
-            }
-
-            if (!checkConduct.checked || !checkTerms.checked) {
                 return;
             }
+            nameError.classList.add('hidden');
 
-            // Create record
-            const acceptanceRecord = {
-                accepted: true,
-                signerName: nameInput.value.trim(),
+            const record = {
+                name: nameInput.value.trim(),
                 timestamp: new Date().toLocaleString(),
-                referenceId: 'CAD-' + Math.floor(100000 + Math.random() * 900000)
+                refId: 'REF-' + Math.random().toString(36).substr(2, 9).toUpperCase()
             };
 
-            // Save state (Simulated LocalStorage)
-            try {
-                localStorage.setItem(STORAGE_KEY, JSON.stringify(acceptanceRecord));
-            } catch (err) {
-                console.log('Storage unavailable');
-            }
-
-            // Update UI State
-            displayAcceptedState(acceptanceRecord);
+            localStorage.setItem(STORAGE_KEY, JSON.stringify(record));
+            applyStoredState(record);
         }
 
-        // Update UI to Accepted State
-        function displayAcceptedState(record) {
-            const t = translations[currentLang] || translations.en;
-
+        function applyStoredState(record) {
+            document.getElementById('agreementFormCard').classList.add('hidden');
             document.getElementById('statusAlert').classList.remove('hidden');
-            document.getElementById('recordedName').textContent = record.signerName;
-            document.getElementById('recordedDate').textContent = record.timestamp;
-            document.getElementById('recordedRef').textContent = record.referenceId;
+            document.getElementById('headerStatusBadge').className = "hidden sm:inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-semibold bg-emerald-50 text-emerald-700 border border-emerald-200";
+            document.getElementById('headerStatusBadge').innerHTML = `<span class="w-2 h-2 rounded-full bg-emerald-500"></span><span>${translations[currentLang].badgeVerified}</span>`;
 
-            // Form element updates
-            document.getElementById('agreementFormCard').classList.add('opacity-75');
-            document.getElementById('fullName').value = record.signerName;
-            document.getElementById('fullName').disabled = true;
-            document.getElementById('checkConduct').checked = true;
-            document.getElementById('checkTerms').checked = true;
-            document.getElementById('checkConduct').disabled = true;
-            document.getElementById('checkTerms').disabled = true;
-            
-            const submitBtn = document.getElementById('submitBtn');
-            submitBtn.disabled = true;
-            submitBtn.className = "w-full sm:w-auto px-6 py-3 bg-emerald-600 text-white font-semibold text-sm rounded-xl cursor-not-allowed flex items-center justify-center gap-2";
-            submitBtn.innerHTML = `<i class="fa-solid fa-check"></i> <span>${t.btnAccepted}</span>`;
-
-            // Header status update
-            const badge = document.getElementById('headerStatusBadge');
-            badge.className = "inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-semibold bg-emerald-50 text-emerald-700 border border-emerald-200";
-            badge.innerHTML = `<span class="w-2 h-2 rounded-full bg-emerald-500"></span> ${t.badgeVerified}`;
+            document.getElementById('recordedName').innerText = record.name;
+            document.getElementById('recordedDate').innerText = record.timestamp;
+            document.getElementById('recordedRef').innerText = record.refId;
         }
 
-        // Reset state for demo testing
         function resetAgreement() {
-            const t = translations[currentLang] || translations.en;
-
-            try {
-                localStorage.removeItem(STORAGE_KEY);
-            } catch (e) {}
-
+            localStorage.removeItem(STORAGE_KEY);
             document.getElementById('statusAlert').classList.add('hidden');
-            document.getElementById('agreementFormCard').classList.remove('opacity-75');
+            document.getElementById('agreementFormCard').classList.remove('hidden');
             document.getElementById('fullName').value = '';
-            document.getElementById('fullName').disabled = false;
             document.getElementById('checkConduct').checked = false;
             document.getElementById('checkTerms').checked = false;
-            document.getElementById('checkConduct').disabled = false;
-            document.getElementById('checkTerms').disabled = false;
-
-            const submitBtn = document.getElementById('submitBtn');
-            submitBtn.disabled = false;
-            submitBtn.className = "w-full sm:w-auto px-6 py-3 bg-brand-600 hover:bg-brand-700 active:bg-brand-900 text-white font-semibold text-sm rounded-xl shadow-md shadow-brand-500/20 hover:shadow-lg hover:shadow-brand-500/30 transition-all flex items-center justify-center gap-2";
-            submitBtn.innerHTML = `<span>${t.btnSubmit}</span> <i class="fa-solid fa-arrow-right text-xs"></i>`;
-
-            const badge = document.getElementById('headerStatusBadge');
-            badge.className = "hidden sm:inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-semibold bg-amber-50 text-amber-700 border border-amber-200";
-            badge.innerHTML = `<span class="w-2 h-2 rounded-full bg-amber-500 animate-pulse"></span> ${t.badgeNeeded}`;
+            document.getElementById('headerStatusBadge').className = "hidden sm:inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-semibold bg-amber-50 text-amber-700 border border-amber-200";
+            document.getElementById('headerStatusBadge').innerHTML = `<span class="w-2 h-2 rounded-full bg-amber-500 animate-pulse"></span><span id="txt-badge">${translations[currentLang].badgeNeeded}</span>`;
         }
 
-        // On Load Check
-        window.addEventListener('DOMContentLoaded', () => {
-            try {
-                const saved = localStorage.getItem(STORAGE_KEY);
-                if (saved) {
-                    const parsed = JSON.parse(saved);
-                    if (parsed && parsed.accepted) {
-                        displayAcceptedState(parsed);
-                    }
-                }
-            } catch (e) {}
+        function openTermsModal(e) {
+            if (e) e.preventDefault();
+            document.getElementById('termsModal').classList.remove('hidden');
+        }
+
+        function closeTermsModal() {
+            document.getElementById('termsModal').classList.add('hidden');
+        }
+
+        function checkUrlHash() {
+            const hash = window.location.hash.toLowerCase();
+            if (hash === '#terms') {
+                switchTab('terms');
+            } else if (hash === '#conduct') {
+                switchTab('conduct');
+            }
+        }
+
+        const viewer = document.getElementById('documentViewer');
+        viewer.addEventListener('scroll', () => {
+            const scrollTop = viewer.scrollTop;
+            const scrollHeight = viewer.scrollHeight - viewer.clientHeight;
+            const scrollPercent = scrollHeight > 0 ? Math.round((scrollTop / scrollHeight) * 100) : 100;
+            document.getElementById('scrollPercent').innerText = `${scrollPercent}% ${translations[currentLang].viewed || 'viewed'}`;
         });
+
+        window.addEventListener('DOMContentLoaded', () => {
+            checkUrlHash();
+            const saved = localStorage.getItem(STORAGE_KEY);
+            if (saved) {
+                try {
+                    applyStoredState(JSON.parse(saved));
+                } catch (e) {
+                    localStorage.removeItem(STORAGE_KEY);
+                }
+            }
+        });
+
+        window.addEventListener('hashchange', checkUrlHash);
     </script>
 </body>
 </html>
