@@ -17,6 +17,7 @@ import type { Pairing, ResourceTeam, SharedResource } from '@/lib/types';
 import { Icon, type IconName } from './marketing';
 import { Alert, Button, Spinner, cx } from './ui';
 import { Field, TextArea, TextInput } from './ui/fields';
+import { ReportConcernButton } from './report-concern';
 
 const MAX_BYTES = 10 * 1024 * 1024;
 const ACCEPT = '.pdf,.jpg,.jpeg,.png,.mp3,.m4a,application/pdf,image/jpeg,image/png,audio/mpeg,audio/mp4,audio/x-m4a';
@@ -301,6 +302,9 @@ function ResourceCard({
             <Button size="sm" variant="ghost" disabled={busy !== null} onClick={remove}>
               {busy === 'remove' ? 'Removing…' : 'Remove'}
             </Button>
+          ) : null}
+          {!resource.mine && !teamMode ? (
+            <ReportConcernButton kind="resource" targetId={resource.id} about={`“${resource.title}”`} label="Report" className="ml-auto" />
           ) : null}
         </div>
       </div>

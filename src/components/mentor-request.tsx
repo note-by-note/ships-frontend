@@ -18,6 +18,7 @@ import type { Application, Options, OwnMatchRequest } from '@/lib/types';
 import { sidesOf, useAuth } from './auth-provider';
 import { Icon } from './marketing';
 import { cx } from './ui';
+import { ConductGate } from './conduct-acceptance';
 
 /** The fields a request needs to know about a mentor. */
 export interface RequestableMentor {
@@ -249,6 +250,9 @@ export function RequestDialog({ mentor, onClose }: { mentor: RequestableMentor; 
         request a test mentor.
       </p>
     );
+  } else if (!user.agreements?.conduct && !sent) {
+    // Asking a mentor for lessons needs the Code of Conduct accepted first.
+    content = <ConductGate action={`ask ${firstName} for lessons`} />;
   } else if (sent) {
     content = (
       <>

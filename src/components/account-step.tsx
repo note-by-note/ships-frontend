@@ -12,6 +12,7 @@ import { ApiError } from '@/lib/api';
 import { useAuth } from './auth-provider';
 import { Alert, Button, cx } from './ui';
 import { Field, TextInput } from './ui/fields';
+import { SignUpAgreement } from './conduct-acceptance';
 
 export function AccountStep({ onDone }: { onDone: () => void }) {
   const { register, signIn } = useAuth();
@@ -19,6 +20,7 @@ export function AccountStep({ onDone }: { onDone: () => void }) {
   const [name, setName] = useState('');
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
+  const [agreed, setAgreed] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [busy, setBusy] = useState(false);
 
@@ -28,7 +30,7 @@ export function AccountStep({ onDone }: { onDone: () => void }) {
     setBusy(true);
 
     try {
-      if (mode === 'register') await register({ name, email, password, role: 'student' });
+      if (mode === 'register') await register({ name, email, password, role: 'student', acceptAgreements: agreed });
       else await signIn(email, password);
       onDone();
     } catch (err) {
@@ -119,6 +121,8 @@ export function AccountStep({ onDone }: { onDone: () => void }) {
             />
           )}
         </Field>
+
+        {mode === 'register' ? <SignUpAgreement checked={agreed} onChange={setAgreed} /> : null}
 
         <Button type="submit" size="lg" disabled={busy} className="w-full">
           {busy ? 'One moment…' : mode === 'register' ? 'Create account and continue' : 'Sign in and continue'}

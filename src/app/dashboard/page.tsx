@@ -15,6 +15,8 @@ import {
   ResourcesPanel,
   useLessonsAndMessages,
 } from '@/components/dashboard-widgets';
+import { ParentConsentCard } from '@/components/agreement-cards';
+import { ConductGate } from '@/components/conduct-acceptance';
 import { Icon } from '@/components/marketing';
 import { NextSteps } from '@/components/next-steps';
 import { Alert, Button, ButtonLink, Spinner, StatusBadge, cx, humanize } from '@/components/ui';
@@ -31,8 +33,7 @@ export default function DashboardPage() {
   const { user } = useAuth();
   if (!user) return null;
   const sides = sidesOf(user);
-  if (sides.mentor && sides.student) return <MentorAndStudentDashboard />;
-  return sides.mentor ? <MentorDashboard /> : <StudentDashboard />;
+  return sides.mentor && sides.student ? <MentorAndStudentDashboard /> : sides.mentor ? <MentorDashboard /> : <StudentDashboard />;
 }
 
 type Side = 'mentor' | 'student';
@@ -131,6 +132,7 @@ function StudentDashboard() {
 
       <div className="grid gap-6 xl:grid-cols-[1fr_340px]">
         <div className="flex flex-col gap-6">
+          <ParentConsentCard />
           {studentApplication?.status === 'accepted' ? (
             <NextSteps application={studentApplication} hideWhenDone />
           ) : !matched ? (
@@ -363,6 +365,7 @@ function MentorDashboard() {
         <div className="flex flex-col gap-6">
           {pending.length ? (
             <Panel title="Requests waiting for you">
+              {user!.agreements && !user!.agreements.conduct ? <ConductGate action="accept a student" className="mb-4" /> : null}
               <ul className="flex flex-col gap-4">
                 {pending.map((request) => (
                   <li key={request.id} className="rounded-xl border border-line p-4">

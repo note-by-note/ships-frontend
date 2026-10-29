@@ -24,7 +24,14 @@ interface AuthValue {
   /** True until the stored session has been checked, so guards do not flash. */
   loading: boolean;
   signIn(email: string, password: string): Promise<AccountUser>;
-  register(input: { name: string; email: string; password: string; role?: 'student' | 'mentor' }): Promise<AccountUser>;
+  register(input: {
+    name: string;
+    email: string;
+    password: string;
+    role?: 'student' | 'mentor';
+    /** Ticked the Terms, Code of Conduct and Privacy box on the sign-up form. */
+    acceptAgreements?: boolean;
+  }): Promise<AccountUser>;
   signOut(): Promise<void>;
   refreshUser(): Promise<void>;
   /** True if the signed-in account's role grants this permission. */

@@ -10,6 +10,7 @@ import { createContext, useContext, useEffect, useState, type ReactNode } from '
 import { api } from '@/lib/api';
 import { ROLE_LABELS, type Permission, type StaffOverview } from '@/lib/types';
 import { AdminGuard } from './admin-guard';
+import { AgreementReminder } from './agreement-cards';
 import { sidesOf, useAuth } from './auth-provider';
 import { DashboardShell, PageTabs, type ShellLink } from './dashboard-shell';
 
@@ -22,7 +23,7 @@ const SECTIONS: (ShellLink & { anyOf: Permission[] | 'all'; count?: keyof Waitin
   { href: '/admin', label: 'Overview', icon: 'star', exact: true, anyOf: ['stats.view'] },
   { group: 'Program', href: '/admin/applications', also: ['/admin/matching'], label: 'Applications', icon: 'file', anyOf: ['applications.review'], count: 'toMatch' },
   { group: 'Program', href: '/admin/mentors', also: ['/admin/photos'], label: 'Mentors', icon: 'music', anyOf: ['mentors.view', 'mentors.manage'], count: 'photos' },
-  { group: 'Program', href: '/admin/messages', label: 'Messages', icon: 'message', anyOf: ['messages.review'], count: 'reports' },
+  { group: 'Program', href: '/admin/messages', also: ['/admin/reports'], label: 'Messages & reports', icon: 'message', anyOf: ['messages.review'], count: 'reports' },
   { group: 'Program', href: '/admin/my-hours', also: ['/admin/hours'], label: 'Volunteer hours', icon: 'heart', anyOf: 'all', count: 'hours' },
   { group: 'Program', href: '/admin/resources', label: 'Resources', icon: 'book', anyOf: ['resources.manage'] },
   { group: 'Site & settings', href: '/admin/forms', also: ['/admin/schools'], label: 'Forms', icon: 'file', anyOf: ['forms.manage'] },
@@ -71,6 +72,7 @@ function StaffFrame({ children }: { children: ReactNode }) {
         subtitle={user ? `${user.name} · ${ROLE_LABELS[user.role]}` : undefined}
         links={links}
       >
+        <AgreementReminder className="mb-6" />
         {children}
       </DashboardShell>
     </WaitingContext.Provider>
@@ -107,6 +109,17 @@ export function MentorTabs() {
       tabs={[
         { href: '/admin/mentors', label: 'Mentor pages' },
         ...(can('mentors.manage') ? [{ href: '/admin/photos', label: 'Photos to approve', badge: waiting.photos }] : []),
+      ]}
+    />
+  );
+}
+
+export function MessageTabs() {
+  return (
+    <PageTabs
+      tabs={[
+        { href: '/admin/messages', label: 'Conversations' },
+        { href: '/admin/reports', label: 'Reports' },
       ]}
     />
   );

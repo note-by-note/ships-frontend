@@ -5,6 +5,7 @@ import Link from 'next/link';
 import { useRouter } from 'next/navigation';
 import { ApiError } from '@/lib/api';
 import { useAuth } from './auth-provider';
+import { SignUpAgreement } from './conduct-acceptance';
 import { Alert, Button, Card } from './ui';
 import { Field, TextInput } from './ui/fields';
 
@@ -15,6 +16,7 @@ export function RegisterForm() {
   const [name, setName] = useState('');
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
+  const [agreed, setAgreed] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [busy, setBusy] = useState(false);
 
@@ -24,7 +26,7 @@ export function RegisterForm() {
     setBusy(true);
 
     try {
-      await register({ name, email, password, role: 'student' });
+      await register({ name, email, password, role: 'student', acceptAgreements: agreed });
       router.replace('/apply');
     } catch (err) {
       setError(err instanceof ApiError ? err.message : 'Something went wrong. Please try again.');
@@ -78,6 +80,8 @@ export function RegisterForm() {
             />
           )}
         </Field>
+
+        <SignUpAgreement checked={agreed} onChange={setAgreed} />
 
         <Button type="submit" size="lg" className="w-full" disabled={busy}>
           {busy ? 'Creating…' : 'Create account'}

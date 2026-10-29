@@ -14,6 +14,7 @@ import { Container, Icon } from './marketing';
 import { MentorAction, useStudentStanding } from './mentor-request';
 import { MentorPage } from './mentor-page';
 import { Spinner } from './ui';
+import { ReportConcernButton } from './report-concern';
 
 export function MentorProfileView({ slug }: { slug: string }) {
   const { user, loading: authLoading } = useAuth();
@@ -86,6 +87,13 @@ export function MentorProfileView({ slug }: { slug: string }) {
       </div>
 
       <MentorPage mentor={mentor} action={isOwner ? null : <MentorAction mentor={mentor} standing={standing} />} />
+      {isOwner ? null : (
+        <div className="bg-cream">
+          <Container className="pb-10">
+            <ReportConcernButton kind="mentor" targetId={mentor.id} about={`${mentor.name.replace(/\s*\(test\)$/, '')}’s mentor page`} label="Report this page" />
+          </Container>
+        </div>
+      )}
     </>
   );
 }

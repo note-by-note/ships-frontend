@@ -6,6 +6,7 @@ import Link from 'next/link';
 import { useEffect, useState } from 'react';
 import { RequirePermission } from '@/components/admin-guard';
 import { DashboardHeading } from '@/components/dashboard-shell';
+import { MessageTabs } from '@/components/staff-shell';
 import { Alert, Badge, Spinner } from '@/components/ui';
 import { ApiError, api } from '@/lib/api';
 import type { ReviewedConversation } from '@/lib/types';
@@ -24,6 +25,7 @@ export default function MessageReviewPage() {
 
   return (
     <RequirePermission anyOf={['messages.review']}>
+      <MessageTabs />
       <DashboardHeading
         title="Messages"
         description="Read-only access to mentor and student conversations, so staff can act on reports and check on students. Mentors and students are told staff can see their messages."

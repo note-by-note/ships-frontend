@@ -190,6 +190,37 @@ export function ApplicationReview({ id }: { id: string }) {
         </div>
 
         <div className="space-y-6">
+          <Card className="p-5">
+            <h2 className="font-medium text-ink">Agreements</h2>
+            <dl className="mt-2 space-y-1.5 text-sm">
+              <div className="flex justify-between gap-3">
+                <dt className="text-ink-soft">Code of Conduct</dt>
+                <dd className={application.conductAccepted ? 'text-ok' : 'text-ink-faint'}>
+                  {application.conductAccepted ? 'Accepted' : 'Not yet'}
+                </dd>
+              </div>
+              {application.consent && application.consent.state !== 'not_needed' ? (
+                <div className="flex justify-between gap-3">
+                  <dt className="text-ink-soft">Parent consent</dt>
+                  <dd className={application.consent.state === 'given' ? 'text-right text-ok' : 'text-right text-warn'}>
+                    {application.consent.state === 'given'
+                      ? `Given${application.consent.guardianName ? ` by ${application.consent.guardianName}` : ''}${
+                          application.consent.givenAt ? `, ${new Date(application.consent.givenAt).toLocaleDateString()}` : ''
+                        }`
+                      : application.consent.linkSent
+                        ? 'Link sent, waiting'
+                        : 'Not yet'}
+                  </dd>
+                </div>
+              ) : null}
+            </dl>
+            {application.consent?.state === 'needed' ? (
+              <p className="mt-3 text-xs text-ink-faint">
+                The student sends their parent a link from their dashboard. Lessons shouldn’t start until it’s given.
+              </p>
+            ) : null}
+          </Card>
+
           {application.requestedMentor ? (
             <Card className="p-5">
               <h2 className="font-medium text-ink">Requested mentor</h2>

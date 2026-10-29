@@ -4,6 +4,7 @@ import { useEffect, useState, type ReactNode } from 'react';
 import Link from 'next/link';
 import { usePathname, useRouter } from 'next/navigation';
 import { api } from '@/lib/api';
+import { AgreementReminder } from './agreement-cards';
 import { sidesOf, useAuth } from './auth-provider';
 import { DashboardShell, type ShellLink } from './dashboard-shell';
 import { MESSAGES_CHANGED } from './messages';
@@ -17,6 +18,7 @@ const STUDENT_LINKS: ShellLink[] = [
   { href: '/applications', label: 'My applications', icon: 'file' },
   { href: '/apply', label: 'Apply', icon: 'school' },
   { href: '/dashboard/settings', label: 'Settings', icon: 'mail' },
+  { href: '/dashboard/report', label: 'Report a concern', icon: 'shield' },
   { href: '/faq', label: 'Help', icon: 'help' },
 ];
 
@@ -30,6 +32,7 @@ const MENTOR_LINKS: ShellLink[] = [
   { href: '/dashboard/hours', label: 'Volunteer hours', icon: 'heart' },
   { href: '/applications', label: 'My applications', icon: 'file' },
   { href: '/dashboard/settings', label: 'Settings', icon: 'mail' },
+  { href: '/dashboard/report', label: 'Report a concern', icon: 'shield' },
   { href: '/faq', label: 'Help', icon: 'help' },
 ];
 
@@ -112,6 +115,7 @@ export function MemberShell({ children }: { children: ReactNode }) {
         ...base.map((link) => (link.href === '/dashboard/messages' ? { ...link, badge: unread } : link)),
       ]}
     >
+      <AgreementReminder className="mb-6" />
       {children}
     </DashboardShell>
   );

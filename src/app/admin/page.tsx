@@ -67,7 +67,7 @@ export default function StaffOverviewPage() {
 function NeedsAttention({ overview, can }: { overview: StaffOverview; can: (permission: Permission) => boolean }) {
   const waiting = overview.waiting ?? { photos: 0, hours: 0, reports: 0, toMatch: 0 };
   const rows = [
-    { count: waiting.reports, label: ['reported message', 'reported messages'], href: '/admin/messages', permission: 'messages.review' as Permission, urgent: true },
+    { count: waiting.reports, label: ['report to look at', 'reports to look at'], href: '/admin/reports', permission: 'messages.review' as Permission, urgent: true },
     { count: overview.applications.byStatus.submitted ?? 0, label: ['application to review', 'applications to review'], href: '/admin/applications', permission: 'applications.review' as Permission, urgent: false },
     { count: waiting.toMatch ?? 0, label: ['student waiting for a mentor', 'students waiting for a mentor'], href: '/admin/matching', permission: 'applications.review' as Permission, urgent: false },
     { count: waiting.photos, label: ['mentor photo to approve', 'mentor photos to approve'], href: '/admin/photos', permission: 'mentors.manage' as Permission, urgent: false },

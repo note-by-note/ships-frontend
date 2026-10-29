@@ -68,6 +68,21 @@ export const FOOTER_LINKS = [
   },
 ];
 
+/** The policy pages, linked from the footer and from each other. */
+export const POLICIES = [
+  { href: '/code-of-conduct', label: 'Code of Conduct' },
+  { href: '/terms', label: 'Terms of Use' },
+  { href: '/privacy', label: 'Privacy Policy' },
+  { href: '/parent-consent', label: 'Parent & guardian consent' },
+];
+
+/**
+ * When the policies last changed. Keep in step with the versions in the API
+ * (`ships-api/src/util/agreements.ts`): changing the Code of Conduct or Terms
+ * enough that people should agree again means bumping both.
+ */
+export const POLICIES_UPDATED = 'October 29, 2026';
+
 export type InstrumentFamily = 'Keys' | 'Strings' | 'Woodwinds' | 'Brass' | 'Percussion' | 'Theory';
 
 /**
@@ -76,6 +91,9 @@ export type InstrumentFamily = 'Keys' | 'Strings' | 'Woodwinds' | 'Brass' | 'Per
  */
 /** A few words under instruments whose name doesn't say what's included. */
 export const INSTRUMENT_HINTS: Record<string, string> = {
+  Guitar: 'Any style',
+  'Classical Guitar': 'Nylon strings',
+  'Bass Guitar': 'Electric bass',
   Percussion: 'All-round school band percussion',
   'Drum Set': 'Drum kit',
   Glockenspiel: 'Bells',
@@ -89,7 +107,19 @@ export const INSTRUMENT_FAMILIES: { family: InstrumentFamily; blurb: string; ins
   {
     family: 'Strings',
     blurb: 'Bowed and plucked, from classical to campfire songs.',
-    instruments: ['Violin', 'Viola', 'Cello', 'String Bass', 'Guitar', 'Ukulele'],
+    instruments: [
+      'Violin',
+      'Viola',
+      'Cello',
+      'String Bass',
+      'Guitar',
+      'Acoustic Guitar',
+      'Classical Guitar',
+      'Electric Guitar',
+      'Bass Guitar',
+      'Banjo',
+      'Ukulele',
+    ],
   },
   {
     family: 'Woodwinds',

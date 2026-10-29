@@ -1,5 +1,5 @@
 import Link from 'next/link';
-import { FOOTER_LINKS, SITE } from '@/lib/site';
+import { FOOTER_LINKS, POLICIES, SITE } from '@/lib/site';
 import { ContactEmail, Container, Icon } from './marketing';
 
 export function SiteFooter() {
@@ -35,8 +35,21 @@ export function SiteFooter() {
       </Container>
 
       <div className="border-t border-cream/10">
-        <Container className="py-6 text-xs text-cream/60">
-          © {new Date().getFullYear()} {SITE.name}. A student-led initiative.
+        <Container className="flex flex-col gap-3 py-6 text-xs text-cream/60 md:flex-row md:items-center md:justify-between">
+          <p>
+            © {new Date().getFullYear()} {SITE.name}. A student-led initiative.
+          </p>
+          <nav aria-label="Policies">
+            <ul className="flex flex-wrap gap-x-5 gap-y-2">
+              {POLICIES.map((policy) => (
+                <li key={policy.href}>
+                  <Link href={policy.href} className="hover:text-cream">
+                    {policy.label}
+                  </Link>
+                </li>
+              ))}
+            </ul>
+          </nav>
         </Container>
       </div>
     </footer>

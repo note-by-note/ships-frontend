@@ -15,6 +15,9 @@ import { ApiError, api } from '@/lib/api';
 import type { ChatMessage, Conversation, ConversationThread } from '@/lib/types';
 import { Avatar } from './avatar';
 import { Alert, Button, Spinner, cx } from './ui';
+import { ReportConcernButton } from './report-concern';
+import { ConductGate } from './conduct-acceptance';
+import { useAuth } from './auth-provider';
 
 const MAX_LENGTH = 2000;
 export const MESSAGES_CHANGED = 'nbn:messages-changed';
@@ -36,9 +39,9 @@ function dayLabel(iso: string): string {
 export function SafetyNote({ className }: { className?: string }) {
   return (
     <p className={cx('rounded-xl bg-mist/60 px-4 py-3 text-xs leading-relaxed text-navy/75', className)}>
-      Messages are kept, and Note by Note staff can read them to keep everyone safe. Keep it to lessons and music,
-      and don&apos;t share phone numbers, home addresses or social media. If anything makes you uncomfortable, use
-      Report or tell a parent or guardian.
+      Messages are kept, and Note by Note admins can read them to keep everyone safe. Keep it to lessons and music,
+      and don&apos;t share phone numbers, home addresses or social media. If anything makes you uncomfortable, report
+      the message or the conversation, or tell a parent or guardian.
     </p>
   );
 }
@@ -135,6 +138,9 @@ function Thread({ pairingId, onActivity }: { pairingId: string; onActivity: () =
   const [draft, setDraft] = useState('');
   const [sending, setSending] = useState(false);
   const [reporting, setReporting] = useState<ChatMessage | null>(null);
+  const { user } = useAuth();
+  // Sending messages needs the current Code of Conduct accepted first.
+  const needsConduct = Boolean(user && !user.agreements?.conduct);
   const endRef = useRef<HTMLDivElement>(null);
   const lastCount = useRef(0);
 
@@ -216,6 +222,7 @@ function Thread({ pairingId, onActivity }: { pairingId: string; onActivity: () =
           <p className="truncate font-semibold text-navy">{thread.with}</p>
           <p className="text-xs text-ink-faint">{thread.side === 'mentor' ? 'Your student' : 'Your mentor'}</p>
         </div>
+        <ReportConcernButton kind="pairing" targetId={thread.pairingId} about={`Lessons with ${thread.with}`} label="Report" className="ml-auto shrink-0" />
       </header>
 
       <div className="flex-1 overflow-y-auto px-4 py-4" aria-live="polite">
@@ -268,6 +275,11 @@ function Thread({ pairingId, onActivity }: { pairingId: string; onActivity: () =
         <div ref={endRef} />
       </div>
 
+      {needsConduct ? (
+        <div className="border-t border-line p-3">
+          <ConductGate action="send messages" />
+        </div>
+      ) : (
       <form onSubmit={send} className="border-t border-line p-3">
         {error ? <p role="alert" className="mb-2 text-sm text-danger">{error}</p> : null}
         <div className="flex items-end gap-2">
@@ -294,6 +306,7 @@ function Thread({ pairingId, onActivity }: { pairingId: string; onActivity: () =
           </p>
         ) : null}
       </form>
+      )}
 
       {reporting ? (
         <ReportDialog

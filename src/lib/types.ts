@@ -173,6 +173,10 @@ export interface ApplicationDetail extends Application {
   applicant: string | null;
   applicantName: string;
   applicantEmail: string;
+  /** Whether the applicant has accepted the current Code of Conduct. */
+  conductAccepted?: boolean;
+  /** Student applications: their parent or guardian's consent. */
+  consent?: ConsentState | null;
   formSnapshot: FormSnapshot | null;
   decision: {
     status: string | null;
@@ -240,6 +244,18 @@ export interface AccountUser {
   /** A mentor or volunteer who takes lessons too (students always do). */
   alsoStudent?: boolean;
   mentorProfile?: { id: string; name: string; slug: string } | null;
+  /** Whether they've accepted the current Code of Conduct and Terms of Use. */
+  agreements?: { conduct: boolean; conductAcceptedAt: string | null; terms: boolean };
+}
+
+/** A student's parent or guardian consent, as the student and staff see it. */
+export interface ConsentState {
+  state: 'not_needed' | 'needed' | 'given';
+  givenAt: string | null;
+  guardianName: string | null;
+  relationship: string | null;
+  linkSent: boolean;
+  emailedAt: string | null;
 }
 
 export interface DirectoryUser {
@@ -414,6 +430,7 @@ export interface MatchingStudent {
   goals: string;
   acceptedAt: string;
   isTest: boolean;
+  consent?: ConsentState['state'];
 }
 
 export interface MentorSuggestion {
@@ -595,6 +612,8 @@ export interface AbsenceNotice {
 export interface Pairing {
   id: string;
   side: 'mentor' | 'student';
+  /** The student is under 18 and their parent hasn't given consent yet. */
+  waitingForConsent?: boolean;
   instrument: string;
   mentor: { id: string; name: string };
   student: { id: string; name: string };

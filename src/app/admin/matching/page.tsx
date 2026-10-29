@@ -139,6 +139,7 @@ function StudentCard({ student, onMatch }: { student: Student; onMatch: (mentor:
         <p className="flex flex-wrap items-center gap-2 font-display text-lg font-bold text-navy">
           {plain(student.name)}
           {student.isTest ? <Badge tone="warn">Test</Badge> : null}
+          {student.consent === 'needed' ? <Badge tone="warn">Parent consent not yet given</Badge> : null}
         </p>
         <p className="text-sm text-ink-soft">{facts.join(' · ')}</p>
         {student.availability.length ? (
@@ -241,6 +242,12 @@ function ConfirmMatch({
             <span className="block text-ink-soft">Match them now, without waiting for {mentorName} to accept.</span>
           </span>
         </label>
+        {student.consent === 'needed' ? (
+          <p className="mt-3 rounded-xl bg-warn-soft p-3 text-sm text-warn">
+            {studentName}’s parent or guardian hasn’t given consent yet. You can match them, but lessons shouldn’t start
+            until it’s given.
+          </p>
+        ) : null}
         {error ? <p className="mt-3 text-sm text-danger">{error}</p> : null}
         <div className="mt-5 flex justify-end gap-2">
           <Button variant="secondary" onClick={onClose} disabled={busy}>

@@ -24,6 +24,8 @@ import { useAuth } from './auth-provider';
 import { AccountStep } from './account-step';
 import { QuestionInput } from './question-input';
 import { Alert, Button, ButtonLink, Card, Spinner, cx } from './ui';
+import { ParentConsentCard } from './agreement-cards';
+import { ConductGate } from './conduct-acceptance';
 
 /**
  * Steps carry a stable key rather than being addressed by position. The account
@@ -52,6 +54,8 @@ export function ApplicationWizard({ slug, mentor }: { slug: string; mentor?: str
   const [saveState, setSaveState] = useState<'idle' | 'saving' | 'saved' | 'error'>('idle');
   const [submitting, setSubmitting] = useState(false);
   const [submitted, setSubmitted] = useState<{ message: string } | null>(null);
+  // Sending an application needs the current Code of Conduct accepted first.
+  const needsConduct = Boolean(user && !user.agreements?.conduct);
   const [loading, setLoading] = useState(true);
 
   const [mentorError, setMentorError] = useState<string | null>(null);
@@ -333,6 +337,8 @@ export function ApplicationWizard({ slug, mentor }: { slug: string; mentor?: str
           </p>
           {form.kind === 'mentee' ? (
             <div className="mx-auto mt-6 max-w-lg text-left">
+              {/* Under 18: the next thing to do is ask a parent for consent. */}
+              <ParentConsentCard className="mb-4" />
               <MentorChoice application={application} preview={mentorPreview} error={mentorError} onClear={() => chooseMentor(null)} />
             </div>
           ) : null}
@@ -414,6 +420,9 @@ export function ApplicationWizard({ slug, mentor }: { slug: string; mentor?: str
 
             {step?.kind !== 'account' ? (
               <>
+                {step?.kind === 'review' && needsConduct ? (
+                  <ConductGate action="send your application" className="mt-6" />
+                ) : null}
                 {submitError ? (
                   <div className="mt-6">
                     <Alert>{submitError}</Alert>
@@ -428,7 +437,7 @@ export function ApplicationWizard({ slug, mentor }: { slug: string; mentor?: str
                   <div className="flex items-center gap-4">
                     <SaveIndicator state={saveState} enabled={form.settings.allowDrafts} />
                     {step?.kind === 'review' ? (
-                      <Button size="lg" onClick={submit} disabled={submitting || !application}>
+                      <Button size="lg" onClick={submit} disabled={submitting || !application || needsConduct}>
                         {submitting ? 'Sending…' : 'Submit application'}
                       </Button>
                     ) : (

@@ -12,7 +12,9 @@
 import { useCallback, useEffect, useMemo, useState } from 'react';
 import Link from 'next/link';
 import { DashboardHeading, Panel } from '@/components/dashboard-shell';
+import { ParentConsentCard } from '@/components/agreement-cards';
 import { LessonNotes, MeetingLink } from '@/components/lesson-notes';
+import { ReportConcernButton } from '@/components/report-concern';
 import { Icon } from '@/components/marketing';
 import { Alert, Badge, Button, EmptyState, Spinner } from '@/components/ui';
 import { Field, Select, TextArea } from '@/components/ui/fields';
@@ -52,6 +54,7 @@ export default function LessonsPage() {
         description="Agree a weekly lesson time, and let each other know if you can’t make one."
       />
       {error ? <Alert>{error}</Alert> : null}
+      <ParentConsentCard className="mb-6" />
       {!pairings && !error ? <Spinner /> : null}
       {pairings && rules ? (
         pairings.length ? (
@@ -76,6 +79,7 @@ function PairingCard({ pairing, rules, onChange }: { pairing: Pairing; rules: Le
   const [busy, setBusy] = useState(false);
   const other = pairing.side === 'mentor' ? pairing.student : pairing.mentor;
   const otherLabel = pairing.side === 'mentor' ? 'your student' : 'your mentor';
+  const firstName = other.name.replace(/\s*\(test\)$/, '').split(' ')[0];
   const zone = zoneLabel(pairing.timeZone);
 
   async function run(action: () => Promise<unknown>) {
@@ -129,6 +133,13 @@ function PairingCard({ pairing, rules, onChange }: { pairing: Pairing; rules: Le
             ) : (
               <p className="mt-1 text-navy/75">Not agreed yet. Propose a time below, or answer {otherLabel}’s proposal.</p>
             )}
+            {pairing.waitingForConsent ? (
+              <p className="mt-3 border-t border-navy/10 pt-3 text-sm text-navy/80">
+                {pairing.side === 'student'
+                  ? 'Lessons start once your parent or guardian gives consent. Send them the link from the top of this page.'
+                  : `Lessons start once ${firstName}’s parent or guardian gives consent. You can suggest a time now; it’s confirmed after that.`}
+              </p>
+            ) : null}
           </div>
 
           {proposal ? (
@@ -180,6 +191,7 @@ function PairingCard({ pairing, rules, onChange }: { pairing: Pairing; rules: Le
               Shared resources
             </Link>
           </div>
+          <ReportConcernButton kind="pairing" targetId={pairing.id} about={`Lessons with ${firstName}`} className="self-start" />
         </div>
       </div>
 
