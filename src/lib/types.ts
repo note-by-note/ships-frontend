@@ -254,6 +254,8 @@ export interface ConsentState {
   givenAt: string | null;
   guardianName: string | null;
   relationship: string | null;
+  /** The language of the consent page they agreed on: 'en', 'es' or 'fr'. */
+  language: string | null;
   linkSent: boolean;
   emailedAt: string | null;
 }

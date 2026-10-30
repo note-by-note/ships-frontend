@@ -7,14 +7,17 @@
 
 import Link from 'next/link';
 import { useState, type FormEvent } from 'react';
+import { CONDUCT_FORM } from '@/content/policies/forms';
 import { ApiError, api } from '@/lib/api';
+import { POLICY_LANGUAGES, policyHref, type PolicyLanguage } from '@/lib/policy-languages';
 import type { AccountUser } from '@/lib/types';
 import { useAuth } from './auth-provider';
 import { Alert, Button } from './ui';
 import { Field, TextInput } from './ui/fields';
 
-export function ConductAcceptance() {
+export function ConductAcceptance({ lang = 'en' }: { lang?: PolicyLanguage }) {
   const { user, loading } = useAuth();
+  const t = CONDUCT_FORM[lang];
 
   if (loading) return null;
 
@@ -23,13 +26,16 @@ export function ConductAcceptance() {
   if (!user) {
     return (
       <section id="accept" className={box}>
-        <h2 className="font-display text-2xl font-bold">Agreeing to this code</h2>
+        <h2 className="font-display text-2xl font-bold">{t.signedOutTitle}</h2>
         <p className="mt-2 leading-relaxed text-navy/80">
-          Everyone agrees to it when they create an account. If you already have one,{' '}
-          <Link href="/login?next=%2Fcode-of-conduct%23accept" className="font-medium underline underline-offset-2">
-            sign in
+          {t.signedOutBefore}{' '}
+          <Link
+            href={`/login?next=${encodeURIComponent(`${policyHref('/code-of-conduct', lang)}#accept`)}`}
+            className="font-medium underline underline-offset-2"
+          >
+            {t.signIn}
           </Link>{' '}
-          to accept it.
+          {t.signedOutAfter}
         </p>
       </section>
     );
@@ -37,13 +43,14 @@ export function ConductAcceptance() {
 
   if (hasAccepted(user)) {
     const when = user.agreements?.conductAcceptedAt
-      ? new Date(user.agreements.conductAcceptedAt).toLocaleDateString(undefined, { dateStyle: 'long' })
+      ? new Date(user.agreements.conductAcceptedAt).toLocaleDateString(localeOf(lang), { dateStyle: 'long' })
       : null;
     return (
       <section id="accept" className={box}>
-        <h2 className="font-display text-2xl font-bold">You’ve accepted this code</h2>
+        <h2 className="font-display text-2xl font-bold">{t.acceptedTitle}</h2>
         <p className="mt-2 leading-relaxed text-navy/80">
-          {when ? `You accepted it on ${when}. ` : ''}Thank you for helping keep Note by Note a good place to learn.
+          {when ? t.acceptedOn(when) : ''}
+          {t.thanks}
         </p>
       </section>
     );
@@ -51,13 +58,15 @@ export function ConductAcceptance() {
 
   return (
     <section id="accept" className={box}>
-      <h2 className="font-display text-2xl font-bold">Accept the Code of Conduct</h2>
-      <p className="mt-2 leading-relaxed text-navy/80">
-        Please accept it to keep using your account. We keep a record of the date and the name you type.
-      </p>
-      <ConductForm className="mt-6" />
+      <h2 className="font-display text-2xl font-bold">{t.acceptTitle}</h2>
+      <p className="mt-2 leading-relaxed text-navy/80">{t.acceptIntro}</p>
+      <ConductForm className="mt-6" lang={lang} />
     </section>
   );
+}
+
+function localeOf(lang: PolicyLanguage) {
+  return POLICY_LANGUAGES.find((language) => language.code === lang)?.locale;
 }
 
 /** Whether the current Code of Conduct and Terms are both accepted. (Either one changing asks again.) */
@@ -69,8 +78,17 @@ export function hasAccepted(user: AccountUser | null): boolean {
  * Tick, type your name, accept. On the Code of Conduct page, and inline
  * wherever something needs it first (sending an application, asking a mentor).
  */
-export function ConductForm({ className, compact = false }: { className?: string; compact?: boolean }) {
+export function ConductForm({
+  className,
+  compact = false,
+  lang = 'en',
+}: {
+  className?: string;
+  compact?: boolean;
+  lang?: PolicyLanguage;
+}) {
   const { user, refreshUser } = useAuth();
+  const t = CONDUCT_FORM[lang];
   const [agreed, setAgreed] = useState(false);
   const [terms, setTerms] = useState(false);
   const [name, setName] = useState('');
@@ -81,44 +99,50 @@ export function ConductForm({ className, compact = false }: { className?: string
   async function submit(event: FormEvent) {
     event.preventDefault();
     setError(null);
-    if (!agreed) return setError('Tick the box to accept the Code of Conduct.');
-    if (needsTerms && !terms) return setError('Tick the box to accept the Terms of Use.');
-    if (name.trim().length < 2) return setError('Type your full name to sign.');
+    if (!agreed) return setError(t.tickConduct);
+    if (needsTerms && !terms) return setError(t.tickTerms);
+    if (name.trim().length < 2) return setError(t.typeName);
     setBusy(true);
     try {
       await api.post('/me/agreements', { conduct: true, terms, signedName: name.trim() });
       await refreshUser();
     } catch (err) {
-      setError(err instanceof ApiError ? err.message : 'That didn’t save. Please try again.');
+      setError(err instanceof ApiError ? err.message : t.notSaved);
       setBusy(false);
     }
   }
 
+  const target = compact ? '_blank' : undefined;
   const text = compact ? 'text-sm text-navy/90' : 'text-navy/90';
   return (
     <form onSubmit={submit} className={`flex flex-col gap-4 ${className ?? ''}`}>
       <label className={`flex items-start gap-3 ${text}`}>
         <input type="checkbox" checked={agreed} onChange={(e) => setAgreed(e.target.checked)} className="mt-1 size-4 shrink-0 accent-navy" />
         <span>
-          I’ve read the{' '}
-          <Link href="/code-of-conduct" target={compact ? '_blank' : undefined} className="underline underline-offset-2">
-            Code of Conduct
-          </Link>{' '}
-          and agree to follow it.
+          {t.conductTick[0]}
+          <Link href={policyHref('/code-of-conduct', lang)} target={target} className="underline underline-offset-2">
+            {t.conductTick[1]}
+          </Link>
+          {t.conductTick[2]}
         </span>
       </label>
       {needsTerms ? (
         <label className={`flex items-start gap-3 ${text}`}>
           <input type="checkbox" checked={terms} onChange={(e) => setTerms(e.target.checked)} className="mt-1 size-4 shrink-0 accent-navy" />
           <span>
-            I also agree to the{' '}
-            <Link href="/terms" target={compact ? '_blank' : undefined} className="underline underline-offset-2">Terms of Use</Link> and
-            have read the{' '}
-            <Link href="/privacy" target={compact ? '_blank' : undefined} className="underline underline-offset-2">Privacy Policy</Link>.
+            {t.termsTick[0]}
+            <Link href={policyHref('/terms', lang)} target={target} className="underline underline-offset-2">
+              {t.termsTick[1]}
+            </Link>
+            {t.termsTick[2]}
+            <Link href={policyHref('/privacy', lang)} target={target} className="underline underline-offset-2">
+              {t.termsTick[3]}
+            </Link>
+            {t.termsTick[4]}
           </span>
         </label>
       ) : null}
-      <Field label="Your full name" required help="Typing your name counts as your signature.">
+      <Field label={t.nameLabel} required help={t.nameHelp}>
         {({ id, describedBy }) => (
           <TextInput
             id={id}
@@ -134,7 +158,7 @@ export function ConductForm({ className, compact = false }: { className?: string
       {error ? <Alert>{error}</Alert> : null}
       <div>
         <Button type="submit" size={compact ? 'sm' : undefined} disabled={busy}>
-          {busy ? 'Saving…' : 'Accept'}
+          {busy ? t.saving : t.accept}
         </Button>
       </div>
     </form>

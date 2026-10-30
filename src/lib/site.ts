@@ -77,11 +77,12 @@ export const POLICIES = [
 ];
 
 /**
- * When the policies last changed. Keep in step with the versions in the API
- * (`ships-api/src/util/agreements.ts`): changing the Code of Conduct or Terms
- * enough that people should agree again means bumping both.
+ * When the policies last changed (shown in each language's date format). Keep
+ * in step with the versions in the API (`ships-api/src/util/agreements.ts`):
+ * changing the Code of Conduct or Terms enough that people should agree again
+ * means bumping both. Change the translations too (`src/content/policies`).
  */
-export const POLICIES_UPDATED = 'October 29, 2026';
+export const POLICIES_UPDATED = '2026-10-29';
 
 export type InstrumentFamily = 'Keys' | 'Strings' | 'Woodwinds' | 'Brass' | 'Percussion' | 'Theory';
 
