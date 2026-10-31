@@ -13,7 +13,7 @@
 
 import { useCallback, useEffect, useMemo, useState, type FormEvent, type ReactNode } from 'react';
 import { ApiError, api } from '@/lib/api';
-import type { Pairing, ResourceTeam, SharedResource } from '@/lib/types';
+import { ALL_TEAMS, TEAM_LABELS, type Pairing, type ResourceTeam, type SharedResource } from '@/lib/types';
 import { Icon, type IconName } from './marketing';
 import { Alert, Button, Spinner, cx } from './ui';
 import { Field, TextArea, TextInput } from './ui/fields';
@@ -64,13 +64,7 @@ async function openFile(resource: SharedResource, download: boolean) {
 }
 
 /** Who a team resource can be for. None picked means everyone on the team. */
-const TEAMS: { key: ResourceTeam; label: string }[] = [
-  { key: 'mentors', label: 'Mentors' },
-  { key: 'admin', label: 'Admin' },
-  { key: 'tech', label: 'Tech' },
-  { key: 'outreach', label: 'Outreach' },
-  { key: 'marketing', label: 'Marketing' },
-];
+const TEAMS = ALL_TEAMS.map((key) => ({ key, label: TEAM_LABELS[key] }));
 
 function teamsLabel(teams: ResourceTeam[]): string {
   if (!teams.length) return 'Everyone on the team';

@@ -13,7 +13,7 @@ import { useAuth } from './auth-provider';
 import { Alert, Button, cx } from './ui';
 import { Field, TextArea } from './ui/fields';
 
-export type ReportKind = 'mentor' | 'pairing' | 'resource' | 'general';
+export type ReportKind = 'mentor' | 'pairing' | 'resource' | 'team-thread' | 'general';
 
 const CATEGORIES: { value: string; label: string }[] = [
   { value: 'safety', label: 'I’m worried about someone’s safety' },

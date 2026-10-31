@@ -254,7 +254,7 @@ export interface ConsentState {
   givenAt: string | null;
   guardianName: string | null;
   relationship: string | null;
-  /** The language of the consent page they agreed on: 'en', 'es' or 'fr'. */
+  /** The language of the consent page they agreed on: 'en', 'es', 'fr' or 'zh'. */
   language: string | null;
   linkSent: boolean;
   emailedAt: string | null;
@@ -513,9 +513,78 @@ export interface ReviewedConversation {
   openReports: number;
 }
 
+// --- Teams -------------------------------------------------------------------------------
+
+/** Mentors, and each staff role. Team resources and team messages are shared by team. */
+export type Team = 'mentors' | 'admin' | 'tech' | 'outreach' | 'marketing';
+
+export const TEAM_LABELS: Record<Team, string> = {
+  mentors: 'Mentors',
+  admin: 'Admin',
+  tech: 'Tech',
+  outreach: 'Outreach',
+  marketing: 'Marketing',
+};
+
+export const ALL_TEAMS = Object.keys(TEAM_LABELS) as Team[];
+
+/** "Tech, Outreach and Sam Lee": who is in a team conversation. */
+export function teamListLabel(teams: Team[], people: string[] = []): string {
+  const names = [...ALL_TEAMS.filter((team) => teams.includes(team)).map((team) => TEAM_LABELS[team]), ...people];
+  return names.length > 1 ? `${names.slice(0, -1).join(', ')} and ${names[names.length - 1]}` : (names[0] ?? '');
+}
+
+/** `GET /team-messages/:id` and the list: one message in a team conversation. */
+export interface TeamMessage {
+  id: string;
+  /** A message, or a note that someone added teams (`body` lists them). */
+  kind: 'message' | 'teams-added';
+  senderName: string;
+  /** The team they wrote for; null when they wrote as themselves. */
+  senderTeam: Team | null;
+  mine: boolean;
+  body: string;
+  createdAt: string;
+}
+
+export interface TeamThreadSummary {
+  id: string;
+  subject: string;
+  teams: Team[];
+  /** People in it by name, not through a team. */
+  people: string[];
+  lastMessage: TeamMessage | null;
+  lastMessageAt: string;
+  /** False when an admin is reading a conversation they aren't in. */
+  member: boolean;
+  unread: number;
+}
+
+export interface TeamThreadsMeta {
+  unread: number;
+  myTeams: Team[];
+  /** The teams this person can write for when starting a conversation. */
+  fromChoices: Team[];
+  canWriteToMentors: boolean;
+  canReviewAll: boolean;
+}
+
+export interface TeamThread {
+  id: string;
+  subject: string;
+  teams: Team[];
+  people: string[];
+  member: boolean;
+  /** The team their replies are shown under, if any. */
+  writingFor: Team | null;
+  createdAt: string;
+  messages: TeamMessage[];
+  hasMore: boolean;
+}
+
 // --- Resources ---------------------------------------------------------------------------
 
-export type ResourceTeam = 'mentors' | 'admin' | 'tech' | 'outreach' | 'marketing';
+export type ResourceTeam = Team;
 
 export interface SharedResource {
   id: string;

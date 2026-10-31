@@ -9,6 +9,7 @@ import {
   formatPolicyDate,
   isPolicyLanguage,
   policyHref,
+  policyLocale,
   type PolicyKey,
   type PolicyLanguage,
 } from '@/lib/policy-languages';
@@ -36,7 +37,7 @@ export function LegalPage({
   const { chrome, [policy]: text } = POLICY_TEXT[lang];
 
   return (
-    <div lang={lang}>
+    <div lang={policyLocale(lang)}>
       <header className="border-b border-navy/10 bg-cream text-navy">
         <Container className="py-12 md:py-16">
           <div className="mb-8 flex flex-wrap items-baseline justify-between gap-x-10 gap-y-4">

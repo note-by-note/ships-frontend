@@ -13,6 +13,7 @@ import { AdminGuard } from './admin-guard';
 import { AgreementReminder } from './agreement-cards';
 import { sidesOf, useAuth } from './auth-provider';
 import { DashboardShell, PageTabs, type ShellLink } from './dashboard-shell';
+import { useTeamUnread } from './team-messages';
 
 type Waiting = NonNullable<StaffOverview['waiting']>;
 
@@ -21,6 +22,7 @@ const WaitingContext = createContext<Waiting>({ photos: 0, hours: 0, reports: 0,
 /** Every staff section and the permissions that unlock it ('all' = every staff role). */
 const SECTIONS: (ShellLink & { anyOf: Permission[] | 'all'; count?: keyof Waiting })[] = [
   { href: '/admin', label: 'Overview', icon: 'star', exact: true, anyOf: ['stats.view'] },
+  { href: '/admin/team-messages', label: 'Team messages', icon: 'megaphone', anyOf: 'all' },
   { group: 'Program', href: '/admin/applications', also: ['/admin/matching'], label: 'Applications', icon: 'file', anyOf: ['applications.review'], count: 'toMatch' },
   { group: 'Program', href: '/admin/mentors', also: ['/admin/photos'], label: 'Mentors', icon: 'music', anyOf: ['mentors.view', 'mentors.manage'], count: 'photos' },
   { group: 'Program', href: '/admin/messages', also: ['/admin/reports'], label: 'Messages & reports', icon: 'message', anyOf: ['messages.review'], count: 'reports' },
@@ -44,6 +46,7 @@ function StaffFrame({ children }: { children: ReactNode }) {
   const { user, can } = useAuth();
   const pathname = usePathname();
   const [waiting, setWaiting] = useState<Waiting>({ photos: 0, hours: 0, reports: 0, toMatch: 0 });
+  const teamUnread = useTeamUnread(Boolean(user), pathname);
 
   // Refreshed on every page change, so a badge clears after the work is done.
   useEffect(() => {
@@ -58,7 +61,8 @@ function StaffFrame({ children }: { children: ReactNode }) {
     (section) => section.anyOf === 'all' || section.anyOf.some((permission) => can(permission)),
   ).map(({ count, ...link }) => ({
     ...link,
-    badge: count && can(COUNT_PERMISSION[count]) ? waiting[count] : undefined,
+    badge:
+      link.href === '/admin/team-messages' ? teamUnread : count && can(COUNT_PERMISSION[count]) ? waiting[count] : undefined,
   }));
   // Volunteers who also mentor or take lessons reach their own dashboard from here.
   if (user && sidesOf(user).any) {

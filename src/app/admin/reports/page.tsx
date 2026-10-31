@@ -15,7 +15,7 @@ import { ApiError, api } from '@/lib/api';
 
 interface ConcernReport {
   id: string;
-  kind: 'mentor' | 'pairing' | 'resource' | 'general';
+  kind: 'mentor' | 'pairing' | 'resource' | 'team-thread' | 'general';
   about: string;
   category: string;
   details: string;
@@ -23,6 +23,7 @@ interface ConcernReport {
   reporterEmail: string | null;
   pairingId: string | null;
   mentorId: string | null;
+  teamThreadId: string | null;
   createdAt: string;
   resolvedAt: string | null;
   resolution: string;
@@ -153,6 +154,11 @@ function ReportItem({ report, onResolved }: { report: ConcernReport; onResolved:
           {report.pairingId ? (
             <Link href={`/admin/messages/${report.pairingId}`} className="font-semibold text-navy underline underline-offset-2">
               Read their messages
+            </Link>
+          ) : null}
+          {report.teamThreadId ? (
+            <Link href={`/admin/team-messages/${report.teamThreadId}`} className="font-semibold text-navy underline underline-offset-2">
+              Read the conversation
             </Link>
           ) : null}
           {report.mentorId ? (

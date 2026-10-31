@@ -70,8 +70,8 @@ function LanguageLinks({ path, lang, label, search }: SwitchProps & { search: st
           <li key={language.code}>
             <Link
               href={`${policyHref(path, language.code)}${search}`}
-              hrefLang={language.code}
-              lang={language.code}
+              hrefLang={language.locale}
+              lang={language.locale}
               aria-current={language.code === lang ? 'true' : undefined}
               className={language.code === lang ? 'font-semibold text-navy' : 'text-navy/60 hover:text-navy'}
             >

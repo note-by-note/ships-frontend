@@ -23,7 +23,7 @@ const MAX_LENGTH = 2000;
 export const MESSAGES_CHANGED = 'nbn:messages-changed';
 const POLL_MS = 8000;
 
-function shortTime(iso: string): string {
+export function shortTime(iso: string): string {
   const date = new Date(iso);
   const today = new Date();
   const sameDay = date.toDateString() === today.toDateString();
@@ -32,7 +32,7 @@ function shortTime(iso: string): string {
     : date.toLocaleDateString(undefined, { weekday: 'short', month: 'short', day: 'numeric' });
 }
 
-function dayLabel(iso: string): string {
+export function dayLabel(iso: string): string {
   return new Date(iso).toLocaleDateString(undefined, { weekday: 'long', month: 'long', day: 'numeric' });
 }
 

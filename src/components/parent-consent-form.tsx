@@ -10,7 +10,7 @@ import { useSearchParams } from 'next/navigation';
 import { useEffect, useState, type FormEvent } from 'react';
 import { CONSENT_FORM, type ConsentFormText } from '@/content/policies/forms';
 import { ApiError, api } from '@/lib/api';
-import { POLICY_LANGUAGES, type PolicyLanguage } from '@/lib/policy-languages';
+import { policyLocale, type PolicyLanguage } from '@/lib/policy-languages';
 import { Alert, Button, Spinner } from './ui';
 import { Field, Select, TextInput } from './ui/fields';
 
@@ -26,8 +26,7 @@ const RELATIONSHIPS = ['Parent', 'Legal guardian', 'Other caregiver'] as const;
 const box = 'scroll-mt-24 rounded-2xl border border-navy/10 bg-cream/60 p-6 md:p-8';
 
 function formatDate(iso: string | null, lang: PolicyLanguage) {
-  const locale = POLICY_LANGUAGES.find((language) => language.code === lang)?.locale;
-  return iso ? new Date(iso).toLocaleDateString(locale, { dateStyle: 'long' }) : '';
+  return iso ? new Date(iso).toLocaleDateString(policyLocale(lang), { dateStyle: 'long' }) : '';
 }
 
 export function ParentConsentForm({ lang = 'en' }: { lang?: PolicyLanguage }) {

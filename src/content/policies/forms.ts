@@ -1,6 +1,6 @@
 // The words in the two forms on the policy pages: accepting the Code of
 // Conduct, and a parent giving consent. These run in the browser, so they're
-// plain strings. Keep them in step with en.tsx, es.tsx and fr.tsx.
+// plain strings. Keep them in step with en.tsx, es.tsx, fr.tsx and zh.tsx.
 //
 // Error messages from the server stay in English.
 
@@ -33,9 +33,9 @@ export interface ConductFormText {
 export const CONDUCT_FORM: Record<PolicyLanguage, ConductFormText> = {
   en: {
     signedOutTitle: 'Agreeing to this code',
-    signedOutBefore: 'Everyone agrees to it when they create an account. If you already have one,',
+    signedOutBefore: 'Everyone agrees to it when they create an account. If you already have one, ',
     signIn: 'sign in',
-    signedOutAfter: 'to accept it.',
+    signedOutAfter: ' to accept it.',
     acceptedTitle: 'You’ve accepted this code',
     acceptedOn: (date) => `You accepted it on ${date}. `,
     thanks: 'Thank you for helping keep Note by Note a good place to learn.',
@@ -54,9 +54,9 @@ export const CONDUCT_FORM: Record<PolicyLanguage, ConductFormText> = {
   },
   es: {
     signedOutTitle: 'Aceptar este código',
-    signedOutBefore: 'Todos lo aceptan al crear una cuenta. Si ya tienes una,',
+    signedOutBefore: 'Todos lo aceptan al crear una cuenta. Si ya tienes una, ',
     signIn: 'inicia sesión',
-    signedOutAfter: 'para aceptarlo.',
+    signedOutAfter: ' para aceptarlo.',
     acceptedTitle: 'Ya aceptaste este código',
     acceptedOn: (date) => `Lo aceptaste el ${date}. `,
     thanks: 'Gracias por ayudar a que Note by Note siga siendo un buen lugar para aprender.',
@@ -75,9 +75,9 @@ export const CONDUCT_FORM: Record<PolicyLanguage, ConductFormText> = {
   },
   fr: {
     signedOutTitle: 'Accepter ce code',
-    signedOutBefore: 'Tout le monde l’accepte en créant un compte. Si vous en avez déjà un,',
+    signedOutBefore: 'Tout le monde l’accepte en créant un compte. Si vous en avez déjà un, ',
     signIn: 'connectez-vous',
-    signedOutAfter: 'pour l’accepter.',
+    signedOutAfter: ' pour l’accepter.',
     acceptedTitle: 'Vous avez accepté ce code',
     acceptedOn: (date) => `Vous l’avez accepté le ${date}. `,
     thanks: 'Merci d’aider Note by Note à rester un bon endroit pour apprendre.',
@@ -93,6 +93,27 @@ export const CONDUCT_FORM: Record<PolicyLanguage, ConductFormText> = {
     notSaved: 'L’enregistrement n’a pas fonctionné. Veuillez réessayer.',
     saving: 'Enregistrement…',
     accept: 'Accepter',
+  },
+  zh: {
+    signedOutTitle: '接受本准则',
+    signedOutBefore: '每个人在创建账户时都会接受本准则。如果你已有账户，请',
+    signIn: '登录',
+    signedOutAfter: '后接受。',
+    acceptedTitle: '你已接受本准则',
+    acceptedOn: (date) => `你于${date}接受了本准则。`,
+    thanks: '感谢你帮助 Note by Note 保持良好的学习环境。',
+    acceptTitle: '接受行为准则',
+    acceptIntro: '请接受本准则，以便继续使用你的账户。我们会记录日期和你输入的姓名。',
+    conductTick: ['我已阅读', '行为准则', '，并同意遵守。'],
+    termsTick: ['我也同意', '使用条款', '，并已阅读', '隐私政策', '。'],
+    nameLabel: '你的全名',
+    nameHelp: '输入你的姓名即视为签名。',
+    tickConduct: '请勾选此框以接受行为准则。',
+    tickTerms: '请勾选此框以接受使用条款。',
+    typeName: '请输入你的全名以签名。',
+    notSaved: '保存失败，请重试。',
+    saving: '正在保存…',
+    accept: '接受',
   },
 };
 
@@ -223,5 +244,34 @@ export const CONSENT_FORM: Record<PolicyLanguage, ConsentFormText> = {
     notSaved: 'L’enregistrement n’a pas fonctionné. Veuillez réessayer.',
     saving: 'Enregistrement…',
     submit: 'Donner mon consentement',
+  },
+  zh: {
+    howTitle: '如何给予同意',
+    howBody:
+      '您的孩子可以从其 Note by Note 控制面板向您发送一个私人链接，或者我们会将链接发送到其申请中填写的电子邮件地址。打开该链接后，同意书表单就会出现在这里。如果您自己管理孩子的账户，链接就在孩子的控制面板上。',
+    invalidTitle: '此链接无效',
+    openFailed: '无法打开此链接，请重试。',
+    opening: '正在打开同意书表单',
+    givenTitle: '已给予同意',
+    givenBody: (guardian, student, date) =>
+      `${guardian || '一位家长或监护人'}${date ? `已于${date}` : '已'}同意${student}参加课程。谢谢！`,
+    yourChild: '孩子',
+    formTitle: (student) => `同意${student}参加课程`,
+    formIntro: '请核对您的信息，勾选每一项并输入您的姓名。我们会记录您同意的内容和时间。',
+    fullName: '您的全名',
+    email: '您的电子邮件',
+    relationship: (student) => `您与${student}的关系`,
+    choose: '请选择…',
+    relationships: { Parent: '父母', 'Legal guardian': '法定监护人', 'Other caregiver': '其他照顾者' },
+    confirmLegend: '我确认',
+    tickGuardian: (student) => `我是${student}的家长或法定监护人，或是负责照顾${student}的人。`,
+    tickLessons: (student) => `${student}可以与志愿者导师一起参加免费在线课程，并按上文所述使用 Note by Note 网站。`,
+    tickPolicies: '我已阅读行为准则和隐私政策。如果孩子未满 13 岁，上课时会有成年人在附近。',
+    signLabel: '请输入您的全名以签名',
+    signHelp: '这将视为您的签名。',
+    tickAll: '请勾选每一项以给予同意。',
+    notSaved: '保存失败，请重试。',
+    saving: '正在保存…',
+    submit: '确认同意',
   },
 };

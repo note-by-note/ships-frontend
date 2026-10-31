@@ -9,7 +9,7 @@ import Link from 'next/link';
 import { useState, type FormEvent } from 'react';
 import { CONDUCT_FORM } from '@/content/policies/forms';
 import { ApiError, api } from '@/lib/api';
-import { POLICY_LANGUAGES, policyHref, type PolicyLanguage } from '@/lib/policy-languages';
+import { policyHref, policyLocale, type PolicyLanguage } from '@/lib/policy-languages';
 import type { AccountUser } from '@/lib/types';
 import { useAuth } from './auth-provider';
 import { Alert, Button } from './ui';
@@ -28,13 +28,13 @@ export function ConductAcceptance({ lang = 'en' }: { lang?: PolicyLanguage }) {
       <section id="accept" className={box}>
         <h2 className="font-display text-2xl font-bold">{t.signedOutTitle}</h2>
         <p className="mt-2 leading-relaxed text-navy/80">
-          {t.signedOutBefore}{' '}
+          {t.signedOutBefore}
           <Link
             href={`/login?next=${encodeURIComponent(`${policyHref('/code-of-conduct', lang)}#accept`)}`}
             className="font-medium underline underline-offset-2"
           >
             {t.signIn}
-          </Link>{' '}
+          </Link>
           {t.signedOutAfter}
         </p>
       </section>
@@ -43,7 +43,7 @@ export function ConductAcceptance({ lang = 'en' }: { lang?: PolicyLanguage }) {
 
   if (hasAccepted(user)) {
     const when = user.agreements?.conductAcceptedAt
-      ? new Date(user.agreements.conductAcceptedAt).toLocaleDateString(localeOf(lang), { dateStyle: 'long' })
+      ? new Date(user.agreements.conductAcceptedAt).toLocaleDateString(policyLocale(lang), { dateStyle: 'long' })
       : null;
     return (
       <section id="accept" className={box}>
@@ -63,10 +63,6 @@ export function ConductAcceptance({ lang = 'en' }: { lang?: PolicyLanguage }) {
       <ConductForm className="mt-6" lang={lang} />
     </section>
   );
-}
-
-function localeOf(lang: PolicyLanguage) {
-  return POLICY_LANGUAGES.find((language) => language.code === lang)?.locale;
 }
 
 /** Whether the current Code of Conduct and Terms are both accepted. (Either one changing asks again.) */

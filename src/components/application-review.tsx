@@ -15,7 +15,7 @@ import { Alert, Button, Card, PageHeader, Spinner, StatusBadge, cx, humanize } f
 import { TextArea } from './ui/fields';
 
 /** The language a parent read the consent page in, when it wasn't English. */
-const LANGUAGE_NAMES: Record<string, string> = { es: 'Spanish', fr: 'French' };
+const LANGUAGE_NAMES: Record<string, string> = { es: 'Spanish', fr: 'French', zh: 'Chinese' };
 
 const DECISIONS = [
   { value: 'under_review', label: 'Mark under review', tone: 'secondary' as const },

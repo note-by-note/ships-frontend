@@ -10,6 +10,8 @@ export const POLICY_LANGUAGES = [
   { code: 'en', label: 'English', locale: 'en-US' },
   { code: 'es', label: 'Español', locale: 'es' },
   { code: 'fr', label: 'Français', locale: 'fr' },
+  // Simplified Chinese, the written form of Mandarin used in mainland China and Singapore.
+  { code: 'zh', label: '简体中文', locale: 'zh-CN' },
 ] as const;
 
 export type PolicyLanguage = (typeof POLICY_LANGUAGES)[number]['code'];
@@ -32,8 +34,15 @@ export function policyHref(path: string, lang: PolicyLanguage) {
   return lang === 'en' ? path : `${path}/${lang}`;
 }
 
+/** The tag for `lang` attributes and dates, e.g. `zh-CN`, so browsers pick the right fonts. */
+export function policyLocale(lang: PolicyLanguage) {
+  return POLICY_LANGUAGES.find((language) => language.code === lang)?.locale ?? 'en-US';
+}
+
 /** A date as people write it in that language, e.g. "29 de octubre de 2026". */
 export function formatPolicyDate(isoDate: string, lang: PolicyLanguage) {
-  const locale = POLICY_LANGUAGES.find((language) => language.code === lang)?.locale ?? 'en-US';
-  return new Date(`${isoDate.slice(0, 10)}T12:00:00Z`).toLocaleDateString(locale, { dateStyle: 'long', timeZone: 'UTC' });
+  return new Date(`${isoDate.slice(0, 10)}T12:00:00Z`).toLocaleDateString(policyLocale(lang), {
+    dateStyle: 'long',
+    timeZone: 'UTC',
+  });
 }
