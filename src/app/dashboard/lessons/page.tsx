@@ -11,11 +11,11 @@
 
 import { useCallback, useEffect, useMemo, useState } from 'react';
 import Link from 'next/link';
-import { DashboardHeading, Panel } from '@/components/dashboard-shell';
-import { ParentConsentCard } from '@/components/agreement-cards';
-import { LessonNotes, MeetingLink } from '@/components/lesson-notes';
-import { ReportConcernButton } from '@/components/report-concern';
-import { Icon } from '@/components/marketing';
+import { DashboardHeading, Panel } from '@/components/layout/dashboard-shell';
+import { ParentConsentCard } from '@/components/policies/agreement-cards';
+import { LessonNotes, MeetingLink } from '@/components/dashboard/lesson-notes';
+import { ReportConcernButton } from '@/components/policies/report-concern';
+import { Icon } from '@/components/public/marketing';
 import { Alert, Badge, Button, EmptyState, Spinner } from '@/components/ui';
 import { Field, Select, TextArea } from '@/components/ui/fields';
 import { ApiError, api } from '@/lib/api';

@@ -18,8 +18,8 @@ import type {
   QuestionType,
 } from '@/lib/types';
 import { QuestionInput } from './question-input';
-import { Alert, Badge, Button, Card, PageHeader, Spinner, StatusBadge, cx, humanize } from './ui';
-import { Field, Select, TextArea, TextInput } from './ui/fields';
+import { Alert, Badge, Button, Card, PageHeader, Spinner, StatusBadge, cx, humanize } from '../ui';
+import { Field, Select, TextArea, TextInput } from '../ui/fields';
 
 const QUESTION_TYPES: { value: QuestionType; label: string }[] = [
   { value: 'short_text', label: 'Short text' },

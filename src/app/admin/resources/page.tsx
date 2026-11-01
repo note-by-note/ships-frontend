@@ -1,8 +1,8 @@
 'use client';
 
-import { RequirePermission } from '@/components/admin-guard';
-import { DashboardHeading } from '@/components/dashboard-shell';
-import { ResourcesBoard } from '@/components/resources-board';
+import { RequirePermission } from '@/components/layout/admin-guard';
+import { DashboardHeading } from '@/components/layout/dashboard-shell';
+import { ResourcesBoard } from '@/components/dashboard/resources-board';
 
 export default function TeamResourcesPage() {
   return (

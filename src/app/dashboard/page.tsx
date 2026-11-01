@@ -2,9 +2,9 @@
 
 import Link from 'next/link';
 import { useCallback, useEffect, useState } from 'react';
-import { sidesOf, useAuth } from '@/components/auth-provider';
-import { Avatar } from '@/components/avatar';
-import { DashboardHeading, Panel, StatTile } from '@/components/dashboard-shell';
+import { sidesOf, useAuth } from '@/components/account/auth-provider';
+import { Avatar } from '@/components/ui/avatar';
+import { DashboardHeading, Panel, StatTile } from '@/components/layout/dashboard-shell';
 import {
   HelpPanel,
   HoursPanel,
@@ -14,11 +14,12 @@ import {
   PracticeThisWeek,
   ResourcesPanel,
   useLessonsAndMessages,
-} from '@/components/dashboard-widgets';
-import { ParentConsentCard } from '@/components/agreement-cards';
-import { ConductGate } from '@/components/conduct-acceptance';
-import { Icon } from '@/components/marketing';
-import { NextSteps } from '@/components/next-steps';
+} from '@/components/dashboard/dashboard-widgets';
+import { ParentConsentCard } from '@/components/policies/agreement-cards';
+import { AnnouncementsPanel, ImportantDatesPanel, useAnnouncements } from '@/components/messages/announcements';
+import { ConductGate } from '@/components/policies/conduct-acceptance';
+import { Icon } from '@/components/public/marketing';
+import { NextSteps } from '@/components/applications/next-steps';
 import { Alert, Button, ButtonLink, Spinner, StatusBadge, cx, humanize } from '@/components/ui';
 import { ApiError, api } from '@/lib/api';
 import type { Application, MatchRequest, MentorProfile, OwnMatchRequest, ScheduleDay } from '@/lib/types';
@@ -27,7 +28,8 @@ import { APPLY_LINKS } from '@/lib/site';
 // Student and mentor dashboards, after the Figma "student-dashboard" and
 // "mentor-dashboard" frames: what's next, lessons, practice, messages and
 // resources for both; requests, students, the mentor's page and volunteer
-// hours for mentors. A mentor who takes lessons too switches between the two.
+// hours for mentors. Announcements and important dates from the team show on
+// both when there are any. A mentor who takes lessons too switches between the two.
 
 export default function DashboardPage() {
   const { user } = useAuth();
@@ -113,6 +115,7 @@ function StudentDashboard() {
   const [applications, setApplications] = useState<Application[] | null>(null);
   const [requests, setRequests] = useState<OwnMatchRequest[] | null>(null);
   const { pairings, conversations } = useSide('student');
+  const notices = useAnnouncements();
 
   useEffect(() => {
     api.get<{ data: Application[] }>('/applications/mine').then((b) => setApplications(b.data)).catch(() => setApplications([]));
@@ -133,6 +136,7 @@ function StudentDashboard() {
       <div className="grid gap-6 xl:grid-cols-[1fr_340px]">
         <div className="flex flex-col gap-6">
           <ParentConsentCard />
+          <AnnouncementsPanel loaded={notices} href="/dashboard/announcements" />
           {studentApplication?.status === 'accepted' ? (
             <NextSteps application={studentApplication} hideWhenDone />
           ) : !matched ? (
@@ -182,6 +186,7 @@ function StudentDashboard() {
         </div>
 
         <div className="flex flex-col gap-6">
+          <ImportantDatesPanel loaded={notices} href="/dashboard/announcements" />
           <Panel title={mentors.length > 1 ? 'Your mentors' : 'Your mentor'}>
             {!requests ? (
               <Spinner />
@@ -282,6 +287,7 @@ function MentorDashboard() {
   const [error, setError] = useState<string | null>(null);
   const [mentorApplication, setMentorApplication] = useState<Application | null>(null);
   const { pairings, conversations } = useSide('mentor');
+  const notices = useAnnouncements();
 
   useEffect(() => {
     api
@@ -363,6 +369,7 @@ function MentorDashboard() {
 
       <div className="grid gap-6 xl:grid-cols-[1fr_340px]">
         <div className="flex flex-col gap-6">
+          <AnnouncementsPanel loaded={notices} href="/dashboard/announcements" />
           {pending.length ? (
             <Panel title="Requests waiting for you">
               {user!.agreements && !user!.agreements.conduct ? <ConductGate action="accept a student" className="mb-4" /> : null}
@@ -452,6 +459,7 @@ function MentorDashboard() {
         </div>
 
         <div className="flex flex-col gap-6">
+          <ImportantDatesPanel loaded={notices} href="/dashboard/announcements" />
           <PageChecklist profile={profile} />
           <HoursPanel />
           <ResourcesPanel scope="team" title="From the Note by Note team" />

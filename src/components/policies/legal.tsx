@@ -14,7 +14,7 @@ import {
   type PolicyLanguage,
 } from '@/lib/policy-languages';
 import { POLICIES_UPDATED } from '@/lib/site';
-import { Container } from './marketing';
+import { Container } from '../public/marketing';
 import { PolicyLanguageSwitch, SameSearchLink } from './policy-language-switch';
 
 // The layout shared by the Code of Conduct, Terms of Use, Privacy Policy and

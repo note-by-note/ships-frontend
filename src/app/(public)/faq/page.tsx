@@ -1,7 +1,7 @@
 import type { Metadata } from 'next';
 import Link from 'next/link';
 import type { ReactNode } from 'react';
-import { ContactEmail, Container, Heading, Icon, IconBadge, PillLink, Section } from '@/components/marketing';
+import { ContactEmail, Container, Heading, Icon, IconBadge, PillLink, Section } from '@/components/public/marketing';
 import { APPLY_LINKS } from '@/lib/site';
 
 export const metadata: Metadata = {

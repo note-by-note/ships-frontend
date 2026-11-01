@@ -1,6 +1,6 @@
 import type { Metadata } from 'next';
 import Link from 'next/link';
-import { MentorDirectory } from '@/components/mentor-directory';
+import { MentorDirectory } from '@/components/public/mentor-directory';
 import { APPLY_LINKS } from '@/lib/site';
 
 export const metadata: Metadata = {

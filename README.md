@@ -1,68 +1,78 @@
-# Note by Note — web
+# Note by Note — website
 
-Next.js 16 (App Router, Tailwind v4) front end for the Note by Note application
-system. It talks to the Express API in [`../../api`](../../api).
+The website people see at notebynote.ca: Next.js 16 (App Router) and
+Tailwind v4. Everything it shows comes from the API in `../ships-api`.
 
 ## Getting started
 
 ```bash
-cd frontend/main
+cd ships-frontend
 npm install
 cp .env.example .env.local     # point NEXT_PUBLIC_API_URL at the API
 npm run dev                    # http://localhost:3000
 ```
 
-The API must be running, seeded and reachable:
+The API must be running too (see `ships-api/README.md`), and its `CORS_ORIGIN`
+has to include `http://localhost:3000`, or the browser refuses every request.
 
-```bash
-cd ../../api
-npm run dev
-npm run seed:forms             # the starter mentee / mentor / job intakes
-npm run user:create -- --email you@example.com --name "You" --role admin
-```
+## Where do I change...?
 
-`CORS_ORIGIN` in the API's `.env` has to include `http://localhost:3000`, or the
-browser will refuse every request.
+| I want to change... | Look in |
+| --- | --- |
+| The words on a public page (home, FAQ, About, ...) | `src/app/(public)/<page name>/page.tsx` (the home page is `src/app/(public)/page.tsx`) |
+| The contact email, Formspree form or Google Analytics ID | `src/lib/site.ts` |
+| The Code of Conduct, Terms, Privacy Policy or parent consent text | `src/content/policies/en.tsx`, then the same change in `es.tsx`, `fr.tsx` and `zh.tsx` |
+| The site header or footer | `src/components/layout/site-header.tsx`, `site-footer.tsx` |
+| The sidebar links in the dashboards | `src/components/layout/member-shell.tsx` (students and mentors), `staff-shell.tsx` (staff) |
+| A dashboard page | `src/app/dashboard/<page name>/page.tsx` |
+| A staff area page | `src/app/admin/<page name>/page.tsx` |
+| Colours and fonts | `src/app/globals.css` |
+| Buttons, form fields, badges used everywhere | `src/components/ui/` |
 
-## Routes
-
-| Route | Who | What |
-| --- | --- | --- |
-| `/` | anyone | Landing page |
-| `/apply` | anyone | Open applications, grouped by kind |
-| `/apply/[slug]` | anyone | The multi-section application itself |
-| `/applications` | any user | Your own applications and their status |
-| `/login`, `/register` | anyone | Account access |
-| `/admin/forms` | admin | Every form; create and duplicate |
-| `/admin/forms/[slug]` | admin | The form editor, with a live preview |
-| `/admin/applications` | admin | The review queue |
-| `/admin/applications/[id]` | admin | One application, decisions and notes |
+Every file starts with a comment saying what it's for. When you're not sure
+where something is, search the project for words you can see on the page.
 
 ## Layout
 
 ```
 src/
-  app/
-    layout.tsx              providers, header, skip link
-    apply/[slug]/           the applicant wizard
-    admin/layout.tsx        wraps every admin route in the role guard
-    admin/forms/[slug]/     the form editor
-    admin/applications/     the review queue and detail
-  components/
-    application-wizard.tsx  sections, progress, autosave, review, submit
-    account-step.tsx        register-or-sign-in, inline in the wizard
-    question-input.tsx      one question definition → the right control
-    form-editor.tsx         sections, questions, options, conditions, preview
-    review-queue.tsx        filters, search, pagination
-    application-review.tsx  answers read against the stored snapshot
-    admin-guard.tsx         client-side role gate (convenience, not security)
-    auth-provider.tsx       session context
-    ui/                     buttons, cards, fields, badges
+  app/                        one folder per web address; page.tsx is the page
+    layout.tsx                around every page: header, footer, sign-in
+    globals.css               colours, fonts and other site-wide styles
+    (public)/                 the public site: home, about, contact, faq,
+                              find-a-mentor, for-mentors, how-it-works,
+                              instruments, partners
+    (policies)/               code-of-conduct, terms, privacy, parent-consent;
+                              each has [lang]/ for its translations
+    (account)/                login, register
+    (applications)/           apply (the forms) and applications (your own)
+    dashboard/                students and mentors, once signed in
+    admin/                    the staff area
+  components/                 the pieces pages are built from
+    layout/                   header, footer, dashboard and staff frames,
+                              the staff-only guard, analytics
+    account/                  signing in and up, who's signed in
+    public/                   public page building blocks, Find a Mentor,
+                              mentor pages, instruments, contact form
+    applications/             applying, reviewing applications, the form editor
+    dashboard/                dashboard panels, lesson notes, hours,
+                              resources, editing a mentor page
+    messages/                 messages, team messages, announcements
+    policies/                 the policy page layout, accepting the Code of
+                              Conduct, parent consent, "Report a concern"
+    ui/                       buttons, fields, badges, avatars
+  content/policies/           the policy text in each language
   lib/
-    api.ts                  fetch wrapper, token storage, refresh handling
-    form-logic.ts           visibility + validation, mirroring the server
-    types.ts                the API's shapes
+    site.ts                   contact details and other site-wide settings
+    api.ts                    talking to the API, staying signed in
+    types.ts                  the shapes of what the API sends
+    form-logic.ts             application form rules (the API checks them too)
+    policy-languages.ts       the languages the policies come in
+    schedule.ts               lesson time helpers
 ```
+
+Folder names in brackets, like `(public)`, are only for sorting. They don't
+appear in the web address: `src/app/(public)/faq/page.tsx` is `/faq`.
 
 ## How the application page works
 

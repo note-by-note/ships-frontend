@@ -4,15 +4,17 @@ import { useEffect, useState, type ReactNode } from 'react';
 import Link from 'next/link';
 import { usePathname, useRouter } from 'next/navigation';
 import { api } from '@/lib/api';
-import { AgreementReminder } from './agreement-cards';
-import { sidesOf, useAuth } from './auth-provider';
+import { AgreementReminder } from '../policies/agreement-cards';
+import { sidesOf, useAuth } from '../account/auth-provider';
 import { DashboardShell, type ShellLink } from './dashboard-shell';
-import { MESSAGES_CHANGED } from './messages';
-import { useTeamUnread } from './team-messages';
-import { EmptyState, Spinner } from './ui';
+import { MESSAGES_CHANGED } from '../messages/messages';
+import { useAnnouncementsUnseen } from '../messages/announcements';
+import { useTeamUnread } from '../messages/team-messages';
+import { EmptyState, Spinner } from '../ui';
 
 const STUDENT_LINKS: ShellLink[] = [
   { href: '/dashboard', label: 'Dashboard', icon: 'star', exact: true },
+  { href: '/dashboard/announcements', label: 'Announcements', icon: 'megaphone' },
   { href: '/dashboard/lessons', label: 'Lessons', icon: 'calendar' },
   { href: '/dashboard/messages', label: 'Messages', icon: 'message' },
   { href: '/dashboard/resources', label: 'Resources', icon: 'book' },
@@ -25,9 +27,10 @@ const STUDENT_LINKS: ShellLink[] = [
 
 const MENTOR_LINKS: ShellLink[] = [
   { href: '/dashboard', label: 'Dashboard', icon: 'star', exact: true },
+  { href: '/dashboard/announcements', label: 'Announcements', icon: 'megaphone' },
   { href: '/dashboard/lessons', label: 'Lessons', icon: 'calendar' },
   { href: '/dashboard/messages', label: 'Messages', icon: 'message' },
-  { href: '/dashboard/team-messages', label: 'Team messages', icon: 'megaphone' },
+  { href: '/dashboard/team-messages', label: 'Team messages', icon: 'users' },
   { href: '/dashboard/resources', label: 'Resources', icon: 'book' },
   { href: '/dashboard/availability', label: 'My availability', icon: 'clock' },
   { href: '/dashboard/profile', label: 'My page', icon: 'users' },
@@ -83,6 +86,7 @@ export function MemberShell({ children }: { children: ReactNode }) {
   const sides = user ? sidesOf(user) : { mentor: false, student: false, any: false };
   const unread = useUnreadMessages(Boolean(user && sides.any), pathname);
   const teamUnread = useTeamUnread(Boolean(user && sides.mentor), pathname);
+  const unseenAnnouncements = useAnnouncementsUnseen(Boolean(user && sides.any), pathname);
 
   useEffect(() => {
     if (!loading && !user) router.replace(`/login?next=${encodeURIComponent(pathname)}`);
@@ -120,7 +124,9 @@ export function MemberShell({ children }: { children: ReactNode }) {
             ? { ...link, badge: unread }
             : link.href === '/dashboard/team-messages'
               ? { ...link, badge: teamUnread }
-              : link,
+              : link.href === '/dashboard/announcements'
+                ? { ...link, badge: unseenAnnouncements }
+                : link,
         ),
       ]}
     >

@@ -1,7 +1,7 @@
 'use client';
 
-import { DashboardHeading } from '@/components/dashboard-shell';
-import { MessagesHome } from '@/components/messages';
+import { DashboardHeading } from '@/components/layout/dashboard-shell';
+import { MessagesHome } from '@/components/messages/messages';
 
 export default function MessagesPage() {
   return (

@@ -13,11 +13,11 @@ import Link from 'next/link';
 import { useCallback, useEffect, useRef, useState, type FormEvent, type KeyboardEvent } from 'react';
 import { ApiError, api } from '@/lib/api';
 import type { ChatMessage, Conversation, ConversationThread } from '@/lib/types';
-import { Avatar } from './avatar';
-import { Alert, Button, Spinner, cx } from './ui';
-import { ReportConcernButton } from './report-concern';
-import { ConductGate } from './conduct-acceptance';
-import { useAuth } from './auth-provider';
+import { Avatar } from '../ui/avatar';
+import { Alert, Button, Spinner, cx } from '../ui';
+import { ReportConcernButton } from '../policies/report-concern';
+import { ConductGate } from '../policies/conduct-acceptance';
+import { useAuth } from '../account/auth-provider';
 
 const MAX_LENGTH = 2000;
 export const MESSAGES_CHANGED = 'nbn:messages-changed';

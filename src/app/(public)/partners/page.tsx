@@ -11,7 +11,7 @@ import {
   Section,
   SectionIntro,
   type IconName,
-} from '@/components/marketing';
+} from '@/components/public/marketing';
 
 export const metadata: Metadata = {
   title: 'Schools & partners',

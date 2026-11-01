@@ -6,8 +6,8 @@
 
 import { useState, type FormEvent } from 'react';
 import { SITE } from '@/lib/site';
-import { Button } from './ui';
-import { Field, Select, TextArea, TextInput } from './ui/fields';
+import { Button } from '../ui';
+import { Field, Select, TextArea, TextInput } from '../ui/fields';
 
 const TOPICS = ['Lessons', 'Mentoring', 'Volunteering', 'Schools and partners', 'My application', 'Something else'];
 const MAX_MESSAGE = 2000;

@@ -3,11 +3,11 @@
 // Staff approve the volunteer hours mentors and team members log.
 
 import { useCallback, useEffect, useState } from 'react';
-import { RequirePermission } from '@/components/admin-guard';
-import { useAuth } from '@/components/auth-provider';
-import { DashboardHeading } from '@/components/dashboard-shell';
-import { HoursTabs } from '@/components/staff-shell';
-import { formatMinutes } from '@/components/hours-log';
+import { RequirePermission } from '@/components/layout/admin-guard';
+import { useAuth } from '@/components/account/auth-provider';
+import { DashboardHeading } from '@/components/layout/dashboard-shell';
+import { HoursTabs } from '@/components/layout/staff-shell';
+import { formatMinutes } from '@/components/dashboard/hours-log';
 import { Alert, Button, Spinner, cx } from '@/components/ui';
 import { ApiError, api } from '@/lib/api';
 import type { HoursEntry, HoursStatus } from '@/lib/types';

@@ -5,8 +5,8 @@ import Link from 'next/link';
 import { useRouter, useSearchParams } from 'next/navigation';
 import { ApiError } from '@/lib/api';
 import { accountHome, useAuth } from './auth-provider';
-import { Alert, Button, Card } from './ui';
-import { Field, TextInput } from './ui/fields';
+import { Alert, Button, Card } from '../ui';
+import { Field, TextInput } from '../ui/fields';
 
 export function SignInForm() {
   const { signIn, user } = useAuth();

@@ -2,9 +2,9 @@
 
 import { useCallback, useEffect, useState } from 'react';
 import { useRouter } from 'next/navigation';
-import { RequirePermission } from '@/components/admin-guard';
-import { useAuth } from '@/components/auth-provider';
-import { DashboardHeading, Panel } from '@/components/dashboard-shell';
+import { RequirePermission } from '@/components/layout/admin-guard';
+import { useAuth } from '@/components/account/auth-provider';
+import { DashboardHeading, Panel } from '@/components/layout/dashboard-shell';
 import { Alert, Badge, Button, Card, EmptyState, Spinner } from '@/components/ui';
 import { Select } from '@/components/ui/fields';
 import { ApiError, api } from '@/lib/api';

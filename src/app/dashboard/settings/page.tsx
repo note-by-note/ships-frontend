@@ -1,8 +1,8 @@
 'use client';
 
 import { useEffect, useState } from 'react';
-import { sidesOf, useAuth } from '@/components/auth-provider';
-import { DashboardHeading, Panel } from '@/components/dashboard-shell';
+import { sidesOf, useAuth } from '@/components/account/auth-provider';
+import { DashboardHeading, Panel } from '@/components/layout/dashboard-shell';
 import { Alert, Spinner } from '@/components/ui';
 import { ApiError, api } from '@/lib/api';
 

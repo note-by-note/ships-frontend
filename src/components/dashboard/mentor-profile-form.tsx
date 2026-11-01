@@ -10,8 +10,8 @@
 import { useEffect, useState, type ReactNode } from 'react';
 import { ApiError, api } from '@/lib/api';
 import type { MentorProfile, Options } from '@/lib/types';
-import { Alert, Button, Spinner, cx } from './ui';
-import { Field, TextArea, TextInput } from './ui/fields';
+import { Alert, Button, Spinner, cx } from '../ui';
+import { Field, TextArea, TextInput } from '../ui/fields';
 
 export type MentorProfileValues = {
   name: string;

@@ -1,9 +1,9 @@
 'use client';
 
 import { useCallback, useEffect, useState } from 'react';
-import { RequirePermission } from '@/components/admin-guard';
-import { useAuth } from '@/components/auth-provider';
-import { DashboardHeading } from '@/components/dashboard-shell';
+import { RequirePermission } from '@/components/layout/admin-guard';
+import { useAuth } from '@/components/account/auth-provider';
+import { DashboardHeading } from '@/components/layout/dashboard-shell';
 import { Alert, Badge, Button, Card, EmptyState, Spinner } from '@/components/ui';
 import { Select, TextInput } from '@/components/ui/fields';
 import { ApiError, api } from '@/lib/api';
@@ -22,8 +22,8 @@ const ROLE_HELP: Record<UserRole, string> = {
   mentor: 'Teaches; can be linked to a mentor profile.',
   admin: 'Everything, including roles.',
   tech: 'Mentors, accounts, forms, applications, test mode.',
-  outreach: 'Reviews applications; reads mentor profiles.',
-  marketing: 'Overview numbers only.',
+  outreach: 'Reviews applications; reads mentor profiles; approves hours; posts announcements.',
+  marketing: 'Overview numbers, the About page team and announcements.',
 };
 
 export default function PeoplePage() {

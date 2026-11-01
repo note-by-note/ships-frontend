@@ -9,10 +9,10 @@
 
 import { useState } from 'react';
 import { ApiError } from '@/lib/api';
-import { useAuth } from './auth-provider';
-import { Alert, Button, cx } from './ui';
-import { Field, TextInput } from './ui/fields';
-import { SignUpAgreement } from './conduct-acceptance';
+import { useAuth } from '../account/auth-provider';
+import { Alert, Button, cx } from '../ui';
+import { Field, TextInput } from '../ui/fields';
+import { SignUpAgreement } from '../policies/conduct-acceptance';
 
 export function AccountStep({ onDone }: { onDone: () => void }) {
   const { register, signIn } = useAuth();

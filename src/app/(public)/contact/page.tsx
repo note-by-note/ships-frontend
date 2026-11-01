@@ -1,7 +1,7 @@
 import type { Metadata } from 'next';
 import Link from 'next/link';
-import { ContactForm } from '@/components/contact-form';
-import { ContactEmail, Container, Heading, Icon, IconBadge, Section, StickyNote, type IconName } from '@/components/marketing';
+import { ContactForm } from '@/components/public/contact-form';
+import { ContactEmail, Container, Heading, Icon, IconBadge, Section, StickyNote, type IconName } from '@/components/public/marketing';
 import { SITE } from '@/lib/site';
 
 export const metadata: Metadata = {

@@ -1,6 +1,6 @@
 import type { Metadata } from 'next';
-import { ConductAcceptance } from '@/components/conduct-acceptance';
-import { LegalPage, policyMetadata } from '@/components/legal';
+import { ConductAcceptance } from '@/components/policies/conduct-acceptance';
+import { LegalPage, policyMetadata } from '@/components/policies/legal';
 
 // The text is in `src/content/policies`. Translations are at /code-of-conduct/es and so on.
 

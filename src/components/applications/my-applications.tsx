@@ -7,9 +7,9 @@ import { useCallback, useEffect, useState } from 'react';
 import Link from 'next/link';
 import { ApiError, api } from '@/lib/api';
 import type { Application } from '@/lib/types';
-import { useAuth } from './auth-provider';
+import { useAuth } from '../account/auth-provider';
 import { NextSteps } from './next-steps';
-import { Alert, Button, ButtonLink, Card, EmptyState, Spinner, StatusBadge } from './ui';
+import { Alert, Button, ButtonLink, Card, EmptyState, Spinner, StatusBadge } from '../ui';
 
 /** Statuses an applicant can still withdraw from (the API's list). */
 const WITHDRAWABLE = ['draft', 'submitted', 'under_review', 'waitlisted', 'accepted'];

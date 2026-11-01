@@ -1,6 +1,6 @@
 import type { Metadata } from 'next';
-import { ConductAcceptance } from '@/components/conduct-acceptance';
-import { LegalPage, policyMetadata, translatedLanguage, translatedLanguageParams } from '@/components/legal';
+import { ConductAcceptance } from '@/components/policies/conduct-acceptance';
+import { LegalPage, policyMetadata, translatedLanguage, translatedLanguageParams } from '@/components/policies/legal';
 
 // /code-of-conduct/es and the other translations. English is /code-of-conduct.
 

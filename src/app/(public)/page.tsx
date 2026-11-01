@@ -15,9 +15,9 @@ import {
   SectionIntro,
   StickyNote,
   type IconName,
-} from '@/components/marketing';
+} from '@/components/public/marketing';
 import { Suspense } from 'react';
-import { SignedInHome } from '@/components/signed-in-home';
+import { SignedInHome } from '@/components/account/signed-in-home';
 import { APPLY_LINKS } from '@/lib/site';
 
 // Layout follows "note-by-note-homepage-desktop" in the Figma file. Copy is

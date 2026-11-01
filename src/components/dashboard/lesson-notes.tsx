@@ -8,8 +8,8 @@
 import { useCallback, useEffect, useState, type FormEvent } from 'react';
 import { ApiError, api } from '@/lib/api';
 import type { LessonNote, Pairing } from '@/lib/types';
-import { Alert, Button, Spinner, cx } from './ui';
-import { TextArea, TextInput } from './ui/fields';
+import { Alert, Button, Spinner, cx } from '../ui';
+import { TextArea, TextInput } from '../ui/fields';
 
 const MAX_PRACTICE = 10;
 

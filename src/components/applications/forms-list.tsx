@@ -5,8 +5,8 @@ import Link from 'next/link';
 import { useRouter } from 'next/navigation';
 import { ApiError, api } from '@/lib/api';
 import type { ApplicationForm, FormKind, FormListing, Paged } from '@/lib/types';
-import { Alert, Badge, Button, Card, EmptyState, PageHeader, Spinner, StatusBadge, humanize } from './ui';
-import { Field, Select, TextInput } from './ui/fields';
+import { Alert, Badge, Button, Card, EmptyState, PageHeader, Spinner, StatusBadge, humanize } from '../ui';
+import { Field, Select, TextInput } from '../ui/fields';
 
 const KINDS: { value: FormKind; label: string }[] = [
   { value: 'mentee', label: 'Student intake' },

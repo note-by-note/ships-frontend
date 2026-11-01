@@ -2,7 +2,7 @@
 
 import { useState } from 'react';
 import { useRouter } from 'next/navigation';
-import { useAuth } from './auth-provider';
+import { useAuth } from '../account/auth-provider';
 
 /** The yellow bar shown on every page while staff are inside a test account. */
 export function TestModeBanner() {

@@ -7,10 +7,10 @@ import Link from 'next/link';
 import { useCallback, useEffect, useState, type FormEvent } from 'react';
 import { ApiError, api } from '@/lib/api';
 import type { HoursEntry, Pairing } from '@/lib/types';
-import { useAuth } from './auth-provider';
-import { StatTile } from './dashboard-shell';
-import { Alert, Badge, Button, Spinner } from './ui';
-import { Field, Select, TextArea, TextInput } from './ui/fields';
+import { useAuth } from '../account/auth-provider';
+import { StatTile } from '../layout/dashboard-shell';
+import { Alert, Badge, Button, Spinner } from '../ui';
+import { Field, Select, TextArea, TextInput } from '../ui/fields';
 
 export function formatMinutes(minutes: number): string {
   const hours = Math.floor(minutes / 60);

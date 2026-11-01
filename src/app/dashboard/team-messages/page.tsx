@@ -1,7 +1,7 @@
 'use client';
 
-import { DashboardHeading } from '@/components/dashboard-shell';
-import { TeamMessagesHome } from '@/components/team-messages';
+import { DashboardHeading } from '@/components/layout/dashboard-shell';
+import { TeamMessagesHome } from '@/components/messages/team-messages';
 
 export default function MentorTeamMessagesPage() {
   return (

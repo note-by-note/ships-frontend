@@ -14,10 +14,10 @@
 import { useCallback, useEffect, useMemo, useState, type FormEvent, type ReactNode } from 'react';
 import { ApiError, api } from '@/lib/api';
 import { ALL_TEAMS, TEAM_LABELS, type Pairing, type ResourceTeam, type SharedResource } from '@/lib/types';
-import { Icon, type IconName } from './marketing';
-import { Alert, Button, Spinner, cx } from './ui';
-import { Field, TextArea, TextInput } from './ui/fields';
-import { ReportConcernButton } from './report-concern';
+import { Icon, type IconName } from '../public/marketing';
+import { Alert, Button, Spinner, cx } from '../ui';
+import { Field, TextArea, TextInput } from '../ui/fields';
+import { ReportConcernButton } from '../policies/report-concern';
 
 const MAX_BYTES = 10 * 1024 * 1024;
 const ACCEPT = '.pdf,.jpg,.jpeg,.png,.mp3,.m4a,application/pdf,image/jpeg,image/png,audio/mpeg,audio/mp4,audio/x-m4a';

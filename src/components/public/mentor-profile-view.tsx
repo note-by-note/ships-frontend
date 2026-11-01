@@ -9,12 +9,12 @@ import Link from 'next/link';
 import { useEffect, useState } from 'react';
 import { ApiError, api } from '@/lib/api';
 import type { PublicMentor } from '@/lib/types';
-import { useAuth } from './auth-provider';
+import { useAuth } from '../account/auth-provider';
 import { Container, Icon } from './marketing';
 import { MentorAction, useStudentStanding } from './mentor-request';
 import { MentorPage } from './mentor-page';
-import { Spinner } from './ui';
-import { ReportConcernButton } from './report-concern';
+import { Spinner } from '../ui';
+import { ReportConcernButton } from '../policies/report-concern';
 
 export function MentorProfileView({ slug }: { slug: string }) {
   const { user, loading: authLoading } = useAuth();

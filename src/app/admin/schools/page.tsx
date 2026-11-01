@@ -5,9 +5,9 @@
 // applications but keeps what past applicants answered.
 
 import { useCallback, useEffect, useState, type FormEvent } from 'react';
-import { RequirePermission } from '@/components/admin-guard';
-import { DashboardHeading, Panel } from '@/components/dashboard-shell';
-import { FormTabs } from '@/components/staff-shell';
+import { RequirePermission } from '@/components/layout/admin-guard';
+import { DashboardHeading, Panel } from '@/components/layout/dashboard-shell';
+import { FormTabs } from '@/components/layout/staff-shell';
 import { Alert, Badge, Button, Spinner } from '@/components/ui';
 import { TextInput } from '@/components/ui/fields';
 import { ApiError, api } from '@/lib/api';

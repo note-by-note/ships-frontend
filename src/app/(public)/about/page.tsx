@@ -11,8 +11,8 @@ import {
   Section,
   SectionIntro,
   type IconName,
-} from '@/components/marketing';
-import { TeamSection } from '@/components/team-grid';
+} from '@/components/public/marketing';
+import { TeamSection } from '@/components/public/team-grid';
 import { APPLY_LINKS } from '@/lib/site';
 
 export const metadata: Metadata = {

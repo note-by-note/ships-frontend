@@ -9,8 +9,8 @@
 import { useEffect, useState, type ChangeEvent } from 'react';
 import { ApiError, api } from '@/lib/api';
 import type { PhotoState } from '@/lib/types';
-import { Avatar } from './avatar';
-import { Button } from './ui';
+import { Avatar } from '../ui/avatar';
+import { Button } from '../ui';
 
 const SIZE = 640;
 

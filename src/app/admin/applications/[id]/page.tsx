@@ -1,6 +1,6 @@
 import type { Metadata } from 'next';
-import { RequirePermission } from '@/components/admin-guard';
-import { ApplicationReview } from '@/components/application-review';
+import { RequirePermission } from '@/components/layout/admin-guard';
+import { ApplicationReview } from '@/components/applications/application-review';
 
 export const metadata: Metadata = { title: 'Review application' };
 

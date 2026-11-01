@@ -15,10 +15,10 @@ import { usePathname } from 'next/navigation';
 import { ApiError, api } from '@/lib/api';
 import { APPLY_LINKS } from '@/lib/site';
 import type { Application, Options, OwnMatchRequest } from '@/lib/types';
-import { sidesOf, useAuth } from './auth-provider';
+import { sidesOf, useAuth } from '../account/auth-provider';
 import { Icon } from './marketing';
-import { cx } from './ui';
-import { ConductGate } from './conduct-acceptance';
+import { cx } from '../ui';
+import { ConductGate } from '../policies/conduct-acceptance';
 
 /** The fields a request needs to know about a mentor. */
 export interface RequestableMentor {

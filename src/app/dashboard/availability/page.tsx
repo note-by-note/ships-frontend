@@ -11,7 +11,7 @@
 
 import { useEffect, useRef, useState } from 'react';
 import Link from 'next/link';
-import { DashboardHeading, Panel } from '@/components/dashboard-shell';
+import { DashboardHeading, Panel } from '@/components/layout/dashboard-shell';
 import { Alert, Button, Spinner, cx } from '@/components/ui';
 import { ApiError, api } from '@/lib/api';
 import { DAY_NAMES, WEEKDAYS, blocksIn, formatRange, formatTime, toMinutes, toTime, zoneLabel } from '@/lib/schedule';

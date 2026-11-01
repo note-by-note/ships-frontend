@@ -6,9 +6,9 @@
 
 import Link from 'next/link';
 import { useCallback, useEffect, useState } from 'react';
-import { RequirePermission } from '@/components/admin-guard';
-import { DashboardHeading } from '@/components/dashboard-shell';
-import { MessageTabs } from '@/components/staff-shell';
+import { RequirePermission } from '@/components/layout/admin-guard';
+import { DashboardHeading } from '@/components/layout/dashboard-shell';
+import { MessageTabs } from '@/components/layout/staff-shell';
 import { Alert, Badge, Button, Spinner } from '@/components/ui';
 import { TextArea } from '@/components/ui/fields';
 import { ApiError, api } from '@/lib/api';

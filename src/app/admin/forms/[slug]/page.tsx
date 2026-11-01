@@ -1,6 +1,6 @@
 import type { Metadata } from 'next';
-import { RequirePermission } from '@/components/admin-guard';
-import { FormEditor } from '@/components/form-editor';
+import { RequirePermission } from '@/components/layout/admin-guard';
+import { FormEditor } from '@/components/applications/form-editor';
 
 export const metadata: Metadata = { title: 'Edit form' };
 

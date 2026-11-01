@@ -1,6 +1,6 @@
 'use client';
 
-import { HoursSummary } from '@/components/hours-log';
+import { HoursSummary } from '@/components/dashboard/hours-log';
 
 export default function StaffHoursSummaryPage() {
   return <HoursSummary backHref="/admin/my-hours" />;

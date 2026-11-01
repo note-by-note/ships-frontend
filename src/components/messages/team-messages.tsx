@@ -24,12 +24,12 @@ import {
   type TeamThreadSummary,
   type TeamThreadsMeta,
 } from '@/lib/types';
-import { useAuth } from './auth-provider';
-import { ConductGate } from './conduct-acceptance';
+import { useAuth } from '../account/auth-provider';
+import { ConductGate } from '../policies/conduct-acceptance';
 import { dayLabel, shortTime } from './messages';
-import { ReportConcernButton } from './report-concern';
-import { Alert, Button, Spinner, cx } from './ui';
-import { Field, TextInput } from './ui/fields';
+import { ReportConcernButton } from '../policies/report-concern';
+import { Alert, Button, Spinner, cx } from '../ui';
+import { Field, TextInput } from '../ui/fields';
 
 const MAX_LENGTH = 4000;
 const SUBJECT_MAX_LENGTH = 120;

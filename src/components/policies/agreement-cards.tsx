@@ -12,8 +12,8 @@ import { useEffect, useState } from 'react';
 import { ApiError, api } from '@/lib/api';
 import { POLICY_LANGUAGES, policyHref, type PolicyLanguage } from '@/lib/policy-languages';
 import type { ConsentState } from '@/lib/types';
-import { useAuth } from './auth-provider';
-import { Button } from './ui';
+import { useAuth } from '../account/auth-provider';
+import { Button } from '../ui';
 
 export function AgreementReminder({ className }: { className?: string }) {
   const { user } = useAuth();

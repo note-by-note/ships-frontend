@@ -16,10 +16,10 @@ import { ApiError, api } from '@/lib/api';
 import { zoneLabel } from '@/lib/schedule';
 import type { MentorProfile, Options, PageTheme, PublicMentor, ScheduleDay } from '@/lib/types';
 import { Chips, Toggle } from './mentor-profile-form';
-import { MentorPage, OpenTimes, PAGE_THEMES } from './mentor-page';
+import { MentorPage, OpenTimes, PAGE_THEMES } from '../public/mentor-page';
 import { PhotoUploader } from './photo-uploader';
-import { Alert, Button, Spinner, cx } from './ui';
-import { Field, Select, TextArea, TextInput } from './ui/fields';
+import { Alert, Button, Spinner, cx } from '../ui';
+import { Field, Select, TextArea, TextInput } from '../ui/fields';
 
 type OwnProfile = MentorProfile & { schedule?: ScheduleDay[] };
 

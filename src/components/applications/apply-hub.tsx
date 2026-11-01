@@ -11,8 +11,8 @@ import { useEffect, useState } from 'react';
 import { api } from '@/lib/api';
 import { APPLY_LINKS } from '@/lib/site';
 import type { FormKind, OpenForm } from '@/lib/types';
-import { Icon, type IconName } from './marketing';
-import { cx } from './ui';
+import { Icon, type IconName } from '../public/marketing';
+import { cx } from '../ui';
 
 interface Path {
   kind: FormKind;

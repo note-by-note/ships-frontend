@@ -8,11 +8,11 @@ import { useEffect, useState } from 'react';
 import { api } from '@/lib/api';
 import { formatDate, formatRange, upcomingDates, zoneLabel } from '@/lib/schedule';
 import type { Conversation, LessonNote, MentorProfile, Pairing, ScheduleDay, SharedResource } from '@/lib/types';
-import { Avatar } from './avatar';
-import { Panel } from './dashboard-shell';
+import { Avatar } from '../ui/avatar';
+import { Panel } from '../layout/dashboard-shell';
 import { formatMinutes } from './hours-log';
-import { Icon } from './marketing';
-import { Spinner, cx } from './ui';
+import { Icon } from '../public/marketing';
+import { Spinner, cx } from '../ui';
 
 const plain = (name: string) => name.replace(/\s*\(test\)$/, '');
 

@@ -5,9 +5,9 @@ import Link from 'next/link';
 import { useRouter } from 'next/navigation';
 import { ApiError } from '@/lib/api';
 import { useAuth } from './auth-provider';
-import { SignUpAgreement } from './conduct-acceptance';
-import { Alert, Button, Card } from './ui';
-import { Field, TextInput } from './ui/fields';
+import { SignUpAgreement } from '../policies/conduct-acceptance';
+import { Alert, Button, Card } from '../ui';
+import { Field, TextInput } from '../ui/fields';
 
 export function RegisterForm() {
   const { register } = useAuth();

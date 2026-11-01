@@ -1,11 +1,11 @@
 import type { Metadata } from 'next';
 import { Inter, Playfair_Display } from 'next/font/google';
-import { AuthProvider } from '@/components/auth-provider';
-import { GoogleAnalytics } from '@/components/google-analytics';
-import { SiteAnalytics } from '@/components/site-analytics';
-import { SiteFooter } from '@/components/site-footer';
-import { SiteHeader } from '@/components/site-header';
-import { TestModeBanner } from '@/components/test-mode-banner';
+import { AuthProvider } from '@/components/account/auth-provider';
+import { GoogleAnalytics } from '@/components/layout/google-analytics';
+import { SiteAnalytics } from '@/components/layout/site-analytics';
+import { SiteFooter } from '@/components/layout/site-footer';
+import { SiteHeader } from '@/components/layout/site-header';
+import { TestModeBanner } from '@/components/layout/test-mode-banner';
 import './globals.css';
 
 // Type from the Figma design: Playfair Display for headings, Inter for text.

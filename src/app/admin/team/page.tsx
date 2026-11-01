@@ -6,10 +6,10 @@
 
 import Link from 'next/link';
 import { useCallback, useEffect, useState, type ChangeEvent, type FormEvent } from 'react';
-import { RequirePermission } from '@/components/admin-guard';
-import { Avatar } from '@/components/avatar';
-import { DashboardHeading } from '@/components/dashboard-shell';
-import { squareJpeg } from '@/components/photo-uploader';
+import { RequirePermission } from '@/components/layout/admin-guard';
+import { Avatar } from '@/components/ui/avatar';
+import { DashboardHeading } from '@/components/layout/dashboard-shell';
+import { squareJpeg } from '@/components/dashboard/photo-uploader';
 import { Alert, Button, Spinner } from '@/components/ui';
 import { Field, TextArea, TextInput } from '@/components/ui/fields';
 import { ApiError, api } from '@/lib/api';

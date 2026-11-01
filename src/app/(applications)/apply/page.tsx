@@ -1,7 +1,7 @@
 import type { Metadata } from 'next';
 import Link from 'next/link';
-import { ApplyHub } from '@/components/apply-hub';
-import { Container, Heading, IconBadge, StickyNote, type IconName } from '@/components/marketing';
+import { ApplyHub } from '@/components/applications/apply-hub';
+import { Container, Heading, IconBadge, StickyNote, type IconName } from '@/components/public/marketing';
 
 export const metadata: Metadata = {
   title: 'Apply',

@@ -1,7 +1,7 @@
 import type { Metadata } from 'next';
-import { RequirePermission } from '@/components/admin-guard';
-import { FormsList } from '@/components/forms-list';
-import { FormTabs } from '@/components/staff-shell';
+import { RequirePermission } from '@/components/layout/admin-guard';
+import { FormsList } from '@/components/applications/forms-list';
+import { FormTabs } from '@/components/layout/staff-shell';
 
 export const metadata: Metadata = { title: 'Forms' };
 

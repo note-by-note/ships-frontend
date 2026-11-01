@@ -20,12 +20,12 @@ import {
   type AnswerMap,
 } from '@/lib/form-logic';
 import type { AnswerValue, Application, ApplicationForm } from '@/lib/types';
-import { useAuth } from './auth-provider';
+import { useAuth } from '../account/auth-provider';
 import { AccountStep } from './account-step';
 import { QuestionInput } from './question-input';
-import { Alert, Button, ButtonLink, Card, Spinner, cx } from './ui';
-import { ParentConsentCard } from './agreement-cards';
-import { ConductGate } from './conduct-acceptance';
+import { Alert, Button, ButtonLink, Card, Spinner, cx } from '../ui';
+import { ParentConsentCard } from '../policies/agreement-cards';
+import { ConductGate } from '../policies/conduct-acceptance';
 
 /**
  * Steps carry a stable key rather than being addressed by position. The account

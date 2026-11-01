@@ -9,8 +9,8 @@
 import { useEffect, type ReactNode } from 'react';
 import { usePathname, useRouter } from 'next/navigation';
 import type { Permission } from '@/lib/types';
-import { useAuth } from './auth-provider';
-import { EmptyState, Spinner } from './ui';
+import { useAuth } from '../account/auth-provider';
+import { EmptyState, Spinner } from '../ui';
 
 /** Any staff role (admin, tech, outreach, marketing) gets past this. */
 export function AdminGuard({ children }: { children: ReactNode }) {

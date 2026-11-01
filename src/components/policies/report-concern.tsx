@@ -9,9 +9,9 @@
 import Link from 'next/link';
 import { useState, type FormEvent } from 'react';
 import { ApiError, api } from '@/lib/api';
-import { useAuth } from './auth-provider';
-import { Alert, Button, cx } from './ui';
-import { Field, TextArea } from './ui/fields';
+import { useAuth } from '../account/auth-provider';
+import { Alert, Button, cx } from '../ui';
+import { Field, TextArea } from '../ui/fields';
 
 export type ReportKind = 'mentor' | 'pairing' | 'resource' | 'team-thread' | 'general';
 

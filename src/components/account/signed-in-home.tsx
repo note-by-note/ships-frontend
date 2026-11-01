@@ -8,7 +8,7 @@ import { useEffect, useSyncExternalStore } from 'react';
 import { useRouter, useSearchParams } from 'next/navigation';
 import { hasStoredSession } from '@/lib/api';
 import { accountHome, useAuth } from './auth-provider';
-import { Spinner } from './ui';
+import { Spinner } from '../ui';
 
 const noChanges = () => () => {};
 

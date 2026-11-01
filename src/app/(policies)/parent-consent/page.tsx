@@ -1,7 +1,7 @@
 import type { Metadata } from 'next';
 import { Suspense } from 'react';
-import { LegalPage, policyMetadata } from '@/components/legal';
-import { ParentConsentForm } from '@/components/parent-consent-form';
+import { LegalPage, policyMetadata } from '@/components/policies/legal';
+import { ParentConsentForm } from '@/components/policies/parent-consent-form';
 
 // The text is in `src/content/policies`. Translations are at /parent-consent/es and so on.
 

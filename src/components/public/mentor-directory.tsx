@@ -15,11 +15,11 @@ import Link from 'next/link';
 import { useEffect, useId, useMemo, useState } from 'react';
 import { api } from '@/lib/api';
 import { APPLY_LINKS, INSTRUMENT_FAMILIES, type InstrumentFamily } from '@/lib/site';
-import { useAuth } from './auth-provider';
-import { Avatar } from './avatar';
+import { useAuth } from '../account/auth-provider';
+import { Avatar } from '../ui/avatar';
 import { Icon } from './marketing';
 import { MentorAction, firstNameOf, useStudentStanding, type StudentStanding } from './mentor-request';
-import { SlowNotice, cx } from './ui';
+import { SlowNotice, cx } from '../ui';
 
 /** The card fields `GET /api/mentors` returns. */
 interface DirectoryMentor {

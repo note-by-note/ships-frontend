@@ -8,8 +8,8 @@
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
 import { Fragment, type ReactNode } from 'react';
-import { Icon, type IconName } from './marketing';
-import { cx } from './ui';
+import { Icon, type IconName } from '../public/marketing';
+import { cx } from '../ui';
 
 export interface ShellLink {
   href: string;

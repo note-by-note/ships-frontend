@@ -2,8 +2,8 @@
 
 import Link from 'next/link';
 import { use, useCallback, useEffect, useState } from 'react';
-import { RequirePermission } from '@/components/admin-guard';
-import { DashboardHeading } from '@/components/dashboard-shell';
+import { RequirePermission } from '@/components/layout/admin-guard';
+import { DashboardHeading } from '@/components/layout/dashboard-shell';
 import { Alert, Button, Spinner, cx } from '@/components/ui';
 import { ApiError, api } from '@/lib/api';
 import type { ChatMessage } from '@/lib/types';

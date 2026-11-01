@@ -12,8 +12,8 @@ import Link from 'next/link';
 import { useEffect, useState } from 'react';
 import { api } from '@/lib/api';
 import type { Application, MentorProfile, OwnMatchRequest, Pairing, ScheduleDay } from '@/lib/types';
-import { useAuth } from './auth-provider';
-import { Spinner, cx } from './ui';
+import { useAuth } from '../account/auth-provider';
+import { Spinner, cx } from '../ui';
 
 interface Step {
   label: string;

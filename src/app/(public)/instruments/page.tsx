@@ -1,6 +1,6 @@
 import type { Metadata } from 'next';
-import { InstrumentExplorer } from '@/components/instrument-explorer';
-import { ArtPanel, Container, CtaBand, Heading, IconBadge, PageHero, Polaroid, Section } from '@/components/marketing';
+import { InstrumentExplorer } from '@/components/public/instrument-explorer';
+import { ArtPanel, Container, CtaBand, Heading, IconBadge, PageHero, Polaroid, Section } from '@/components/public/marketing';
 import { APPLY_LINKS } from '@/lib/site';
 
 export const metadata: Metadata = {

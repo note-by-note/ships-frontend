@@ -7,7 +7,7 @@
 // in the editor's type list — nowhere else.
 
 import type { AnswerValue, FormQuestion } from '@/lib/types';
-import { ChoiceGroup, ChoiceRow, Field, Select, TextArea, TextInput } from './ui/fields';
+import { ChoiceGroup, ChoiceRow, Field, Select, TextArea, TextInput } from '../ui/fields';
 
 interface Props {
   question: FormQuestion;

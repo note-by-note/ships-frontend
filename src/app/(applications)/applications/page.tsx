@@ -1,5 +1,5 @@
 import type { Metadata } from 'next';
-import { MyApplications } from '@/components/my-applications';
+import { MyApplications } from '@/components/applications/my-applications';
 
 export const metadata: Metadata = { title: 'My applications' };
 

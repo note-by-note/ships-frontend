@@ -2,10 +2,10 @@
 
 import Link from 'next/link';
 import { useEffect, useState } from 'react';
-import { RequirePermission } from '@/components/admin-guard';
-import { useAuth } from '@/components/auth-provider';
-import { DashboardHeading } from '@/components/dashboard-shell';
-import { MentorTabs } from '@/components/staff-shell';
+import { RequirePermission } from '@/components/layout/admin-guard';
+import { useAuth } from '@/components/account/auth-provider';
+import { DashboardHeading } from '@/components/layout/dashboard-shell';
+import { MentorTabs } from '@/components/layout/staff-shell';
 import { Badge, ButtonLink, Card, EmptyState, Spinner } from '@/components/ui';
 import { TextInput } from '@/components/ui/fields';
 import { api } from '@/lib/api';

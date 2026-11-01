@@ -1,5 +1,5 @@
 import type { Metadata } from 'next';
-import { LegalPage, policyMetadata, translatedLanguage, translatedLanguageParams } from '@/components/legal';
+import { LegalPage, policyMetadata, translatedLanguage, translatedLanguageParams } from '@/components/policies/legal';
 
 // /privacy/es and the other translations. English is /privacy.
 

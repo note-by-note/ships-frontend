@@ -11,7 +11,7 @@ import {
   Section,
   SectionIntro,
   type IconName,
-} from '@/components/marketing';
+} from '@/components/public/marketing';
 import { APPLY_LINKS } from '@/lib/site';
 
 export const metadata: Metadata = {

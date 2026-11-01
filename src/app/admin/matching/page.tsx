@@ -6,9 +6,9 @@
 
 import Link from 'next/link';
 import { useCallback, useEffect, useState } from 'react';
-import { RequirePermission } from '@/components/admin-guard';
-import { DashboardHeading, Panel } from '@/components/dashboard-shell';
-import { ApplicationTabs } from '@/components/staff-shell';
+import { RequirePermission } from '@/components/layout/admin-guard';
+import { DashboardHeading, Panel } from '@/components/layout/dashboard-shell';
+import { ApplicationTabs } from '@/components/layout/staff-shell';
 import { Alert, Badge, Button, Spinner } from '@/components/ui';
 import { ApiError, api } from '@/lib/api';
 import type { MatchingBoard, MentorSuggestion } from '@/lib/types';

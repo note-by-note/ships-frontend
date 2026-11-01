@@ -1,7 +1,7 @@
 'use client';
 
-import { DashboardHeading } from '@/components/dashboard-shell';
-import { ResourcesBoard } from '@/components/resources-board';
+import { DashboardHeading } from '@/components/layout/dashboard-shell';
+import { ResourcesBoard } from '@/components/dashboard/resources-board';
 
 export default function ResourcesPage() {
   return (

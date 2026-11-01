@@ -1,5 +1,5 @@
 import type { Metadata } from 'next';
-import { ApplicationWizard } from '@/components/application-wizard';
+import { ApplicationWizard } from '@/components/applications/application-wizard';
 
 export async function generateMetadata({ params }: PageProps<'/apply/[slug]'>): Promise<Metadata> {
   const { slug } = await params;

@@ -1,8 +1,8 @@
 'use client';
 
 import Link from 'next/link';
-import { DashboardHeading, Panel } from '@/components/dashboard-shell';
-import { ReportConcernForm } from '@/components/report-concern';
+import { DashboardHeading, Panel } from '@/components/layout/dashboard-shell';
+import { ReportConcernForm } from '@/components/policies/report-concern';
 
 // A concern that isn't about one message, page or file: anything that worries
 // someone. Reports go to Note by Note admins only.

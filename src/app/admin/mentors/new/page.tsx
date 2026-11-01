@@ -3,9 +3,9 @@
 import Link from 'next/link';
 import { useState } from 'react';
 import { useRouter } from 'next/navigation';
-import { RequirePermission } from '@/components/admin-guard';
-import { DashboardHeading, Panel } from '@/components/dashboard-shell';
-import { MentorProfileForm } from '@/components/mentor-profile-form';
+import { RequirePermission } from '@/components/layout/admin-guard';
+import { DashboardHeading, Panel } from '@/components/layout/dashboard-shell';
+import { MentorProfileForm } from '@/components/dashboard/mentor-profile-form';
 import { Field, TextInput } from '@/components/ui/fields';
 import { api } from '@/lib/api';
 import type { MentorProfile } from '@/lib/types';

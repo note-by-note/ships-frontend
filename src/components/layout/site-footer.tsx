@@ -1,6 +1,6 @@
 import Link from 'next/link';
 import { FOOTER_LINKS, POLICIES, SITE } from '@/lib/site';
-import { ContactEmail, Container, Icon } from './marketing';
+import { ContactEmail, Container, Icon } from '../public/marketing';
 
 export function SiteFooter() {
   return (

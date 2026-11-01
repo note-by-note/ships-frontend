@@ -2,15 +2,17 @@
 
 import Link from 'next/link';
 import { useEffect, useState } from 'react';
-import { RequirePermission } from '@/components/admin-guard';
-import { useAuth } from '@/components/auth-provider';
-import { DashboardHeading, Panel } from '@/components/dashboard-shell';
-import { Icon } from '@/components/marketing';
+import { RequirePermission } from '@/components/layout/admin-guard';
+import { AnnouncementsPanel, ImportantDatesPanel, useAnnouncements } from '@/components/messages/announcements';
+import { useAuth } from '@/components/account/auth-provider';
+import { DashboardHeading, Panel } from '@/components/layout/dashboard-shell';
+import { Icon } from '@/components/public/marketing';
 import { Alert, Spinner, cx } from '@/components/ui';
 import { api } from '@/lib/api';
 import { ROLE_LABELS, type Permission, type StaffOverview } from '@/lib/types';
 
-// The staff home: what needs someone now, then the numbers at a glance.
+// The staff home: what needs someone now, announcements and dates for the
+// volunteers, then the numbers at a glance.
 // Counts only. Every staff role can read it, marketing included, so nothing
 // here identifies anyone.
 
@@ -18,6 +20,7 @@ export default function StaffOverviewPage() {
   const { user, can } = useAuth();
   const [overview, setOverview] = useState<StaffOverview | null>(null);
   const [error, setError] = useState(false);
+  const notices = useAnnouncements();
 
   useEffect(() => {
     if (!can('stats.view')) return;
@@ -40,6 +43,10 @@ export default function StaffOverviewPage() {
       {overview ? (
         <div className="flex max-w-4xl flex-col gap-6">
           <NeedsAttention overview={overview} can={can} />
+          <div className="grid gap-6 lg:grid-cols-2 [&>*:only-child]:lg:col-span-2">
+            <AnnouncementsPanel loaded={notices} href="/admin/announcements" />
+            <ImportantDatesPanel loaded={notices} href="/admin/announcements" />
+          </div>
           <AtAGlance overview={overview} />
           {overview.studentsBySchool?.length ? (
             <Panel title="Students by school">

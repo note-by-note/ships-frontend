@@ -11,8 +11,8 @@ import { useEffect, useState, type FormEvent } from 'react';
 import { CONSENT_FORM, type ConsentFormText } from '@/content/policies/forms';
 import { ApiError, api } from '@/lib/api';
 import { policyLocale, type PolicyLanguage } from '@/lib/policy-languages';
-import { Alert, Button, Spinner } from './ui';
-import { Field, Select, TextInput } from './ui/fields';
+import { Alert, Button, Spinner } from '../ui';
+import { Field, Select, TextInput } from '../ui/fields';
 
 interface ConsentLink {
   studentFirstName: string;

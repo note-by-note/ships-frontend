@@ -1,8 +1,8 @@
 'use client';
 
 import { use } from 'react';
-import { DashboardHeading } from '@/components/dashboard-shell';
-import { MessagesHome } from '@/components/messages';
+import { DashboardHeading } from '@/components/layout/dashboard-shell';
+import { MessagesHome } from '@/components/messages/messages';
 
 export default function ConversationPage({ params }: { params: Promise<{ pairingId: string }> }) {
   const { pairingId } = use(params);

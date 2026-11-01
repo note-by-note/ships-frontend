@@ -1,7 +1,7 @@
 'use client';
 
-import { DashboardHeading } from '@/components/dashboard-shell';
-import { HoursLog } from '@/components/hours-log';
+import { DashboardHeading } from '@/components/layout/dashboard-shell';
+import { HoursLog } from '@/components/dashboard/hours-log';
 
 export default function VolunteerHoursPage() {
   return (

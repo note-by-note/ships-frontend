@@ -9,7 +9,7 @@ import Link from 'next/link';
 import { useEffect, useState } from 'react';
 import { api } from '@/lib/api';
 import { INSTRUMENT_FAMILIES, INSTRUMENT_HINTS, type InstrumentFamily } from '@/lib/site';
-import { cx } from './ui';
+import { cx } from '../ui';
 
 interface Facets {
   data: { instruments: { value: string; count: number }[] };

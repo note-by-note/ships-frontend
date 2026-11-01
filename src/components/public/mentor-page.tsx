@@ -11,10 +11,10 @@
 import type { ReactNode } from 'react';
 import { DAY_NAMES, WEEKDAYS, formatTime, toMinutes, toTime, zoneLabel } from '@/lib/schedule';
 import type { PageTheme, PublicMentor, ScheduleDay } from '@/lib/types';
-import { Avatar } from './avatar';
+import { Avatar } from '../ui/avatar';
 import { Icon, type IconName } from './marketing';
 import { firstNameOf } from './mentor-request';
-import { cx } from './ui';
+import { cx } from '../ui';
 
 export const PAGE_THEMES: Record<PageTheme, { label: string; band: string; solid: string; soft: string }> = {
   sky: { label: 'Sky', band: 'bg-sky/45', solid: 'bg-sky', soft: 'bg-sky/15' },

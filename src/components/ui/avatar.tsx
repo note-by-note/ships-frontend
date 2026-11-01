@@ -2,7 +2,7 @@
 // Photos are only ever approved mentor photos, served publicly by the API.
 
 import { apiUrl } from '@/lib/api';
-import { cx } from './ui';
+import { cx } from '.';
 
 const TONES = ['bg-sky', 'bg-gold', 'bg-sage', 'bg-coral/70'];
 

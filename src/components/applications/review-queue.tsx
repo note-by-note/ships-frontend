@@ -9,8 +9,8 @@ import Link from 'next/link';
 import { useRouter, useSearchParams } from 'next/navigation';
 import { api } from '@/lib/api';
 import type { ApplicationListing, FormListing, Paged } from '@/lib/types';
-import { Badge, Button, Card, EmptyState, PageHeader, Spinner, StatusBadge, cx, humanize } from './ui';
-import { Select, TextInput } from './ui/fields';
+import { Badge, Button, Card, EmptyState, PageHeader, Spinner, StatusBadge, cx, humanize } from '../ui';
+import { Select, TextInput } from '../ui/fields';
 
 const STATUS_FILTERS = ['submitted', 'under_review', 'accepted', 'waitlisted', 'rejected', 'withdrawn'] as const;
 

@@ -1,5 +1,5 @@
 import type { Metadata } from 'next';
-import { MentorProfileView } from '@/components/mentor-profile-view';
+import { MentorProfileView } from '@/components/public/mentor-profile-view';
 
 export const metadata: Metadata = {
   title: 'Mentor',

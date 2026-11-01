@@ -11,9 +11,9 @@ import { CONDUCT_FORM } from '@/content/policies/forms';
 import { ApiError, api } from '@/lib/api';
 import { policyHref, policyLocale, type PolicyLanguage } from '@/lib/policy-languages';
 import type { AccountUser } from '@/lib/types';
-import { useAuth } from './auth-provider';
-import { Alert, Button } from './ui';
-import { Field, TextInput } from './ui/fields';
+import { useAuth } from '../account/auth-provider';
+import { Alert, Button } from '../ui';
+import { Field, TextInput } from '../ui/fields';
 
 export function ConductAcceptance({ lang = 'en' }: { lang?: PolicyLanguage }) {
   const { user, loading } = useAuth();

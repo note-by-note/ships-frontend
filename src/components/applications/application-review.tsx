@@ -11,8 +11,8 @@ import Link from 'next/link';
 import { ApiError, api } from '@/lib/api';
 import type { ApplicationDetail } from '@/lib/types';
 import { formatAnswer } from './application-wizard';
-import { Alert, Button, Card, PageHeader, Spinner, StatusBadge, cx, humanize } from './ui';
-import { TextArea } from './ui/fields';
+import { Alert, Button, Card, PageHeader, Spinner, StatusBadge, cx, humanize } from '../ui';
+import { TextArea } from '../ui/fields';
 
 /** The language a parent read the consent page in, when it wasn't English. */
 const LANGUAGE_NAMES: Record<string, string> = { es: 'Spanish', fr: 'French', zh: 'Chinese' };

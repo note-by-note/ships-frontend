@@ -1,5 +1,5 @@
 import type { Metadata } from 'next';
-import { LegalPage, policyMetadata } from '@/components/legal';
+import { LegalPage, policyMetadata } from '@/components/policies/legal';
 
 // The text is in `src/content/policies`. Translations are at /privacy/es and so on.
 

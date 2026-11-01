@@ -8,9 +8,9 @@ import { useEffect, useRef, useState, type ReactNode } from 'react';
 import Link from 'next/link';
 import { usePathname, useRouter } from 'next/navigation';
 import { NAV_LINKS, SITE } from '@/lib/site';
-import { accountHome, sidesOf, useAuth } from './auth-provider';
-import { Icon } from './marketing';
-import { cx } from './ui';
+import { accountHome, sidesOf, useAuth } from '../account/auth-provider';
+import { Icon } from '../public/marketing';
+import { cx } from '../ui';
 
 const MEMBER_LINKS = [
   { href: '/dashboard', label: 'Dashboard' },

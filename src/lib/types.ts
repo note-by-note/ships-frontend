@@ -218,7 +218,8 @@ export type Permission =
   | 'messages.review'
   | 'resources.manage'
   | 'hours.approve'
-  | 'team.manage';
+  | 'team.manage'
+  | 'announcements.manage';
 
 export const STAFF_ROLES: StaffRole[] = ['admin', 'tech', 'outreach', 'marketing'];
 
@@ -582,6 +583,44 @@ export interface TeamThread {
   createdAt: string;
   messages: TeamMessage[];
   hasMore: boolean;
+}
+
+// --- Announcements and important dates ---------------------------------------------------
+
+/** Who an announcement or date is for: students, and each team. */
+export type Audience = 'students' | Team;
+
+export const AUDIENCE_LABELS: Record<Audience, string> = { students: 'Students', ...TEAM_LABELS };
+
+export interface Announcement {
+  id: string;
+  kind: 'announcement' | 'date';
+  title: string;
+  body: string;
+  audience: Audience[];
+  link: { url: string; label: string } | null;
+  pinned: boolean;
+  /** Announcements: the last day it shows, "YYYY-MM-DD". */
+  showUntil: string | null;
+  /** Important dates: the day (and last day of a range), "YYYY-MM-DD". */
+  date: string | null;
+  endDate: string | null;
+  time: string;
+  createdAt: string;
+  updatedAt: string;
+  /** Only for people who manage announcements. */
+  authorName?: string;
+}
+
+export interface AnnouncementFeed {
+  announcements: Announcement[];
+  dates: Announcement[];
+}
+
+export interface AnnouncementFeedMeta {
+  unseen: number;
+  seenAt: string | null;
+  canManage: boolean;
 }
 
 // --- Resources ---------------------------------------------------------------------------
