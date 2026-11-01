@@ -338,9 +338,12 @@ function Thread({ id, base, meta, onActivity }: { id: string; base: string; meta
   const [draft, setDraft] = useState('');
   const [sending, setSending] = useState(false);
   const [adding, setAdding] = useState(false);
+  const [replyingTo, setReplyingTo] = useState<TeamMessage | null>(null);
   const { user } = useAuth();
   const needsConduct = Boolean(user && !user.agreements?.conduct);
+  const canReply = Boolean(thread?.member) && !needsConduct;
   const endRef = useRef<HTMLDivElement>(null);
+  const composeRef = useRef<HTMLTextAreaElement>(null);
   const lastCount = useRef(0);
 
   const refresh = useCallback(async () => {
@@ -387,8 +390,9 @@ function Thread({ id, base, meta, onActivity }: { id: string; base: string; meta
     setSending(true);
     setError(null);
     try {
-      await api.post(`/team-messages/${id}`, { body: text });
+      await api.post(`/team-messages/${id}`, { body: text, ...(replyingTo ? { replyTo: replyingTo.id } : {}) });
       setDraft('');
+      setReplyingTo(null);
       await refresh();
       onActivity();
     } catch (err) {
@@ -399,11 +403,27 @@ function Thread({ id, base, meta, onActivity }: { id: string; base: string; meta
   }
 
   function onKeyDown(event: KeyboardEvent<HTMLTextAreaElement>) {
-    // Enter sends; Shift+Enter starts a new line.
+    // Enter sends; Shift+Enter starts a new line; Escape stops replying to a message.
     if (event.key === 'Enter' && !event.shiftKey) {
       event.preventDefault();
       void send();
+    } else if (event.key === 'Escape' && replyingTo) {
+      setReplyingTo(null);
     }
+  }
+
+  function replyTo(message: TeamMessage) {
+    setReplyingTo(message);
+    composeRef.current?.focus();
+  }
+
+  /** Jump to the message a reply quotes, if it's loaded, and highlight it for a moment. */
+  function showOriginal(messageId: string) {
+    const element = document.getElementById(`team-message-${messageId}`);
+    if (!element) return;
+    element.scrollIntoView({ behavior: 'smooth', block: 'center' });
+    element.classList.add('ring-2', 'ring-gold');
+    setTimeout(() => element.classList.remove('ring-2', 'ring-gold'), 1500);
   }
 
   if (!thread) return error ? <Alert>{error}</Alert> : <Spinner label="Loading the conversation" />;
@@ -477,16 +497,39 @@ function Thread({ id, base, meta, onActivity }: { id: string; base: string; meta
                         {message.senderTeam ? ` · ${TEAM_LABELS[message.senderTeam]}` : null}
                       </p>
                     ) : null}
+                    {message.replyTo ? (
+                      <button
+                        type="button"
+                        onClick={() => showOriginal(message.replyTo!.id)}
+                        className="max-w-full rounded-lg border-l-4 border-gold bg-paper/70 px-3 py-1.5 text-left text-xs text-ink-soft hover:bg-paper"
+                      >
+                        <span className="block font-semibold text-navy">
+                          {message.replyTo.mine ? 'You' : message.replyTo.senderName}
+                        </span>
+                        <span className="line-clamp-2">{message.replyTo.body}</span>
+                      </button>
+                    ) : null}
                     <p
+                      id={`team-message-${message.id}`}
                       className={cx(
-                        'rounded-2xl px-4 py-2.5 text-sm leading-relaxed whitespace-pre-wrap',
+                        'rounded-2xl px-4 py-2.5 text-sm leading-relaxed whitespace-pre-wrap transition-shadow',
                         message.mine ? 'rounded-br-md bg-navy text-cream' : 'rounded-bl-md bg-paper text-navy',
                       )}
                     >
                       {message.body}
                     </p>
-                    <span className="text-[11px] text-ink-faint">
+                    <span className="flex items-center gap-2 text-[11px] text-ink-faint">
                       {new Date(message.createdAt).toLocaleTimeString(undefined, { hour: 'numeric', minute: '2-digit' })}
+                      {canReply ? (
+                        <button
+                          type="button"
+                          onClick={() => replyTo(message)}
+                          aria-label={`Reply to ${message.mine ? 'your message' : message.senderName}`}
+                          className="font-semibold text-navy/70 underline-offset-2 hover:text-navy hover:underline"
+                        >
+                          Reply
+                        </button>
+                      ) : null}
                     </span>
                   </div>
                 )}
@@ -508,11 +551,28 @@ function Thread({ id, base, meta, onActivity }: { id: string; base: string; meta
       ) : (
         <form onSubmit={send} className="border-t border-line p-3">
           {error ? <p role="alert" className="mb-2 text-sm text-danger">{error}</p> : null}
+          {replyingTo ? (
+            <div className="mb-2 flex items-start gap-3 rounded-lg border-l-4 border-gold bg-paper px-3 py-2 text-xs">
+              <div className="min-w-0 flex-1">
+                <p className="font-semibold text-navy">Replying to {replyingTo.mine ? 'yourself' : replyingTo.senderName}</p>
+                <p className="truncate text-ink-soft">{replyingTo.body}</p>
+              </div>
+              <button
+                type="button"
+                onClick={() => setReplyingTo(null)}
+                aria-label="Stop replying to this message"
+                className="rounded-full px-1.5 text-base leading-none text-navy/60 hover:bg-white hover:text-navy"
+              >
+                ×
+              </button>
+            </div>
+          ) : null}
           <div className="flex items-end gap-2">
             <label htmlFor={`team-compose-${id}`} className="sr-only">
-              Reply to {thread.subject}
+              {replyingTo ? `Reply to ${replyingTo.senderName}` : `Reply to ${thread.subject}`}
             </label>
             <textarea
+              ref={composeRef}
               id={`team-compose-${id}`}
               rows={2}
               maxLength={MAX_LENGTH}

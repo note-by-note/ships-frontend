@@ -544,6 +544,8 @@ export interface TeamMessage {
   senderTeam: Team | null;
   mine: boolean;
   body: string;
+  /** The message this one answers, shortened, shown quoted above it. */
+  replyTo: { id: string; senderName: string; mine: boolean; body: string } | null;
   createdAt: string;
 }
 
