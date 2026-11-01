@@ -8,6 +8,7 @@
 
 import { useEffect, useState, type ChangeEvent } from 'react';
 import { ApiError, api } from '@/lib/api';
+import { canvasToJpeg, readImage } from '@/lib/images';
 import type { PhotoState } from '@/lib/types';
 import { Avatar } from '../ui/avatar';
 import { Button } from '../ui';
@@ -16,14 +17,8 @@ const SIZE = 640;
 
 /** Centre-crop to a square and re-encode as JPEG. */
 export async function squareJpeg(file: File): Promise<Blob> {
-  const url = URL.createObjectURL(file);
+  const { image, done } = await readImage(file);
   try {
-    const image = await new Promise<HTMLImageElement>((resolve, reject) => {
-      const element = new Image();
-      element.onload = () => resolve(element);
-      element.onerror = () => reject(new Error('unreadable'));
-      element.src = url;
-    });
     const side = Math.min(image.naturalWidth, image.naturalHeight);
     const canvas = document.createElement('canvas');
     canvas.width = SIZE;
@@ -41,11 +36,9 @@ export async function squareJpeg(file: File): Promise<Blob> {
       SIZE,
       SIZE,
     );
-    return await new Promise<Blob>((resolve, reject) =>
-      canvas.toBlob((blob) => (blob ? resolve(blob) : reject(new Error('unreadable'))), 'image/jpeg', 0.86),
-    );
+    return await canvasToJpeg(canvas);
   } finally {
-    URL.revokeObjectURL(url);
+    done();
   }
 }
 

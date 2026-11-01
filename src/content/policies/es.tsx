@@ -412,12 +412,24 @@ export const es: PolicySet = {
                 <strong>Mensajes y archivos</strong> compartidos entre un mentor y su estudiante.
               </li>
               <li>
+                <strong>Mensajes de equipo:</strong> conversaciones entre los mentores y los equipos de Note by Note, incluidas
+                las imágenes que se envían en ellas.
+              </li>
+              <li>
+                <strong>Anuncios:</strong> lo que publica el equipo, quién lo publicó y cuándo abriste por última vez la página
+                de anuncios.
+              </li>
+              <li>
+                <strong>Reportes:</strong> los problemas que se envían con “Report a concern” (Reportar un problema) y los
+                mensajes reportados, quién los reportó y lo que escribió.
+              </li>
+              <li>
                 <strong>Horas de voluntariado</strong> que registran los mentores y voluntarios.
               </li>
               <li>
                 <strong>Acuerdos:</strong> cuándo aceptaste el Código de conducta y las Condiciones de uso, y el nombre que
                 escribiste. Para un estudiante menor de 18 años, el consentimiento de su padre, madre o tutor: su nombre,
-                correo, relación con el estudiante y la fecha.
+                correo, relación con el estudiante, la fecha y el idioma en que lo leyó.
               </li>
               <li>
                 <strong>Mensajes enviados con nuestro formulario de contacto.</strong>
@@ -454,13 +466,20 @@ export const es: PolicySet = {
               de la cuenta que hizo la solicitud.
             </li>
             <li>
+              <strong>Las personas de una conversación de equipo.</strong> Los mensajes de equipo, incluidas las imágenes, los
+              pueden leer todas las personas de los equipos de esa conversación y quienes participan en ella a título personal.
+              Un equipo que se añade puede leer todo lo dicho hasta entonces. Los estudiantes nunca participan en estas
+              conversaciones.
+            </li>
+            <li>
               <strong>El público.</strong> Las páginas de mentor publicadas, incluidas las fotos aprobadas, se muestran en
               Find a Mentor. Los miembros del equipo de la página About se muestran allí. Nada más es público.
             </li>
             <li>
               <strong>El equipo de Note by Note.</strong> Los voluntarios solo ven lo que necesita su función. Los
-              administradores pueden leer los mensajes entre mentores y estudiantes para proteger a las personas, por
-              ejemplo cuando se reporta uno. Algunos voluntarios solo ven totales, nunca nombres.
+              administradores pueden leer los mensajes entre mentores y estudiantes, y los mensajes de equipo, para proteger a
+              las personas, por ejemplo cuando se reporta uno. Solo los administradores ven los reportes, y la persona reportada
+              no sabe quién la reportó. Algunos voluntarios solo ven totales, nunca nombres.
             </li>
             <li>
               <strong>Servicios que hacen funcionar el sitio</strong> (en la lista de abajo), solo para hacer ese trabajo.
@@ -483,7 +502,7 @@ export const es: PolicySet = {
               <strong>Render</strong> hace funcionar nuestro servidor.
             </li>
             <li>
-              <strong>MongoDB Atlas</strong> guarda nuestra base de datos.
+              <strong>MongoDB Atlas</strong> guarda nuestra base de datos, incluidas las fotos y los archivos que se suben.
             </li>
             <li>
               <strong>Google Analytics</strong> cuenta las visitas. Desactivamos Google Signals y la personalización de

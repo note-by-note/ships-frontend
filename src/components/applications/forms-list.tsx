@@ -304,8 +304,9 @@ function OpenSwitch({ form, busy, onChange }: { form: FormListing; busy: boolean
   const label = open ? (scheduled ? 'Open, but outside its dates' : 'Accepting applications') : form.status === 'draft' ? 'Draft' : 'Closed';
 
   return (
-    <label className="flex shrink-0 items-center gap-3 text-sm">
-      <span className={open && !scheduled ? 'font-medium text-ok' : 'text-ink-soft'}>{label}</span>
+    <label className="flex w-full shrink-0 items-center justify-between gap-3 text-sm sm:w-auto sm:justify-start">
+      {/* A set width, so the card's layout stays put when the words change. */}
+      <span className={`sm:w-48 sm:text-right ${open && !scheduled ? 'font-medium text-ok' : 'text-ink-soft'}`}>{label}</span>
       <span className="relative inline-flex items-center">
         <input
           type="checkbox"

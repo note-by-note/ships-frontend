@@ -390,11 +390,24 @@ export const en: PolicySet = {
                 <strong>Messages and files</strong> shared between a mentor and their student.
               </li>
               <li>
+                <strong>Team messages:</strong> conversations between mentors and the Note by Note teams, including any images
+                sent in them.
+              </li>
+              <li>
+                <strong>Announcements:</strong> what the team posts, who posted it, and when you last opened the Announcements
+                page.
+              </li>
+              <li>
+                <strong>Reports:</strong> concerns raised through “Report a concern” and messages that are reported, who reported
+                them and what they wrote.
+              </li>
+              <li>
                 <strong>Volunteer hours</strong> that mentors and volunteers log.
               </li>
               <li>
                 <strong>Agreements:</strong> when you accepted the Code of Conduct and Terms of Use, and the name you typed. For
-                a student under 18, their parent or guardian’s consent: their name, email, relationship and the date.
+                a student under 18, their parent or guardian’s consent: their name, email, relationship, the date and the
+                language they read it in.
               </li>
               <li>
                 <strong>Messages sent through our contact form.</strong>
@@ -432,13 +445,18 @@ export const en: PolicySet = {
               account that asked.
             </li>
             <li>
+              <strong>People in a team conversation.</strong> Team messages, including images, can be read by everyone on the
+              teams in that conversation and anyone in it by name. A team that’s added can read everything said so far. Students
+              are never in these conversations.
+            </li>
+            <li>
               <strong>The public.</strong> Published mentor pages, including approved photos, are shown on Find a Mentor.
               Team members on the About page are shown there. Nothing else is public.
             </li>
             <li>
               <strong>The Note by Note team.</strong> Volunteers see only what their role needs. Admins can read messages
-              between mentors and students to keep people safe, such as when one is reported. Some volunteers see only
-              totals, never names.
+              between mentors and students, and team messages, to keep people safe, such as when one is reported. Only admins
+              see reports, and the person reported isn’t told who raised them. Some volunteers see only totals, never names.
             </li>
             <li>
               <strong>Services that run the site for us</strong> (listed below), only to do that job.
@@ -461,7 +479,7 @@ export const en: PolicySet = {
               <strong>Render</strong> runs our server.
             </li>
             <li>
-              <strong>MongoDB Atlas</strong> stores our database.
+              <strong>MongoDB Atlas</strong> stores our database, including uploaded photos and files.
             </li>
             <li>
               <strong>Google Analytics</strong> counts visits. We’ve turned off Google signals and ad personalization, and we

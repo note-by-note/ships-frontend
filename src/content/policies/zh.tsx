@@ -275,8 +275,11 @@ export const zh: PolicySet = {
               <li><strong>导师页面：</strong>导师写的自我介绍、所教乐器、每周有空的时间，以及照片（如果有添加）。</li>
               <li><strong>课程：</strong>课程申请、约定的上课时间、“无法参加”通知、课程笔记、练习清单和视频通话链接。</li>
               <li><strong>消息和文件：</strong>导师和学生之间分享的内容。</li>
+              <li><strong>团队消息：</strong>导师和 Note by Note 各团队之间的对话，包括其中发送的图片。</li>
+              <li><strong>公告：</strong>团队发布的内容、发布者，以及你上次打开公告页面的时间。</li>
+              <li><strong>举报：</strong>通过 Report a concern（举报问题）提交的问题和被举报的消息、举报人及其填写的内容。</li>
               <li><strong>志愿服务时长：</strong>导师和志愿者记录的时长。</li>
-              <li><strong>同意记录：</strong>你接受行为准则和使用条款的时间，以及你输入的姓名。对于未满 18 岁的学生，还包括其家长或监护人的同意：姓名、电子邮件、与学生的关系和日期。</li>
+              <li><strong>同意记录：</strong>你接受行为准则和使用条款的时间，以及你输入的姓名。对于未满 18 岁的学生，还包括其家长或监护人的同意：姓名、电子邮件、与学生的关系、日期，以及其阅读时使用的语言。</li>
               <li><strong>通过我们的联系表单发送的消息。</strong></li>
               <li><strong>访问记录：</strong>哪些页面被浏览，不包括网址中可能识别出你身份的部分。</li>
             </ul>
@@ -299,8 +302,9 @@ export const zh: PolicySet = {
         body: (
           <ul>
             <li><strong>你的导师或学生。</strong>导师在接受学生之前，可以看到学生的名字、年龄段、水平、乐器和偏好的时间。接受之后，还可以看到提交申请的账户的姓名和电子邮件。</li>
+            <li><strong>团队对话中的人。</strong>团队消息（包括图片）可以被该对话中各团队的所有成员，以及以个人身份参与对话的人阅读。新加入的团队可以看到之前的所有内容。学生不会参与这些对话。</li>
             <li><strong>公众。</strong>已发布的导师页面（包括已批准的照片）会显示在 Find a Mentor 页面上。About 页面上的团队成员会显示在那里。其他内容都不公开。</li>
-            <li><strong>Note by Note 团队。</strong>志愿者只能看到其职责所需的内容。管理员可以阅读导师和学生之间的消息，以保护大家，例如有消息被举报时。有些志愿者只能看到总数，看不到姓名。</li>
+            <li><strong>Note by Note 团队。</strong>志愿者只能看到其职责所需的内容。管理员可以阅读导师和学生之间的消息以及团队消息，以保护大家，例如有消息被举报时。只有管理员能看到举报内容，被举报的人不会知道是谁举报的。有些志愿者只能看到总数，看不到姓名。</li>
             <li><strong>让网站运作的服务</strong>（见下方列表），仅用于完成相应的工作。</li>
             <li><strong>其他人，仅在必要时：</strong>法律要求时，或为了保护某人免受伤害时。</li>
           </ul>
@@ -313,7 +317,7 @@ export const zh: PolicySet = {
           <ul>
             <li><strong>Vercel</strong> 托管网站并统计页面访问量。</li>
             <li><strong>Render</strong> 运行我们的服务器。</li>
-            <li><strong>MongoDB Atlas</strong> 存储我们的数据库。</li>
+            <li><strong>MongoDB Atlas</strong> 存储我们的数据库，包括上传的照片和文件。</li>
             <li><strong>Google Analytics</strong> 统计访问量。我们关闭了 Google Signals 和广告个性化功能，并从它看到的网址中去掉了任何可能识别你身份的内容。</li>
             <li><strong>Formspree</strong> 传送我们联系表单中的消息。</li>
             <li><strong>一个邮件发送服务</strong>负责发送网站的电子邮件，例如课程通知和同意请求。</li>

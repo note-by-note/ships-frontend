@@ -69,6 +69,7 @@ src/
     form-logic.ts             application form rules (the API checks them too)
     policy-languages.ts       the languages the policies come in
     schedule.ts               lesson time helpers
+    images.ts                 shrinking images in the browser before upload
 ```
 
 Folder names in brackets, like `(public)`, are only for sorting. They don't

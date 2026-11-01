@@ -2,6 +2,8 @@
 // instrument list. Anything the team has not confirmed yet is `null`, and the
 // pages show a visible "to be confirmed" placeholder rather than a made-up value.
 
+import type { PolicyKey } from './policy-languages';
+
 export const SITE = {
   name: 'Note by Note',
   tagline: 'Free online music tutoring, run by students.',
@@ -77,12 +79,18 @@ export const POLICIES = [
 ];
 
 /**
- * When the policies last changed (shown in each language's date format). Keep
- * in step with the versions in the API (`ships-api/src/util/agreements.ts`):
- * changing the Code of Conduct or Terms enough that people should agree again
- * means bumping both. Change the translations too (`src/content/policies`).
+ * When each policy's own text last changed (shown in each language's date
+ * format). Only change a policy's date when its text changes, and change its
+ * translations too (`src/content/policies`). The API keeps versions of the
+ * Code of Conduct, Terms and consent (`ships-api/src/util/agreements.ts`):
+ * changing one enough that people should agree again means bumping both.
  */
-export const POLICIES_UPDATED = '2026-10-29';
+export const POLICIES_UPDATED: Record<PolicyKey, string> = {
+  conduct: '2026-10-29',
+  terms: '2026-10-29',
+  privacy: '2026-11-01',
+  consent: '2026-10-29',
+};
 
 export type InstrumentFamily = 'Keys' | 'Strings' | 'Woodwinds' | 'Brass' | 'Percussion' | 'Theory';
 

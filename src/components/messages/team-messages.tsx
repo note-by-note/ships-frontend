@@ -6,14 +6,16 @@
 // A conversation has a subject and goes to the teams you pick. Staff write
 // for their team or as themselves; mentors write as themselves, so a question
 // to Tech isn't seen by every mentor. Anyone in a conversation can bring in
-// another team. The list sits beside the open conversation on wide screens;
+// another team, and messages can be images: chosen with the button or pasted
+// into the box. The list sits beside the open conversation on wide screens;
 // on phones you see one or the other. Used in the staff area and on the
 // mentor dashboard, which pass their own `base` path.
 
 import Link from 'next/link';
 import { useRouter } from 'next/navigation';
-import { useCallback, useEffect, useRef, useState, type FormEvent, type KeyboardEvent } from 'react';
+import { useCallback, useEffect, useRef, useState, type ChangeEvent, type ClipboardEvent, type FormEvent, type KeyboardEvent } from 'react';
 import { ApiError, api } from '@/lib/api';
+import { fittedJpeg } from '@/lib/images';
 import {
   ALL_TEAMS,
   TEAM_LABELS,
@@ -35,6 +37,12 @@ const MAX_LENGTH = 4000;
 const SUBJECT_MAX_LENGTH = 120;
 const POLL_MS = 8000;
 export const TEAM_MESSAGES_CHANGED = 'nbn:team-messages-changed';
+
+/** What went wrong sending, in words. `fittedJpeg` fails with "unreadable" on images the browser can't open. */
+function sendError(err: unknown, fallback: string) {
+  if (err instanceof ApiError) return err.message;
+  return err instanceof Error && err.message === 'unreadable' ? 'We can’t read that image. Try a JPEG or PNG.' : fallback;
+}
 
 const chip = (on: boolean) =>
   cx('rounded-full border px-3 py-1 text-sm', on ? 'border-navy bg-navy text-cream' : 'border-line-strong bg-white text-ink-soft');
@@ -166,7 +174,7 @@ function ThreadLink({ thread, href, active, onOpen }: { thread: TeamThreadSummar
     ? ''
     : last.kind === 'teams-added'
       ? `${last.mine ? 'You' : last.senderName} added ${last.body}`
-      : `${last.mine ? 'You' : last.senderName.split(' ')[0]}: ${last.body}`;
+      : `${last.mine ? 'You' : last.senderName.split(' ')[0]}: ${last.body || 'Sent an image'}`;
   return (
     <Link
       href={href}
@@ -209,6 +217,7 @@ function NewConversation({
   const [to, setTo] = useState<Team[]>([]);
   const [from, setFrom] = useState<Team | 'me'>(meta.fromChoices[0] ?? 'me');
   const [body, setBody] = useState('');
+  const [image, setImage] = useState<File | null>(null);
   const [busy, setBusy] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const toChoices = ALL_TEAMS.filter((team) => team !== 'mentors' || meta.canWriteToMentors);
@@ -222,10 +231,19 @@ function NewConversation({
     setBusy(true);
     setError(null);
     try {
+      // Ready before the conversation is made, so an unreadable image stops here.
+      const jpeg = image ? await fittedJpeg(image) : null;
       const created = await api.post<{ data: { id: string } }>('/team-messages', { subject: subject.trim(), to, from, body: body.trim() });
+      if (jpeg) {
+        try {
+          await api.upload(`/team-messages/${created.data.id}/images`, jpeg);
+        } catch {
+          window.alert('Your conversation started, but the image didn’t send. You can add it again in the conversation.');
+        }
+      }
       onCreated(created.data.id);
     } catch (err) {
-      setError(err instanceof ApiError ? err.message : 'That didn’t send. Please try again.');
+      setError(sendError(err, 'That didn’t send. Please try again.'));
       setBusy(false);
     }
   }
@@ -304,10 +322,13 @@ function NewConversation({
             maxLength={MAX_LENGTH}
             value={body}
             onChange={(event) => setBody(event.target.value)}
+            onPaste={(event) => pasteImage(event, setImage)}
             className="w-full resize-y rounded-lg border border-line-strong bg-white px-3 py-2.5 text-sm text-ink focus:border-navy focus:outline-none"
           />
         )}
       </Field>
+
+      {image ? <ImagePreview file={image} onRemove={() => setImage(null)} /> : <AttachImage onPick={setImage} withLabel />}
 
       {included.length ? (
         <p className="text-sm text-ink-soft">
@@ -339,6 +360,7 @@ function Thread({ id, base, meta, onActivity }: { id: string; base: string; meta
   const [sending, setSending] = useState(false);
   const [adding, setAdding] = useState(false);
   const [replyingTo, setReplyingTo] = useState<TeamMessage | null>(null);
+  const [image, setImage] = useState<File | null>(null);
   const { user } = useAuth();
   const needsConduct = Boolean(user && !user.agreements?.conduct);
   const canReply = Boolean(thread?.member) && !needsConduct;
@@ -386,17 +408,25 @@ function Thread({ id, base, meta, onActivity }: { id: string; base: string; meta
   async function send(event?: FormEvent) {
     event?.preventDefault();
     const text = draft.trim();
-    if (!text || sending) return;
+    if ((!text && !image) || sending) return;
     setSending(true);
     setError(null);
     try {
-      await api.post(`/team-messages/${id}`, { body: text, ...(replyingTo ? { replyTo: replyingTo.id } : {}) });
+      // An image goes first, as its own message, with any words as a message after it.
+      let replyId = replyingTo?.id;
+      if (image) {
+        await api.upload(`/team-messages/${id}/images${replyId ? `?replyTo=${replyId}` : ''}`, await fittedJpeg(image));
+        setImage(null);
+        setReplyingTo(null);
+        replyId = undefined;
+      }
+      if (text) await api.post(`/team-messages/${id}`, { body: text, ...(replyId ? { replyTo: replyId } : {}) });
       setDraft('');
       setReplyingTo(null);
       await refresh();
       onActivity();
     } catch (err) {
-      setError(err instanceof ApiError ? err.message : 'That message didn’t send. Please try again.');
+      setError(sendError(err, 'That message didn’t send. Please try again.'));
     } finally {
       setSending(false);
     }
@@ -509,15 +539,19 @@ function Thread({ id, base, meta, onActivity }: { id: string; base: string; meta
                         <span className="line-clamp-2">{message.replyTo.body}</span>
                       </button>
                     ) : null}
-                    <p
-                      id={`team-message-${message.id}`}
-                      className={cx(
-                        'rounded-2xl px-4 py-2.5 text-sm leading-relaxed whitespace-pre-wrap transition-shadow',
-                        message.mine ? 'rounded-br-md bg-navy text-cream' : 'rounded-bl-md bg-paper text-navy',
-                      )}
-                    >
-                      {message.body}
-                    </p>
+                    {message.hasImage ? (
+                      <TeamImage threadId={id} messageId={message.id} alt={`Image from ${message.mine ? 'you' : message.senderName}`} />
+                    ) : (
+                      <p
+                        id={`team-message-${message.id}`}
+                        className={cx(
+                          'rounded-2xl px-4 py-2.5 text-sm leading-relaxed whitespace-pre-wrap transition-shadow',
+                          message.mine ? 'rounded-br-md bg-navy text-cream' : 'rounded-bl-md bg-paper text-navy',
+                        )}
+                      >
+                        {message.body}
+                      </p>
+                    )}
                     <span className="flex items-center gap-2 text-[11px] text-ink-faint">
                       {new Date(message.createdAt).toLocaleTimeString(undefined, { hour: 'numeric', minute: '2-digit' })}
                       {canReply ? (
@@ -555,7 +589,7 @@ function Thread({ id, base, meta, onActivity }: { id: string; base: string; meta
             <div className="mb-2 flex items-start gap-3 rounded-lg border-l-4 border-gold bg-paper px-3 py-2 text-xs">
               <div className="min-w-0 flex-1">
                 <p className="font-semibold text-navy">Replying to {replyingTo.mine ? 'yourself' : replyingTo.senderName}</p>
-                <p className="truncate text-ink-soft">{replyingTo.body}</p>
+                <p className="truncate text-ink-soft">{replyingTo.body || 'Image'}</p>
               </div>
               <button
                 type="button"
@@ -567,7 +601,9 @@ function Thread({ id, base, meta, onActivity }: { id: string; base: string; meta
               </button>
             </div>
           ) : null}
+          {image ? <ImagePreview file={image} onRemove={() => setImage(null)} className="mb-2" /> : null}
           <div className="flex items-end gap-2">
+            <AttachImage onPick={setImage} />
             <label htmlFor={`team-compose-${id}`} className="sr-only">
               {replyingTo ? `Reply to ${replyingTo.senderName}` : `Reply to ${thread.subject}`}
             </label>
@@ -579,10 +615,11 @@ function Thread({ id, base, meta, onActivity }: { id: string; base: string; meta
               value={draft}
               onChange={(event) => setDraft(event.target.value)}
               onKeyDown={onKeyDown}
+              onPaste={(event) => pasteImage(event, setImage)}
               placeholder={thread.writingFor ? `Reply for ${TEAM_LABELS[thread.writingFor]}…` : 'Reply…'}
               className="min-h-11 flex-1 resize-none rounded-xl border border-line-strong bg-white px-3 py-2.5 text-sm text-ink focus:border-navy focus:outline-none"
             />
-            <Button type="submit" disabled={sending || !draft.trim()}>
+            <Button type="submit" disabled={sending || (!draft.trim() && !image)}>
               {sending ? 'Sending…' : 'Send'}
             </Button>
           </div>
@@ -594,6 +631,138 @@ function Thread({ id, base, meta, onActivity }: { id: string; base: string; meta
         </form>
       )}
     </section>
+  );
+}
+
+/** Use an image pasted into the message box, like a screenshot. */
+function pasteImage(event: ClipboardEvent, onPick: (file: File) => void) {
+  const pasted = [...event.clipboardData.files].find((file) => file.type.startsWith('image/'));
+  if (!pasted) return;
+  event.preventDefault();
+  onPick(pasted);
+}
+
+function AttachImage({ onPick, withLabel = false }: { onPick: (file: File) => void; withLabel?: boolean }) {
+  function choose(event: ChangeEvent<HTMLInputElement>) {
+    const file = event.target.files?.[0];
+    // Cleared so choosing the same image again still counts as a change.
+    event.target.value = '';
+    if (file) onPick(file);
+  }
+  return (
+    <label
+      title="Add an image"
+      className="inline-flex min-h-11 shrink-0 cursor-pointer items-center gap-2 self-start rounded-xl border border-line-strong px-3 text-sm font-medium text-navy hover:bg-paper focus-within:ring-2 focus-within:ring-navy"
+    >
+      <input type="file" accept="image/*" onChange={choose} aria-label="Add an image" className="sr-only" />
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" aria-hidden className="size-5">
+        <rect x="3" y="3" width="18" height="18" rx="2" />
+        <circle cx="8.5" cy="8.5" r="1.5" />
+        <path d="m21 15-5-5L5 21" />
+      </svg>
+      {withLabel ? 'Add an image' : null}
+    </label>
+  );
+}
+
+/** The image waiting to be sent. */
+function ImagePreview({ file, onRemove, className }: { file: File; onRemove: () => void; className?: string }) {
+  const [url, setUrl] = useState<string | null>(null);
+
+  useEffect(() => {
+    const next = URL.createObjectURL(file);
+    // Made here, not during render, so it can be released when the image changes.
+    // eslint-disable-next-line react-hooks/set-state-in-effect
+    setUrl(next);
+    return () => URL.revokeObjectURL(next);
+  }, [file]);
+
+  return (
+    <div className={cx('flex items-center gap-3 rounded-lg bg-paper p-2 text-sm', className)}>
+      {/* eslint-disable-next-line @next/next/no-img-element -- a local preview */}
+      {url ? <img src={url} alt="" className="size-14 rounded-md object-cover" /> : <span className="size-14" />}
+      <span className="min-w-0 flex-1 truncate text-ink-soft">{file.name || 'Pasted image'}</span>
+      <button
+        type="button"
+        onClick={onRemove}
+        aria-label="Remove this image"
+        className="rounded-full px-1.5 text-base leading-none text-navy/60 hover:bg-white hover:text-navy"
+      >
+        ×
+      </button>
+    </div>
+  );
+}
+
+/**
+ * An image in a conversation. Fetched while signed in, since only people who
+ * can read the conversation may see it. The box has a set size so messages
+ * don't jump as images load. Clicking opens it full size.
+ */
+function TeamImage({ threadId, messageId, alt }: { threadId: string; messageId: string; alt: string }) {
+  const [url, setUrl] = useState<string | null>(null);
+  const [failed, setFailed] = useState(false);
+  const [open, setOpen] = useState(false);
+
+  useEffect(() => {
+    let cancelled = false;
+    let made: string | null = null;
+    api
+      .blob(`/team-messages/${threadId}/images/${messageId}`)
+      .then((blob) => {
+        if (cancelled) return;
+        made = URL.createObjectURL(blob);
+        setUrl(made);
+      })
+      .catch(() => {
+        if (!cancelled) setFailed(true);
+      });
+    return () => {
+      cancelled = true;
+      if (made) URL.revokeObjectURL(made);
+    };
+  }, [threadId, messageId]);
+
+  useEffect(() => {
+    if (!open) return;
+    const onKey = (event: globalThis.KeyboardEvent) => {
+      if (event.key === 'Escape') setOpen(false);
+    };
+    window.addEventListener('keydown', onKey);
+    return () => window.removeEventListener('keydown', onKey);
+  }, [open]);
+
+  const box = 'block h-52 w-64 max-w-full rounded-2xl bg-paper transition-shadow';
+  if (failed) {
+    return (
+      <p id={`team-message-${messageId}`} className="rounded-2xl bg-paper px-4 py-2.5 text-sm text-ink-soft">
+        This image didn’t load.
+      </p>
+    );
+  }
+  if (!url) return <div id={`team-message-${messageId}`} className={box} aria-label="Loading image" role="img" />;
+
+  return (
+    <>
+      <button id={`team-message-${messageId}`} type="button" onClick={() => setOpen(true)} className={cx(box, 'overflow-hidden')} aria-label={`${alt}. Open full size`}>
+        {/* eslint-disable-next-line @next/next/no-img-element -- a private image, fetched while signed in */}
+        <img src={url} alt={alt} className="size-full object-contain" />
+      </button>
+      {open ? (
+        <div role="dialog" aria-modal="true" aria-label={alt} onClick={() => setOpen(false)} className="fixed inset-0 z-50 flex flex-col items-center justify-center gap-3 bg-navy/80 p-4">
+          {/* eslint-disable-next-line @next/next/no-img-element -- a private image, fetched while signed in */}
+          <img src={url} alt={alt} onClick={(event) => event.stopPropagation()} className="max-h-[85vh] max-w-full rounded-lg object-contain" />
+          <div className="flex gap-2" onClick={(event) => event.stopPropagation()}>
+            <a href={url} download="team-image.jpg" className="rounded-full bg-cream px-4 py-1.5 text-sm font-semibold text-navy">
+              Save
+            </a>
+            <button type="button" autoFocus onClick={() => setOpen(false)} className="rounded-full border border-cream/60 px-4 py-1.5 text-sm font-semibold text-cream">
+              Close
+            </button>
+          </div>
+        </div>
+      ) : null}
+    </>
   );
 }
 

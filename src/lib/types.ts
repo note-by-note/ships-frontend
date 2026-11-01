@@ -544,7 +544,10 @@ export interface TeamMessage {
   /** The team they wrote for; null when they wrote as themselves. */
   senderTeam: Team | null;
   mine: boolean;
+  /** Empty when the message is just an image. */
   body: string;
+  /** Load it from `/team-messages/:threadId/images/:id`. */
+  hasImage: boolean;
   /** The message this one answers, shortened, shown quoted above it. */
   replyTo: { id: string; senderName: string; mine: boolean; body: string } | null;
   createdAt: string;

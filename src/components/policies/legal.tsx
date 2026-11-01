@@ -60,7 +60,7 @@ export function LegalPage({
             <PolicyLanguageSwitch path={POLICY_PATHS[policy]} lang={lang} label={chrome.languageLabel} />
           </div>
           <h1 className="font-display text-4xl font-bold tracking-tight md:text-5xl">{text.title}</h1>
-          <p className="mt-3 text-sm text-navy/60">{chrome.lastUpdated(formatPolicyDate(POLICIES_UPDATED, lang))}</p>
+          <p className="mt-3 text-sm text-navy/60">{chrome.lastUpdated(formatPolicyDate(POLICIES_UPDATED[policy], lang))}</p>
           {lang !== 'en' ? (
             <p className="mt-2 max-w-2xl text-sm text-navy/60">
               {chrome.translationNote}{' '}
