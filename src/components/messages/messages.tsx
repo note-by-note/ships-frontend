@@ -3,8 +3,9 @@
 // Messages between a mentor and their student.
 //
 // One conversation per pairing. The list sits beside the open conversation
-// on wide screens; on phones you see one or the other. New messages are
-// checked every few seconds while a conversation is open.
+// on wide screens, where it can be closed to give the chat more room; on
+// phones you see one or the other. New messages are checked every few seconds
+// while a conversation is open.
 //
 // Students are often minors, so the page says plainly that staff can read
 // messages, and either side can report a message.
@@ -22,6 +23,60 @@ import { useAuth } from '../account/auth-provider';
 const MAX_LENGTH = 2000;
 export const MESSAGES_CHANGED = 'nbn:messages-changed';
 const POLL_MS = 8000;
+const LIST_CLOSED_KEY = 'nbn.chatListClosed';
+
+function savedListOpen(): boolean {
+  try {
+    return window.localStorage.getItem(LIST_CLOSED_KEY) !== '1';
+  } catch {
+    return true;
+  }
+}
+
+/**
+ * Whether wide screens show the conversation list. Remembered because each
+ * conversation is its own page, and shared by both kinds of chat. The list only
+ * shows once the conversations have loaded, so reading storage here can't differ
+ * from the server render.
+ */
+export function useConversationList() {
+  const [listOpen, setListOpen] = useState(savedListOpen);
+
+  function toggleList() {
+    setListOpen(!listOpen);
+    try {
+      if (listOpen) window.localStorage.setItem(LIST_CLOSED_KEY, '1');
+      else window.localStorage.removeItem(LIST_CLOSED_KEY);
+    } catch {
+      /* private mode: the choice just isn't remembered */
+    }
+  }
+
+  return { listOpen, toggleList };
+}
+
+/** Opens and closes the conversation list. With it closed, shows how many messages are waiting in there. */
+export function ConversationListToggle({ open, unread, onToggle }: { open: boolean; unread: number; onToggle: () => void }) {
+  return (
+    <button
+      type="button"
+      onClick={onToggle}
+      className="inline-flex min-h-9 items-center gap-2 rounded-lg border border-line-strong bg-white px-3 text-sm font-medium text-navy hover:bg-paper"
+    >
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" aria-hidden className="size-4">
+        <rect x="3" y="4" width="18" height="16" rx="2" />
+        <path d="M9 4v16" />
+      </svg>
+      {open ? 'Hide conversations' : 'Show conversations'}
+      {!open && unread ? (
+        <span className="rounded-full bg-gold px-2 py-0.5 text-xs font-bold">
+          {unread}
+          <span className="sr-only"> unread</span>
+        </span>
+      ) : null}
+    </button>
+  );
+}
 
 export function shortTime(iso: string): string {
   const date = new Date(iso);
@@ -49,6 +104,7 @@ export function SafetyNote({ className }: { className?: string }) {
 export function MessagesHome({ selected }: { selected?: string }) {
   const [conversations, setConversations] = useState<Conversation[] | null>(null);
   const [error, setError] = useState<string | null>(null);
+  const { listOpen, toggleList } = useConversationList();
 
   const load = useCallback(() => {
     api
@@ -79,53 +135,59 @@ export function MessagesHome({ selected }: { selected?: string }) {
 
   // With nothing chosen, wide screens open the most recent conversation.
   const open = selected ?? conversations[0].pairingId;
+  const unread = conversations.reduce((total, conversation) => total + conversation.unread, 0);
 
   return (
-    <div className="grid gap-6 lg:grid-cols-[300px_minmax(0,1fr)]">
-      <nav aria-label="Conversations" className={cx(selected && 'hidden lg:block')}>
-        <ul className="flex flex-col gap-2">
-          {conversations.map((conversation) => {
-            const active = conversation.pairingId === open;
-            return (
-              <li key={conversation.pairingId}>
-                <Link
-                  href={`/dashboard/messages/${conversation.pairingId}`}
-                  aria-current={active ? 'page' : undefined}
-                  className={cx(
-                    'flex items-center gap-3 rounded-2xl p-3 transition-colors',
-                    active ? 'bg-white shadow-sm lg:ring-2 lg:ring-navy' : 'bg-white/60 hover:bg-white',
-                  )}
-                >
-                  <Avatar name={conversation.with} photoPath={conversation.withPhotoPath} className="size-11 text-sm" />
-                  <span className="min-w-0 flex-1">
-                    <span className="flex items-baseline justify-between gap-2">
-                      <span className="truncate font-semibold text-navy">{conversation.with}</span>
-                      {conversation.lastMessage ? (
-                        <span className="shrink-0 text-xs text-ink-faint">{shortTime(conversation.lastMessage.createdAt)}</span>
-                      ) : null}
-                    </span>
-                    <span className="flex items-center justify-between gap-2">
-                      <span className="truncate text-sm text-ink-soft">
-                        {conversation.lastMessage
-                          ? `${conversation.lastMessage.mine ? 'You: ' : ''}${conversation.lastMessage.body}`
-                          : `${conversation.instrument} · Say hello`}
+    <div className="flex flex-col gap-3">
+      <div className="hidden lg:block">
+        <ConversationListToggle open={listOpen} unread={unread} onToggle={toggleList} />
+      </div>
+      <div className={cx('grid gap-6', listOpen ? 'lg:grid-cols-[300px_minmax(0,1fr)]' : 'lg:grid-cols-[minmax(0,1fr)]')}>
+        <nav aria-label="Conversations" className={cx(selected && 'hidden', listOpen ? 'lg:block' : 'lg:hidden')}>
+          <ul className="flex flex-col gap-2">
+            {conversations.map((conversation) => {
+              const active = conversation.pairingId === open;
+              return (
+                <li key={conversation.pairingId}>
+                  <Link
+                    href={`/dashboard/messages/${conversation.pairingId}`}
+                    aria-current={active ? 'page' : undefined}
+                    className={cx(
+                      'flex items-center gap-3 rounded-2xl p-3 transition-colors',
+                      active ? 'bg-white shadow-sm lg:ring-2 lg:ring-navy' : 'bg-white/60 hover:bg-white',
+                    )}
+                  >
+                    <Avatar name={conversation.with} photoPath={conversation.withPhotoPath} className="size-11 text-sm" />
+                    <span className="min-w-0 flex-1">
+                      <span className="flex items-baseline justify-between gap-2">
+                        <span className="truncate font-semibold text-navy">{conversation.with}</span>
+                        {conversation.lastMessage ? (
+                          <span className="shrink-0 text-xs text-ink-faint">{shortTime(conversation.lastMessage.createdAt)}</span>
+                        ) : null}
                       </span>
-                      {conversation.unread ? (
-                        <span className="shrink-0 rounded-full bg-gold px-2 py-0.5 text-xs font-bold text-navy">
-                          {conversation.unread}
+                      <span className="flex items-center justify-between gap-2">
+                        <span className="truncate text-sm text-ink-soft">
+                          {conversation.lastMessage
+                            ? `${conversation.lastMessage.mine ? 'You: ' : ''}${conversation.lastMessage.body}`
+                            : `${conversation.instrument} · Say hello`}
                         </span>
-                      ) : null}
+                        {conversation.unread ? (
+                          <span className="shrink-0 rounded-full bg-gold px-2 py-0.5 text-xs font-bold text-navy">
+                            {conversation.unread}
+                          </span>
+                        ) : null}
+                      </span>
                     </span>
-                  </span>
-                </Link>
-              </li>
-            );
-          })}
-        </ul>
-      </nav>
+                  </Link>
+                </li>
+              );
+            })}
+          </ul>
+        </nav>
 
-      <div className={cx(!selected && 'hidden lg:block')}>
-        <Thread key={open} pairingId={open} onActivity={load} />
+        <div className={cx(!selected && 'hidden lg:block')}>
+          <Thread key={open} pairingId={open} onActivity={load} />
+        </div>
       </div>
     </div>
   );

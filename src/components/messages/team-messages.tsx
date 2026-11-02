@@ -7,9 +7,10 @@
 // for their team or as themselves; mentors write as themselves, so a question
 // to Tech isn't seen by every mentor. Anyone in a conversation can bring in
 // another team, and messages can be images: chosen with the button or pasted
-// into the box. The list sits beside the open conversation on wide screens;
-// on phones you see one or the other. Used in the staff area and on the
-// mentor dashboard, which pass their own `base` path.
+// into the box. The list sits beside the open conversation on wide screens,
+// where it can be closed to give the chat more room; on phones you see one or
+// the other. Used in the staff area and on the mentor dashboard, which pass
+// their own `base` path.
 
 import Link from 'next/link';
 import { useRouter } from 'next/navigation';
@@ -28,7 +29,7 @@ import {
 } from '@/lib/types';
 import { useAuth } from '../account/auth-provider';
 import { ConductGate } from '../policies/conduct-acceptance';
-import { dayLabel, shortTime } from './messages';
+import { ConversationListToggle, dayLabel, shortTime, useConversationList } from './messages';
 import { ReportConcernButton } from '../policies/report-concern';
 import { Alert, Button, Spinner, cx } from '../ui';
 import { Field, TextInput } from '../ui/fields';
@@ -91,6 +92,7 @@ export function TeamMessagesHome({ base, selected }: { base: string; selected?: 
   const [error, setError] = useState<string | null>(null);
   const [showAll, setShowAll] = useState(false);
   const [composing, setComposing] = useState(false);
+  const { listOpen, toggleList } = useConversationList();
 
   const load = useCallback(() => {
     api
@@ -117,52 +119,63 @@ export function TeamMessagesHome({ base, selected }: { base: string; selected?: 
   const focused = Boolean(selected) || composing;
 
   return (
-    <div className="grid gap-6 lg:grid-cols-[320px_minmax(0,1fr)]">
-      <div className={cx('flex flex-col gap-3', focused && 'hidden lg:flex')}>
-        <Button type="button" onClick={() => setComposing(true)}>
-          New conversation
-        </Button>
-        {meta.canReviewAll ? (
-          <div className="flex gap-2" role="group" aria-label="Which conversations">
-            <button type="button" aria-pressed={!showAll} onClick={() => setShowAll(false)} className={chip(!showAll)}>
-              Mine
-            </button>
-            <button type="button" aria-pressed={showAll} onClick={() => setShowAll(true)} className={chip(showAll)}>
-              Every team&apos;s
-            </button>
-          </div>
+    <div className="flex flex-col gap-3">
+      <div className="hidden items-center justify-between gap-3 lg:flex">
+        <ConversationListToggle open={listOpen} unread={meta.unread} onToggle={toggleList} />
+        {/* New conversation lives in the list, so it's here while the list is closed. */}
+        {!listOpen && !composing && open ? (
+          <Button type="button" size="sm" onClick={() => setComposing(true)}>
+            New conversation
+          </Button>
         ) : null}
-        {threads.length ? (
-          <nav aria-label="Team conversations">
-            <ul className="flex flex-col gap-2">
-              {threads.map((thread) => (
-                <li key={thread.id}>
-                  <ThreadLink thread={thread} href={`${base}/${thread.id}`} active={!composing && thread.id === open} onOpen={() => setComposing(false)} />
-                </li>
-              ))}
-            </ul>
-          </nav>
-        ) : (
-          <p className="rounded-2xl bg-white/60 p-4 text-sm text-ink-soft">
-            {showAll ? 'No team conversations yet.' : 'No conversations yet. Start one to ask another team something or share an update.'}
-          </p>
-        )}
       </div>
+      <div className={cx('grid gap-6', listOpen ? 'lg:grid-cols-[320px_minmax(0,1fr)]' : 'lg:grid-cols-[minmax(0,1fr)]')}>
+        <div className={cx('flex-col gap-3', focused ? 'hidden' : 'flex', listOpen ? 'lg:flex' : 'lg:hidden')}>
+          <Button type="button" onClick={() => setComposing(true)}>
+            New conversation
+          </Button>
+          {meta.canReviewAll ? (
+            <div className="flex gap-2" role="group" aria-label="Which conversations">
+              <button type="button" aria-pressed={!showAll} onClick={() => setShowAll(false)} className={chip(!showAll)}>
+                Mine
+              </button>
+              <button type="button" aria-pressed={showAll} onClick={() => setShowAll(true)} className={chip(showAll)}>
+                Every team&apos;s
+              </button>
+            </div>
+          ) : null}
+          {threads.length ? (
+            <nav aria-label="Team conversations">
+              <ul className="flex flex-col gap-2">
+                {threads.map((thread) => (
+                  <li key={thread.id}>
+                    <ThreadLink thread={thread} href={`${base}/${thread.id}`} active={!composing && thread.id === open} onOpen={() => setComposing(false)} />
+                  </li>
+                ))}
+              </ul>
+            </nav>
+          ) : (
+            <p className="rounded-2xl bg-white/60 p-4 text-sm text-ink-soft">
+              {showAll ? 'No team conversations yet.' : 'No conversations yet. Start one to ask another team something or share an update.'}
+            </p>
+          )}
+        </div>
 
-      <div className={cx(!focused && 'hidden lg:block')}>
-        {composing || !open ? (
-          <NewConversation
-            meta={meta}
-            onCancel={threads.length ? () => setComposing(false) : undefined}
-            onCreated={(id) => {
-              setComposing(false);
-              load();
-              router.push(`${base}/${id}`);
-            }}
-          />
-        ) : (
-          <Thread key={open} id={open} base={base} meta={meta} onActivity={load} />
-        )}
+        <div className={cx(!focused && 'hidden lg:block')}>
+          {composing || !open ? (
+            <NewConversation
+              meta={meta}
+              onCancel={threads.length ? () => setComposing(false) : undefined}
+              onCreated={(id) => {
+                setComposing(false);
+                load();
+                router.push(`${base}/${id}`);
+              }}
+            />
+          ) : (
+            <Thread key={open} id={open} base={base} meta={meta} onActivity={load} />
+          )}
+        </div>
       </div>
     </div>
   );
@@ -504,7 +517,7 @@ function Thread({ id, base, meta, onActivity }: { id: string; base: string; meta
             </button>
           </div>
         ) : null}
-        <ol className="flex flex-col gap-3">
+        <ol className="flex flex-col">
           {messages.map((message, index) => {
             const day = dayLabel(message.createdAt);
             const showDay = day !== lastDay;
@@ -513,7 +526,8 @@ function Thread({ id, base, meta, onActivity }: { id: string; base: string; meta
             // Name and team once per run of messages from the same person.
             const showName = !message.mine && (showDay || previous?.kind !== 'message' || previous.senderName !== message.senderName);
             return (
-              <li key={message.id} className="flex flex-col">
+              // The whole row, with no gaps between rows, so Reply shows when you're near a message too.
+              <li key={message.id} className="group flex flex-col py-1.5">
                 {showDay ? <p className="my-3 text-center text-xs font-semibold text-ink-faint">{day}</p> : null}
                 {message.kind === 'teams-added' ? (
                   <p className="self-center rounded-full bg-paper px-3 py-1 text-xs text-ink-soft">
@@ -559,7 +573,8 @@ function Thread({ id, base, meta, onActivity }: { id: string; base: string; meta
                           type="button"
                           onClick={() => replyTo(message)}
                           aria-label={`Reply to ${message.mine ? 'your message' : message.senderName}`}
-                          className="font-semibold text-navy/70 underline-offset-2 hover:text-navy hover:underline"
+                          // Only hidden where there's a mouse to bring it back: phones always show it, and so does tabbing to it.
+                          className="font-semibold text-navy/70 underline-offset-2 transition-opacity group-hover:opacity-100 hover:text-navy hover:underline focus-visible:opacity-100 [@media(hover:hover)]:opacity-0"
                         >
                           Reply
                         </button>
