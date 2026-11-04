@@ -3,9 +3,9 @@
 // Two dashboard cards about agreements:
 //   - a reminder to accept the Code of Conduct (and Terms), for anyone who
 //     hasn't accepted the current version
-//   - for students under 18, getting a parent or guardian's consent: copy a
-//     private link to send them, or have the site email the guardian on the
-//     application, in English, Spanish or French
+//   - for students under 18, getting a parent or guardian's consent: copy or
+//     share a private link to send them, or have the site email the guardian on
+//     the application, in any of the policy languages
 
 import Link from 'next/link';
 import { useEffect, useState } from 'react';
@@ -72,12 +72,32 @@ export function ParentConsentCard({ className }: { className?: string }) {
         await navigator.clipboard.writeText(url);
         setNotice('Link copied. Send it to them by text or email. Any link you made before no longer works.');
       } catch {
-        setNotice('Here’s the link. Copy it and send it to them by text or email.');
+        setNotice('Here’s the link. Send it to them by text or email. Any link you made before no longer works.');
       }
     } catch (err) {
       setError(err instanceof ApiError ? err.message : 'We couldn’t make a link. Please try again.');
     } finally {
       setBusy(null);
+    }
+  }
+
+  // Phones only allow copying and sharing straight after a tap, and making the
+  // link takes a moment. So the first copy can fail, and these buttons always work.
+  async function copyLink(key: string) {
+    setError(null);
+    try {
+      await navigator.clipboard.writeText(consentUrl(key));
+      setNotice('Link copied. Send it to them by text or email.');
+    } catch {
+      setNotice('We couldn’t copy it. Press and hold the link above to copy it.');
+    }
+  }
+
+  async function shareLink(key: string) {
+    try {
+      await navigator.share({ title: 'Parent or guardian consent for Note by Note', url: consentUrl(key) });
+    } catch {
+      /* they closed the share menu */
     }
   }
 
@@ -137,6 +157,18 @@ export function ParentConsentCard({ className }: { className?: string }) {
           onFocus={(e) => e.target.select()}
           className="mt-3 w-full rounded-lg border border-line bg-paper px-3 py-2 text-xs text-ink-soft"
         />
+      ) : null}
+      {token ? (
+        <div className="mt-2 flex flex-wrap gap-2">
+          <Button size="sm" variant="secondary" onClick={() => copyLink(token)}>
+            Copy link
+          </Button>
+          {typeof navigator.share === 'function' ? (
+            <Button size="sm" variant="secondary" onClick={() => shareLink(token)}>
+              Share link
+            </Button>
+          ) : null}
+        </div>
       ) : null}
       {notice ? <p className="mt-2 text-sm text-ok">{notice}</p> : null}
       {error ? <p className="mt-2 text-sm text-danger">{error}</p> : null}

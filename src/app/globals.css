@@ -78,6 +78,21 @@
   ::selection {
     background-color: var(--color-accent-soft);
   }
+
+  @media (pointer: coarse) {
+    /* iPhones zoom the whole page when you tap into a box with text under 16px. */
+    input,
+    select,
+    textarea {
+      font-size: 16px !important;
+    }
+
+    input[type='checkbox'],
+    input[type='radio'] {
+      width: 1.25rem !important;
+      height: 1.25rem !important;
+    }
+  }
 }
 
 @layer utilities {

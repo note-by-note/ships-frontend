@@ -27,8 +27,8 @@ const BUTTON_VARIANTS: Record<ButtonVariant, string> = {
 };
 
 const BUTTON_SIZES = {
-  sm: 'h-8 px-3',
-  md: 'h-10 px-4',
+  sm: 'h-8 px-3 pointer-coarse:h-10',
+  md: 'h-10 px-4 pointer-coarse:h-11',
   lg: 'h-11 px-6',
 };
 

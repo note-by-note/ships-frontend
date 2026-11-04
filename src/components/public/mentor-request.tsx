@@ -366,7 +366,7 @@ export function RequestDialog({ mentor, onClose }: { mentor: RequestableMentor; 
       className="fixed inset-0 z-50 flex items-end justify-center bg-navy/50 p-0 sm:items-center sm:p-6"
       onClick={(event) => event.target === event.currentTarget && onClose()}
     >
-      <div className="max-h-[90vh] w-full max-w-lg overflow-y-auto rounded-t-3xl bg-cream p-6 shadow-2xl sm:rounded-3xl sm:p-8">
+      <div className="max-h-[90dvh] w-full max-w-lg overflow-y-auto rounded-t-3xl bg-cream p-6 shadow-2xl sm:rounded-3xl sm:p-8">
         <div className="mb-5 flex items-start justify-between gap-4">
           <h2 id="request-title" className="font-display text-2xl font-bold text-navy">
             Request {firstName}

@@ -155,7 +155,7 @@ export function ReportConcernButton({
       </button>
       {open ? (
         <div role="dialog" aria-modal="true" aria-labelledby="report-title" className="fixed inset-0 z-50 flex items-center justify-center bg-navy/50 p-4">
-          <div className="max-h-[90vh] w-full max-w-lg overflow-y-auto rounded-2xl bg-white p-6 shadow-xl">
+          <div className="max-h-[90dvh] w-full max-w-lg overflow-y-auto rounded-2xl bg-white p-6 shadow-xl">
             <h2 id="report-title" className="mb-4 font-display text-xl font-bold text-navy">Report a concern</h2>
             <ReportConcernForm kind={kind} targetId={targetId} about={about} onDone={() => setOpen(false)} onCancel={() => setOpen(false)} />
           </div>

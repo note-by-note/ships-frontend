@@ -7,7 +7,7 @@
 
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
-import { Fragment, type ReactNode } from 'react';
+import { Fragment, useEffect, useRef, type ReactNode } from 'react';
 import { Icon, type IconName } from '../public/marketing';
 import { cx } from '../ui';
 
@@ -40,15 +40,22 @@ export function DashboardShell({
   const under = (href: string) => pathname === href || pathname.startsWith(`${href}/`);
   const isActive = (link: ShellLink) =>
     link.exact ? pathname === link.href : under(link.href) || Boolean(link.also?.some(under));
+  const nav = useRef<HTMLElement>(null);
+
+  // On small screens the tabs scroll sideways, so bring the open one into view.
+  useEffect(() => {
+    const open = nav.current?.querySelector<HTMLElement>('[aria-current="page"]');
+    if (nav.current && open) nav.current.scrollLeft = open.offsetLeft - (nav.current.clientWidth - open.offsetWidth) / 2;
+  }, [pathname]);
 
   return (
-    <div className="flex min-h-[calc(100vh-4rem)] flex-col bg-cream lg:flex-row">
+    <div className="flex min-h-[calc(100dvh-4rem)] flex-col bg-cream lg:flex-row">
       <aside className="shrink-0 bg-navy text-cream lg:w-64 print:hidden">
         <div className="hidden px-6 pt-8 pb-4 lg:block">
           <p className="font-display text-lg font-bold">{title}</p>
           {subtitle ? <p className="mt-1 text-xs text-cream/60">{subtitle}</p> : null}
         </div>
-        <nav aria-label={title} className="flex gap-1 overflow-x-auto px-3 py-3 lg:flex-col lg:overflow-visible lg:py-2">
+        <nav ref={nav} aria-label={title} className="relative flex gap-1 overflow-x-auto px-3 py-3 lg:flex-col lg:overflow-visible lg:py-2">
           {links.map((link, index) => {
             const active = isActive(link);
             const heading = link.group && link.group !== links[index - 1]?.group ? link.group : null;

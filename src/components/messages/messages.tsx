@@ -78,6 +78,18 @@ export function ConversationListToggle({ open, unread, onToggle }: { open: boole
   );
 }
 
+/**
+ * Whether this key press sends the message. A phone keyboard has no Shift+Enter,
+ * so there Enter starts a new line and the Send button sends. Enter also doesn't
+ * send while it's picking characters, as it does when typing Chinese.
+ */
+export function enterSends(event: KeyboardEvent<HTMLTextAreaElement>) {
+  return event.key === 'Enter' && !event.shiftKey && !event.nativeEvent.isComposing && !window.matchMedia('(pointer: coarse)').matches;
+}
+
+/** Makes the small buttons under a message easy to tap, without moving anything. */
+export const MESSAGE_ACTION_TAP = 'pointer-coarse:-my-2 pointer-coarse:px-2 pointer-coarse:py-2 pointer-coarse:text-xs';
+
 export function shortTime(iso: string): string {
   const date = new Date(iso);
   const today = new Date();
@@ -263,7 +275,7 @@ function Thread({ pairingId, onActivity }: { pairingId: string; onActivity: () =
 
   function onKeyDown(event: KeyboardEvent<HTMLTextAreaElement>) {
     // Enter sends; Shift+Enter starts a new line.
-    if (event.key === 'Enter' && !event.shiftKey) {
+    if (enterSends(event)) {
       event.preventDefault();
       void send();
     }
@@ -274,7 +286,7 @@ function Thread({ pairingId, onActivity }: { pairingId: string; onActivity: () =
   let lastDay = '';
 
   return (
-    <section className="flex h-[min(75vh,720px)] flex-col overflow-hidden rounded-2xl bg-white shadow-sm" aria-label={`Conversation with ${thread.with}`}>
+    <section className="flex h-[min(75dvh,720px)] flex-col overflow-hidden rounded-2xl bg-white shadow-sm" aria-label={`Conversation with ${thread.with}`}>
       <header className="flex items-center gap-3 border-b border-line px-4 py-3">
         <Link href="/dashboard/messages" className="rounded-full p-1 text-navy/60 hover:bg-paper lg:hidden" aria-label="All conversations">
           ←
@@ -323,7 +335,7 @@ function Thread({ pairingId, onActivity }: { pairingId: string; onActivity: () =
                       message.reported ? (
                         <span className="text-warn">· Reported</span>
                       ) : (
-                        <button type="button" onClick={() => setReporting(message)} className="underline-offset-2 hover:text-danger hover:underline">
+                        <button type="button" onClick={() => setReporting(message)} className={cx('underline-offset-2 hover:text-danger hover:underline', MESSAGE_ACTION_TAP)}>
                           Report
                         </button>
                       )

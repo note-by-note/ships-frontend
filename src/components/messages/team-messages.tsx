@@ -29,7 +29,7 @@ import {
 } from '@/lib/types';
 import { useAuth } from '../account/auth-provider';
 import { ConductGate } from '../policies/conduct-acceptance';
-import { ConversationListToggle, dayLabel, shortTime, useConversationList } from './messages';
+import { ConversationListToggle, MESSAGE_ACTION_TAP, dayLabel, enterSends, shortTime, useConversationList } from './messages';
 import { ReportConcernButton } from '../policies/report-concern';
 import { Alert, Button, Spinner, cx } from '../ui';
 import { Field, TextInput } from '../ui/fields';
@@ -46,7 +46,7 @@ function sendError(err: unknown, fallback: string) {
 }
 
 const chip = (on: boolean) =>
-  cx('rounded-full border px-3 py-1 text-sm', on ? 'border-navy bg-navy text-cream' : 'border-line-strong bg-white text-ink-soft');
+  cx('rounded-full border px-3 py-1 text-sm pointer-coarse:py-2', on ? 'border-navy bg-navy text-cream' : 'border-line-strong bg-white text-ink-soft');
 
 /**
  * Unread team messages for a sidebar badge. Checked on every page change and
@@ -447,7 +447,7 @@ function Thread({ id, base, meta, onActivity }: { id: string; base: string; meta
 
   function onKeyDown(event: KeyboardEvent<HTMLTextAreaElement>) {
     // Enter sends; Shift+Enter starts a new line; Escape stops replying to a message.
-    if (event.key === 'Enter' && !event.shiftKey) {
+    if (enterSends(event)) {
       event.preventDefault();
       void send();
     } else if (event.key === 'Escape' && replyingTo) {
@@ -475,7 +475,7 @@ function Thread({ id, base, meta, onActivity }: { id: string; base: string; meta
   let lastDay = '';
 
   return (
-    <section className="flex h-[min(78vh,760px)] flex-col overflow-hidden rounded-2xl bg-white shadow-sm" aria-label={thread.subject}>
+    <section className="flex h-[min(78dvh,760px)] flex-col overflow-hidden rounded-2xl bg-white shadow-sm" aria-label={thread.subject}>
       <header className="border-b border-line px-4 py-3">
         <div className="flex items-start gap-3">
           <Link href={base} className="rounded-full p-1 text-navy/60 hover:bg-paper lg:hidden" aria-label="All team conversations">
@@ -574,7 +574,10 @@ function Thread({ id, base, meta, onActivity }: { id: string; base: string; meta
                           onClick={() => replyTo(message)}
                           aria-label={`Reply to ${message.mine ? 'your message' : message.senderName}`}
                           // Only hidden where there's a mouse to bring it back: phones always show it, and so does tabbing to it.
-                          className="font-semibold text-navy/70 underline-offset-2 transition-opacity group-hover:opacity-100 hover:text-navy hover:underline focus-visible:opacity-100 [@media(hover:hover)]:opacity-0"
+                          className={cx(
+                            'font-semibold text-navy/70 underline-offset-2 transition-opacity group-hover:opacity-100 hover:text-navy hover:underline focus-visible:opacity-100 [@media(hover:hover)]:opacity-0',
+                            MESSAGE_ACTION_TAP,
+                          )}
                         >
                           Reply
                         </button>
@@ -766,7 +769,7 @@ function TeamImage({ threadId, messageId, alt }: { threadId: string; messageId: 
       {open ? (
         <div role="dialog" aria-modal="true" aria-label={alt} onClick={() => setOpen(false)} className="fixed inset-0 z-50 flex flex-col items-center justify-center gap-3 bg-navy/80 p-4">
           {/* eslint-disable-next-line @next/next/no-img-element -- a private image, fetched while signed in */}
-          <img src={url} alt={alt} onClick={(event) => event.stopPropagation()} className="max-h-[85vh] max-w-full rounded-lg object-contain" />
+          <img src={url} alt={alt} onClick={(event) => event.stopPropagation()} className="max-h-[85dvh] max-w-full rounded-lg object-contain" />
           <div className="flex gap-2" onClick={(event) => event.stopPropagation()}>
             <a href={url} download="team-image.jpg" className="rounded-full bg-cream px-4 py-1.5 text-sm font-semibold text-navy">
               Save

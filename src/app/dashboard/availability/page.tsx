@@ -2,8 +2,9 @@
 
 // A mentor's weekly availability: a grid of 30-minute blocks across the
 // program's lesson hours (weekdays 4–8 PM, weekends 8 AM–8 PM — set in the
-// API's util/scheduling.ts). Click or drag to mark blocks free. Lesson times
-// are then agreed inside these blocks on the Lessons page.
+// API's util/scheduling.ts). Click or drag to mark blocks free, or tap them on a
+// touch screen, where dragging scrolls instead. Lesson times are then agreed
+// inside these blocks on the Lessons page.
 //
 // Blocks a student has an accepted lesson in are shown in coral with their
 // name, and are locked: the lesson has to move (on the Lessons page) before
@@ -30,6 +31,8 @@ interface Booking {
 
 const blockKey = (day: Weekday, slot: string) => `${day} ${slot}`;
 
+const CELL_HEIGHT = 'h-7 pointer-coarse:h-10';
+
 /** Every block an accepted lesson touches, e.g. a 45-minute lesson at 16:30 takes 16:30 and 17:00. */
 function bookingsFrom(pairings: Pairing[], blockMinutes: number): Map<string, Booking> {
   const map = new Map<string, Booking>();
@@ -54,6 +57,7 @@ export default function AvailabilityPage() {
   const [error, setError] = useState<string | null>(null);
   const [status, setStatus] = useState<'idle' | 'saving' | 'saved'>('idle');
   const paint = useRef<boolean | null>(null);
+  const usingMouse = useRef(false);
 
   useEffect(() => {
     Promise.all([
@@ -136,19 +140,21 @@ export default function AvailabilityPage() {
 
   const totalHours = WEEKDAYS.reduce((sum, day) => sum + free[day].size, 0) * (rules.blockMinutes / 60);
 
+  const saveControls = (
+    <>
+      {status === 'saved' ? <span className="text-sm text-ok">Saved</span> : null}
+      <Button onClick={save} disabled={status === 'saving'}>
+        {status === 'saving' ? 'Saving…' : 'Save availability'}
+      </Button>
+    </>
+  );
+
   return (
     <>
       <DashboardHeading
         title="My availability"
         description={`Mark the times you could teach each week. Lessons are 30 to 60 minutes and are agreed with your student inside these times. All times are ${zoneLabel(profile.timeZone ?? 'America/Toronto')}.`}
-        actions={
-          <>
-            {status === 'saved' ? <span className="text-sm text-ok">Saved</span> : null}
-            <Button onClick={save} disabled={status === 'saving'}>
-              {status === 'saving' ? 'Saving…' : 'Save availability'}
-            </Button>
-          </>
-        }
+        actions={saveControls}
       />
 
       {error ? <div className="mb-4"><Alert>{error}</Alert></div> : null}
@@ -156,7 +162,7 @@ export default function AvailabilityPage() {
       <Panel>
         <p className="mb-4 text-sm text-ink-soft">
           Lesson hours: weekdays {formatTime(rules.windows.Mon.start)}–{formatTime(rules.windows.Mon.end)}, weekends{' '}
-          {formatTime(rules.windows.Sat.start)}–{formatTime(rules.windows.Sat.end)}. Click or drag across blocks.{' '}
+          {formatTime(rules.windows.Sat.start)}–{formatTime(rules.windows.Sat.end)}. Click or drag across blocks, or tap them on a phone.{' '}
           <strong className="text-ink">{totalHours} hour{totalHours === 1 ? '' : 's'}</strong> marked.
         </p>
 
@@ -171,14 +177,14 @@ export default function AvailabilityPage() {
           <table className="w-full min-w-[640px] border-separate border-spacing-1 select-none">
             <thead>
               <tr>
-                <th scope="col" className="w-20" />
+                <th scope="col" className="sticky left-0 z-10 w-20 bg-white" />
                 {WEEKDAYS.map((day) => (
                   <th key={day} scope="col" className="pb-1 text-center text-sm font-semibold text-navy">
                     {day}
-                    <div className="mt-1 flex justify-center gap-1 text-[11px] font-normal">
-                      <button type="button" className="text-coral hover:underline" onClick={() => setDay(day, true)}>All</button>
+                    <div className="mt-1 flex items-center justify-center gap-1 text-[11px] font-normal">
+                      <button type="button" className="text-coral hover:underline pointer-coarse:px-1.5 pointer-coarse:py-1.5 pointer-coarse:text-xs" onClick={() => setDay(day, true)}>All</button>
                       <span className="text-ink-faint">·</span>
-                      <button type="button" className="text-ink-faint hover:underline" onClick={() => setDay(day, false)}>Clear</button>
+                      <button type="button" className="text-ink-faint hover:underline pointer-coarse:px-1.5 pointer-coarse:py-1.5 pointer-coarse:text-xs" onClick={() => setDay(day, false)}>Clear</button>
                     </div>
                   </th>
                 ))}
@@ -187,12 +193,12 @@ export default function AvailabilityPage() {
             <tbody>
               {rows.map((slot) => (
                 <tr key={slot}>
-                  <th scope="row" className="pr-2 text-right text-xs font-normal whitespace-nowrap text-ink-faint">
+                  <th scope="row" className="sticky left-0 z-10 bg-white pr-2 text-right text-xs font-normal whitespace-nowrap text-ink-faint">
                     {slot.endsWith(':00') ? formatTime(slot) : ''}
                   </th>
                   {WEEKDAYS.map((day) => {
                     if (!inWindow(day, slot)) {
-                      return <td key={day} aria-hidden className="h-7 rounded bg-stone/60" />;
+                      return <td key={day} aria-hidden className={cx(CELL_HEIGHT, 'rounded bg-stone/60')} />;
                     }
                     const booking = booked.get(blockKey(day, slot));
                     if (booking) {
@@ -202,7 +208,7 @@ export default function AvailabilityPage() {
                             role="img"
                             aria-label={`${day} ${formatTime(slot)}: lesson with ${booking.student}`}
                             title={`Lesson with ${booking.student} · ${booking.when}. Change it on the Lessons page.`}
-                            className="flex h-7 w-full cursor-not-allowed items-center overflow-hidden rounded bg-coral px-1.5 text-[11px] leading-none font-semibold whitespace-nowrap text-white"
+                            className={cx(CELL_HEIGHT, 'flex w-full cursor-not-allowed items-center overflow-hidden rounded bg-coral px-1.5 text-[11px] leading-none font-semibold whitespace-nowrap text-white')}
                           >
                             {booking.first ? booking.student : ''}
                           </div>
@@ -217,21 +223,24 @@ export default function AvailabilityPage() {
                           aria-pressed={on}
                           aria-label={`${day} ${formatTime(slot)}`}
                           onPointerDown={(event) => {
+                            // On a touch screen a drag is a scroll, so nothing changes until the tap below.
+                            usingMouse.current = event.pointerType === 'mouse';
+                            if (!usingMouse.current) return;
                             event.preventDefault();
                             paint.current = !on;
+                            setBlock(day, slot, !on);
+                          }}
+                          onClick={(event) => {
+                            // A mouse press was handled above. Taps, keyboards and screen readers arrive here.
+                            if (event.detail > 0 && usingMouse.current) return;
                             setBlock(day, slot, !on);
                           }}
                           onPointerEnter={() => {
                             if (paint.current !== null) setBlock(day, slot, paint.current);
                           }}
-                          onKeyDown={(event) => {
-                            if (event.key === 'Enter' || event.key === ' ') {
-                              event.preventDefault();
-                              setBlock(day, slot, !on);
-                            }
-                          }}
                           className={cx(
-                            'h-7 w-full rounded transition-colors',
+                            CELL_HEIGHT,
+                            'w-full rounded transition-colors',
                             on ? 'bg-sage hover:bg-sage/80' : 'border border-line bg-white hover:bg-sky/30',
                           )}
                         />
@@ -243,6 +252,9 @@ export default function AvailabilityPage() {
             </tbody>
           </table>
         </div>
+
+        {/* The grid is long on a phone, so saving is here too. */}
+        <div className="mt-4 flex items-center justify-end gap-3 lg:hidden">{saveControls}</div>
 
         <p className="mt-4 text-xs text-ink-faint">
           Booked lessons are locked here. To move one, propose a new time on the{' '}

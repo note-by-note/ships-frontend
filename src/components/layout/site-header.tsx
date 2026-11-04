@@ -136,7 +136,7 @@ export function SiteHeader() {
       </div>
 
       {menuOpen ? (
-        <div id="mobile-menu" className="border-t border-cream/10 xl:hidden">
+        <div id="mobile-menu" className="max-h-[calc(100dvh-4rem)] overflow-y-auto overscroll-contain border-t border-cream/10 xl:hidden">
           <nav aria-label="Main" className="mx-auto flex max-w-7xl flex-col px-5 py-4 md:px-8">
             {user ? (
               <>

@@ -98,7 +98,7 @@ export function Chips({
               aria-pressed={on}
               onClick={() => onChange(on ? value.filter((entry) => entry !== option) : [...value, option])}
               className={cx(
-                'rounded-full border px-3 py-1 text-sm transition-colors',
+                'rounded-full border px-3 py-1 text-sm transition-colors pointer-coarse:py-2',
                 on ? 'border-navy bg-navy text-cream' : 'border-line-strong bg-white text-ink-soft hover:border-navy/50',
               )}
             >

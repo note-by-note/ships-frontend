@@ -88,7 +88,7 @@ export function ReviewQueue() {
           type="button"
           onClick={() => setParam('status', '')}
           className={cx(
-            'rounded-full border px-3 py-1 text-sm transition-colors',
+            'rounded-full border px-3 py-1 text-sm transition-colors pointer-coarse:py-2',
             !status ? 'border-accent bg-accent-soft font-medium text-accent' : 'border-line-strong text-ink-soft hover:bg-paper',
           )}
         >
@@ -101,7 +101,7 @@ export function ReviewQueue() {
             type="button"
             onClick={() => setParam('status', entry)}
             className={cx(
-              'rounded-full border px-3 py-1 text-sm transition-colors',
+              'rounded-full border px-3 py-1 text-sm transition-colors pointer-coarse:py-2',
               status === entry
                 ? 'border-accent bg-accent-soft font-medium text-accent'
                 : 'border-line-strong text-ink-soft hover:bg-paper',
