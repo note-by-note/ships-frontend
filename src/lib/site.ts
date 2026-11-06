@@ -7,8 +7,8 @@ import type { PolicyKey } from './policy-languages';
 export const SITE = {
   name: 'Note by Note',
   tagline: 'Free online music tutoring, run by students.',
-  /** Not confirmed yet. Set this and every "Email us" link on the site goes live. */
-  contactEmail: null as string | null,
+  /** Shown on the Contact, FAQ and Partners pages, the home page and the footer. Set to null to hide it. */
+  contactEmail: 'thenotebynote@gmail.com' as string | null,
   /**
    * The Formspree form the contact page sends messages to: the ID at the end
    * of the form's endpoint, https://formspree.io/f/<this part>. While null,
