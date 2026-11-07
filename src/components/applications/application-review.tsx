@@ -289,6 +289,9 @@ export function ApplicationReview({ id }: { id: string }) {
                 </Button>
               ))}
             </div>
+            <p className="mt-3 text-xs text-ink-faint">
+              Accepting, waitlisting or rejecting emails the applicant. The rationale is never included.
+            </p>
           </Card>
 
           <Card className="p-5">
