@@ -7,6 +7,8 @@ import type { PolicyKey } from './policy-languages';
 export const SITE = {
   name: 'Note by Note',
   tagline: 'Free online music tutoring, run by students.',
+  /** The live site's address, used for the sitemap and robots.txt. No slash at the end. */
+  url: 'https://www.notebynote.ca',
   /** Shown on the Contact, FAQ and Partners pages, the home page and the footer. Set to null to hide it. */
   contactEmail: 'thenotebynote@gmail.com' as string | null,
   /**
