@@ -11,6 +11,9 @@
 // above this module.
 
 const BASE_URL = (process.env.NEXT_PUBLIC_API_URL ?? 'http://localhost:4000/api').replace(/\/$/, '');
+
+/** The API's address, for links that point straight at it (the calendar feed). */
+export const API_BASE_URL = BASE_URL;
 const REFRESH_KEY = 'nbn.refresh';
 
 let accessToken: string | null = null;
@@ -194,7 +197,7 @@ function refreshOnce(): Promise<boolean> {
 }
 
 export interface RequestOptions {
-  method?: 'GET' | 'POST' | 'PATCH' | 'DELETE';
+  method?: 'GET' | 'POST' | 'PUT' | 'PATCH' | 'DELETE';
   body?: unknown;
   /** Send this file as the raw body instead of JSON (uploads). */
   file?: Blob;
@@ -256,6 +259,8 @@ export const api = {
     send<T>(path, { ...options, method: 'POST', body }),
   patch: <T>(path: string, body?: unknown, options: RequestOptions = {}) =>
     send<T>(path, { ...options, method: 'PATCH', body }),
+  put: <T>(path: string, body?: unknown, options: RequestOptions = {}) =>
+    send<T>(path, { ...options, method: 'PUT', body }),
   delete: <T>(path: string, options: RequestOptions = {}) => send<T>(path, { ...options, method: 'DELETE' }),
   /** POST a file as the raw request body. */
   upload: <T>(path: string, file: Blob, options: RequestOptions = {}) =>

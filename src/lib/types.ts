@@ -741,4 +741,85 @@ export interface Pairing {
   absences: AbsenceNotice[];
   /** The video call link the mentor set, or null. */
   meetingUrl: string | null;
+  /** The next few lessons, soonest first. */
+  upcoming: LessonEvent[];
+  /** The last few lessons, newest first. */
+  recent: LessonEvent[];
+  /** The last 12 weeks. */
+  attendance: AttendanceCounts;
+}
+
+export type AttendanceStatus = 'held' | 'student_missed' | 'mentor_missed' | 'cancelled';
+
+export interface AttendanceCounts {
+  held: number;
+  student_missed: number;
+  mentor_missed: number;
+  cancelled: number;
+  unmarked: number;
+}
+
+/** One dated lesson, from a weekly lesson time. */
+export interface LessonEvent {
+  /** `${matchId}:${date}` */
+  id: string;
+  matchId: string;
+  side: 'mentor' | 'student';
+  instrument: string;
+  /** The other person in the pairing. */
+  withName: string;
+  /** YYYY-MM-DD in the mentor's time zone. */
+  date: string;
+  start: string;
+  durationMinutes: number;
+  timeZone: string;
+  /** Exact moments, ISO. */
+  startsAt: string;
+  endsAt: string;
+  meetingUrl: string | null;
+  /** What the mentor marked. */
+  attendance: { status: AttendanceStatus; note: string } | null;
+  /** The mark, or "cancelled" when someone said ahead of time they couldn't come. */
+  status: AttendanceStatus | null;
+  notices: { side: 'mentor' | 'student'; message: string }[];
+}
+
+export interface CalendarDate {
+  id: string;
+  title: string;
+  body: string;
+  date: string;
+  endDate: string | null;
+  time: string;
+  link: { url: string; label: string } | null;
+}
+
+export interface CalendarHours {
+  id: string;
+  date: string;
+  minutes: number;
+  activity: string;
+  status: 'pending' | 'approved' | 'declined';
+}
+
+export interface CalendarData {
+  lessons: LessonEvent[];
+  dates: CalendarDate[];
+  hours: CalendarHours[];
+}
+
+export interface AttendanceOverview {
+  weeks: number;
+  totals: AttendanceCounts;
+  pairings: {
+    id: string;
+    instrument: string;
+    mentor: { name: string; slug: string | null };
+    student: { name: string };
+    isTest: boolean;
+    lesson: { day: Weekday; start: string; durationMinutes: number; timeZone: string } | null;
+    counts: AttendanceCounts;
+    recent: { date: string; status: AttendanceStatus | null }[];
+    lastHeld: string | null;
+  }[];
 }

@@ -15,7 +15,8 @@ import { EmptyState, Spinner } from '../ui';
 const STUDENT_LINKS: ShellLink[] = [
   { href: '/dashboard', label: 'Dashboard', icon: 'star', exact: true },
   { href: '/dashboard/announcements', label: 'Announcements', icon: 'megaphone' },
-  { href: '/dashboard/lessons', label: 'Lessons', icon: 'calendar' },
+  { href: '/dashboard/lessons', label: 'Lessons', icon: 'music' },
+  { href: '/dashboard/calendar', label: 'Calendar', icon: 'calendar' },
   { href: '/dashboard/messages', label: 'Messages', icon: 'message' },
   { href: '/dashboard/resources', label: 'Resources', icon: 'book' },
   { href: '/applications', label: 'My applications', icon: 'file' },
@@ -28,7 +29,8 @@ const STUDENT_LINKS: ShellLink[] = [
 const MENTOR_LINKS: ShellLink[] = [
   { href: '/dashboard', label: 'Dashboard', icon: 'star', exact: true },
   { href: '/dashboard/announcements', label: 'Announcements', icon: 'megaphone' },
-  { href: '/dashboard/lessons', label: 'Lessons', icon: 'calendar' },
+  { href: '/dashboard/lessons', label: 'Lessons', icon: 'music' },
+  { href: '/dashboard/calendar', label: 'Calendar', icon: 'calendar' },
   { href: '/dashboard/messages', label: 'Messages', icon: 'message' },
   { href: '/dashboard/team-messages', label: 'Team messages', icon: 'users' },
   { href: '/dashboard/resources', label: 'Resources', icon: 'book' },
