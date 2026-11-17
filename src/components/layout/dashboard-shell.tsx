@@ -117,18 +117,20 @@ export function DashboardHeading({
 
 /** A white dashboard card with an optional heading row. */
 export function Panel({
+  id,
   title,
   action,
   className,
   children,
 }: {
+  id?: string;
   title?: ReactNode;
   action?: ReactNode;
   className?: string;
   children: ReactNode;
 }) {
   return (
-    <section className={cx('rounded-2xl bg-white p-6 shadow-[0_4px_16px_rgba(30,42,68,0.06)]', className)}>
+    <section id={id} className={cx('scroll-mt-24 rounded-2xl bg-white p-6 shadow-[0_4px_16px_rgba(30,42,68,0.06)]', className)}>
       {title || action ? (
         <div className="mb-4 flex items-center justify-between gap-3">
           {title ? <h2 className="font-display text-lg font-bold text-navy">{title}</h2> : <span />}

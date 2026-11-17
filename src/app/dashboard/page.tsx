@@ -51,8 +51,9 @@ function savedView(): Side {
 
 function MentorAndStudentDashboard() {
   // Only rendered once the account has loaded, so reading storage here can't
-  // differ from the server render.
-  const [view, setView] = useState<Side>(savedView);
+  // differ from the server render. "See requests" links here with #requests,
+  // which is on the mentor side.
+  const [view, setView] = useState<Side>(() => (window.location.hash === '#requests' ? 'mentor' : savedView()));
 
   function choose(next: Side) {
     setView(next);
@@ -312,6 +313,18 @@ function MentorDashboard() {
 
   useEffect(load, [load]);
 
+  // The requests box appears once requests load, after the browser has already
+  // looked for #requests. So jump to it then, and on later clicks of "See requests".
+  useEffect(() => {
+    if (!requests) return;
+    const jump = () => {
+      if (window.location.hash === '#requests') document.getElementById('requests')?.scrollIntoView();
+    };
+    jump();
+    window.addEventListener('hashchange', jump);
+    return () => window.removeEventListener('hashchange', jump);
+  }, [requests]);
+
   async function respond(request: MatchRequest, status: 'accepted' | 'declined') {
     if (!profile || profile === 'none') return;
     setError(null);
@@ -370,8 +383,11 @@ function MentorDashboard() {
       <div className="grid gap-6 xl:grid-cols-[1fr_340px]">
         <div className="flex flex-col gap-6">
           <AnnouncementsPanel loaded={notices} href="/dashboard/announcements" />
-          {pending.length ? (
-            <Panel title="Requests waiting for you">
+          <Panel id="requests" title="Requests waiting for you">
+            {!pending.length ? (
+              <p className="text-sm text-ink-soft">No requests right now. When a student asks for you, it shows up here.</p>
+            ) : (
+              <>
               {user!.agreements && !user!.agreements.conduct ? <ConductGate action="accept a student" className="mb-4" /> : null}
               <ul className="flex flex-col gap-4">
                 {pending.map((request) => (
@@ -406,8 +422,9 @@ function MentorDashboard() {
                   </li>
                 ))}
               </ul>
-            </Panel>
-          ) : null}
+              </>
+            )}
+          </Panel>
 
           <NextLessons pairings={pairings} />
 

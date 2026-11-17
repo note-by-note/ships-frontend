@@ -119,7 +119,7 @@ function mentorSteps(profile: OwnProfile | 'none', pairings: Pairing[]): Step[] 
       label: 'Accept your first student',
       detail: 'Requests show up on your dashboard. Accept one to start.',
       done: students.length > 0,
-      action: { href: '/dashboard', label: 'See requests' },
+      action: { href: '/dashboard#requests', label: 'See requests' },
     },
     {
       label: 'Agree a weekly lesson time',
@@ -128,6 +128,15 @@ function mentorSteps(profile: OwnProfile | 'none', pairings: Pairing[]): Step[] 
       action: { href: '/dashboard/lessons', label: 'Propose a time' },
     },
   ];
+}
+
+/**
+ * A link to part of the page you're on ("See requests" on the dashboard) does
+ * nothing once the address already ends with it, so jump there directly.
+ */
+function jumpIfHere(href: string) {
+  const [path, part] = href.split('#');
+  if (part && path === window.location.pathname) document.getElementById(part)?.scrollIntoView();
 }
 
 export function NextSteps({
@@ -212,6 +221,9 @@ export function NextSteps({
                   ) : (
                     <Link
                       href={step.action.href}
+                      onClick={() => jumpIfHere(step.action!.href)}
+                      // The page jumps to its own part (see jumpIfHere and the dashboard), so Next's scrolling would fight it.
+                      scroll={!step.action.href.includes('#')}
                       className="mt-2 inline-block rounded-lg bg-navy px-4 py-2 text-sm font-semibold text-cream hover:bg-navy/90"
                     >
                       {step.action.label}

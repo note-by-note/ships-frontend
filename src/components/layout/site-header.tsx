@@ -25,7 +25,7 @@ const STAFF_LINKS = [
 ];
 
 /** Kept in the bar when signed in; everything else goes under Explore. */
-const SIGNED_IN_KEEP = '/find-a-mentor';
+const SIGNED_IN_KEEP = ['/find-a-mentor', '/partners'];
 
 /** `/?home` shows the front page even when signed in (see SignedInHome). */
 const FRONT_PAGE = { href: '/?home', label: 'Home page' };
@@ -49,9 +49,9 @@ export function SiteHeader() {
         : STAFF_LINKS
       : MEMBER_LINKS
     : [];
-  const exploreLinks = [FRONT_PAGE, ...NAV_LINKS.filter((link) => link.href !== SIGNED_IN_KEEP), { href: '/faq', label: 'FAQ' }];
+  const exploreLinks = [FRONT_PAGE, ...NAV_LINKS.filter((link) => !SIGNED_IN_KEEP.includes(link.href)), { href: '/faq', label: 'FAQ' }];
   const barLinks = user
-    ? [{ href: home, label: 'Dashboard' }, ...NAV_LINKS.filter((link) => link.href === SIGNED_IN_KEEP)]
+    ? [{ href: home, label: 'Dashboard' }, ...NAV_LINKS.filter((link) => SIGNED_IN_KEEP.includes(link.href))]
     : NAV_LINKS;
 
   async function handleSignOut() {

@@ -13,6 +13,7 @@
 import Link from 'next/link';
 import { useEffect, useMemo, useState, type ReactNode } from 'react';
 import { ApiError, api } from '@/lib/api';
+import { publicName } from '@/lib/names';
 import { zoneLabel } from '@/lib/schedule';
 import type { MentorProfile, Options, PageTheme, PublicMentor, ScheduleDay } from '@/lib/types';
 import { Chips, Toggle } from './mentor-profile-form';
@@ -208,6 +209,8 @@ export function MentorPageEditor() {
   const preview: PublicMentor = {
     ...profile,
     ...payloadOf(draft),
+    // As the public sees it: first name and last initial.
+    name: publicName(draft.name.trim()),
     yearsTeaching: draft.yearsTeaching ?? undefined,
     openSchedule: profile.schedule ?? [],
     reviews: [],
@@ -290,8 +293,14 @@ export function MentorPageEditor() {
 
           <Step number={3} title="The basics">
             <div className="grid gap-4 sm:grid-cols-2">
-              <Field label="Your name" required>
-                {({ id }) => <TextInput id={id} value={draft.name} onChange={(e) => set('name', e.target.value)} />}
+              <Field
+                label="Your name"
+                required
+                help={`Your page shows your first name and last initial${draft.name.trim() ? `, “${publicName(draft.name.trim())}”` : ''}. Your students see your full name once you’re matched.`}
+              >
+                {({ id, describedBy }) => (
+                  <TextInput id={id} aria-describedby={describedBy} value={draft.name} onChange={(e) => set('name', e.target.value)} />
+                )}
               </Field>
               <Field label="Pronouns">
                 {({ id }) => (
@@ -470,7 +479,7 @@ export function MentorPageEditor() {
           </Step>
 
           <Step number={8} title="When you're free" intro="Students see your open times. Times you already teach are hidden.">
-            <OpenTimes schedule={profile.schedule ?? []} timeZone={draft.timeZone} name={draft.name || profile.name} />
+            <OpenTimes schedule={profile.schedule ?? []} timeZone={draft.timeZone} name={publicName(draft.name || profile.name)} />
             <Link href="/dashboard/availability" className="self-start rounded-full bg-navy px-5 py-2.5 text-sm font-semibold text-cream">
               Change my times
             </Link>
