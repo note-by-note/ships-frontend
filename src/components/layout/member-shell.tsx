@@ -12,41 +12,38 @@ import { useAnnouncementsUnseen } from '../messages/announcements';
 import { useTeamUnread } from '../messages/team-messages';
 import { EmptyState, Spinner } from '../ui';
 
-const STUDENT_LINKS: ShellLink[] = [
-  { href: '/dashboard', label: 'Dashboard', icon: 'star', exact: true },
+// The sidebar, in sections. Everyone gets the overview, lessons and account
+// sections; mentors also get the tools for teaching and volunteering.
+// (Section headings show on wide screens; phones get one row of tabs.)
+
+const OVERVIEW: ShellLink[] = [
+  { href: '/dashboard', label: 'Dashboard', icon: 'home', exact: true },
   { href: '/dashboard/announcements', label: 'Announcements', icon: 'megaphone' },
-  { href: '/dashboard/lessons', label: 'Lessons', icon: 'music' },
-  { href: '/dashboard/calendar', label: 'Calendar', icon: 'calendar' },
-  { href: '/dashboard/messages', label: 'Messages', icon: 'message' },
-  { href: '/dashboard/resources', label: 'Resources', icon: 'book' },
-  { href: '/applications', label: 'My applications', icon: 'file' },
-  { href: '/apply', label: 'Apply', icon: 'school' },
-  { href: '/dashboard/settings', label: 'Settings', icon: 'mail' },
-  { href: '/dashboard/report', label: 'Report a concern', icon: 'shield' },
-  { href: '/faq', label: 'Help', icon: 'help' },
 ];
 
-const MENTOR_LINKS: ShellLink[] = [
-  { href: '/dashboard', label: 'Dashboard', icon: 'star', exact: true },
-  { href: '/dashboard/announcements', label: 'Announcements', icon: 'megaphone' },
-  { href: '/dashboard/lessons', label: 'Lessons', icon: 'music' },
-  { href: '/dashboard/calendar', label: 'Calendar', icon: 'calendar' },
-  { href: '/dashboard/messages', label: 'Messages', icon: 'message' },
-  { href: '/dashboard/team-messages', label: 'Team messages', icon: 'users' },
-  { href: '/dashboard/resources', label: 'Resources', icon: 'book' },
-  { href: '/dashboard/availability', label: 'My availability', icon: 'clock' },
-  { href: '/dashboard/profile', label: 'My page', icon: 'users' },
-  { href: '/dashboard/hours', label: 'Volunteer hours', icon: 'heart' },
-  { href: '/applications', label: 'My applications', icon: 'file' },
-  { href: '/dashboard/settings', label: 'Settings', icon: 'mail' },
-  { href: '/dashboard/report', label: 'Report a concern', icon: 'shield' },
-  { href: '/faq', label: 'Help', icon: 'help' },
+const LESSONS: ShellLink[] = [
+  { group: 'Lessons', href: '/dashboard/lessons', label: 'Lessons', icon: 'music' },
+  { group: 'Lessons', href: '/dashboard/calendar', label: 'Calendar', icon: 'calendar' },
+  { group: 'Lessons', href: '/dashboard/messages', label: 'Messages', icon: 'message' },
+  { group: 'Lessons', href: '/dashboard/resources', label: 'Resources', icon: 'book' },
 ];
 
-/** A mentor who takes lessons too: the mentor tools, plus applying as a student. */
-const MENTOR_STUDENT_LINKS: ShellLink[] = MENTOR_LINKS.flatMap((link) =>
-  link.href === '/applications' ? [link, { href: '/apply', label: 'Apply', icon: 'school' as const }] : [link],
-);
+const MENTORING: ShellLink[] = [
+  { group: 'Mentoring', href: '/dashboard/profile', label: 'My page', icon: 'user' },
+  { group: 'Mentoring', href: '/dashboard/availability', label: 'Availability', icon: 'clock' },
+  { group: 'Mentoring', href: '/dashboard/hours', label: 'Volunteer hours', icon: 'heart' },
+  { group: 'Mentoring', href: '/dashboard/team-messages', label: 'Team messages', icon: 'users' },
+];
+
+const ACCOUNT: ShellLink[] = [
+  { group: 'Account', href: '/applications', label: 'My applications', icon: 'file' },
+  { group: 'Account', href: '/dashboard/settings', label: 'Settings', icon: 'settings' },
+  { group: 'Account', href: '/dashboard/report', label: 'Report a concern', icon: 'shield' },
+  { group: 'Account', href: '/faq', label: 'Help', icon: 'help' },
+];
+
+const STUDENT_LINKS: ShellLink[] = [...OVERVIEW, ...LESSONS, ...ACCOUNT];
+const MENTOR_LINKS: ShellLink[] = [...OVERVIEW, ...LESSONS, ...MENTORING, ...ACCOUNT];
 
 /**
  * Unread messages for the sidebar badge. Checked on every page change and
@@ -114,13 +111,13 @@ export function MemberShell({ children }: { children: ReactNode }) {
     );
   }
 
-  const base = sides.mentor && sides.student ? MENTOR_STUDENT_LINKS : sides.mentor ? MENTOR_LINKS : STUDENT_LINKS;
+  const base = sides.mentor ? MENTOR_LINKS : STUDENT_LINKS;
   return (
     <DashboardShell
       title={sides.mentor && sides.student ? 'Mentor and student' : sides.mentor ? 'Mentor dashboard' : 'Student dashboard'}
       subtitle={user.name}
       links={[
-        ...(user.isStaff ? [{ href: '/admin', label: 'Staff area', icon: 'shield' as const }] : []),
+        ...(user.isStaff ? [{ href: '/admin', label: 'Staff area', icon: 'star' as const }] : []),
         ...base.map((link) =>
           link.href === '/dashboard/messages'
             ? { ...link, badge: unread }

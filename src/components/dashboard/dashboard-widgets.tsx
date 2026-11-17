@@ -6,7 +6,8 @@
 import Link from 'next/link';
 import { useEffect, useState } from 'react';
 import { api } from '@/lib/api';
-import { formatDate, formatRange, upcomingDates, zoneLabel } from '@/lib/schedule';
+import { formatDate } from '@/lib/schedule';
+import { clockRange, lessonDay } from '@/lib/calendar';
 import type { Conversation, LessonNote, MentorProfile, Pairing, ScheduleDay, SharedResource } from '@/lib/types';
 import { Avatar } from '../ui/avatar';
 import { Panel } from '../layout/dashboard-shell';
@@ -29,9 +30,9 @@ export function useLessonsAndMessages() {
   return { pairings, conversations };
 }
 
-/** The date of the next weekly lesson, counting today. */
-function nextLessonDate(pairing: Pairing): string | null {
-  return pairing.lesson ? upcomingDates(pairing.lesson.day, 1)[0] ?? null : null;
+/** The next lesson that hasn't finished yet. */
+function nextLesson(pairing: Pairing) {
+  return pairing.lesson ? (pairing.upcoming?.[0] ?? null) : null;
 }
 
 export function NextLessons({ pairings }: { pairings: Pairing[] | null }) {
@@ -43,7 +44,8 @@ export function NextLessons({ pairings }: { pairings: Pairing[] | null }) {
       <ul className="flex flex-col gap-3">
         {pairings.map((pairing) => {
           const other = plain((pairing.side === 'mentor' ? pairing.student : pairing.mentor).name);
-          const date = nextLessonDate(pairing);
+          const next = nextLesson(pairing);
+          const date = next?.date ?? null;
           const cancelled = date ? pairing.absences.find((absence) => absence.date === date) : undefined;
           const notices = pairing.absences.filter((absence) => absence.reporterSide !== pairing.side && !absence.acknowledgedAt);
           const toAnswer = pairing.proposal && pairing.proposal.proposedBy !== pairing.side;
@@ -54,10 +56,10 @@ export function NextLessons({ pairings }: { pairings: Pairing[] | null }) {
                 <p className="font-semibold text-ink">
                   {other} · <span className="font-normal text-ink-soft">{pairing.instrument}</span>
                 </p>
-                {pairing.lesson && date ? (
+                {pairing.lesson && next ? (
                   <p className={cx('text-sm', cancelled ? 'text-coral' : 'text-ink-soft')}>
                     {cancelled ? 'Off this week: ' : 'Next: '}
-                    {formatDate(date)}, {formatRange(pairing.lesson.start, pairing.lesson.durationMinutes)} ({zoneLabel(pairing.timeZone)})
+                    {formatDate(lessonDay(next))}, {clockRange(next)}
                   </p>
                 ) : (
                   <p className="text-sm text-ink-soft">No weekly time agreed yet.</p>

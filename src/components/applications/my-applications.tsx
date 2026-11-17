@@ -83,6 +83,12 @@ export function MyApplications() {
 
   return (
     <div className="space-y-4">
+      <p className="text-sm text-ink-soft">
+        Want to apply for something else?{' '}
+        <Link href="/apply" className="font-medium text-accent underline underline-offset-2">
+          See what’s open
+        </Link>
+      </p>
       {error ? <Alert>{error}</Alert> : null}
       {applications.map((application) => (
         <Card key={application.id} className="p-5">
