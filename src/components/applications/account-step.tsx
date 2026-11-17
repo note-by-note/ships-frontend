@@ -121,6 +121,20 @@ export function AccountStep({ onDone }: { onDone: () => void }) {
             />
           )}
         </Field>
+        {mode === 'signin' ? (
+          // A new tab, so the answers typed so far stay on this page.
+          <p className="-mt-1 text-sm">
+            <a
+              href="/forgot-password"
+              target="_blank"
+              rel="noopener"
+              className="font-medium text-accent underline underline-offset-2"
+            >
+              Forgot your password?
+            </a>{' '}
+            <span className="text-ink-soft">(opens in a new tab)</span>
+          </p>
+        ) : null}
 
         {mode === 'register' ? <SignUpAgreement checked={agreed} onChange={setAgreed} /> : null}
 

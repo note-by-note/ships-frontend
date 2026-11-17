@@ -80,6 +80,11 @@ export function SignInForm() {
             />
           )}
         </Field>
+        <p className="-mt-1 text-right text-sm">
+          <Link href="/forgot-password" className="font-medium text-accent underline underline-offset-2">
+            Forgot your password?
+          </Link>
+        </p>
 
         <Button type="submit" size="lg" className="w-full" disabled={busy}>
           {busy ? 'Signing in…' : 'Sign in'}

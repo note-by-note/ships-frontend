@@ -32,6 +32,8 @@ interface AuthValue {
     /** Ticked the Terms, Code of Conduct and Privacy box on the sign-up form. */
     acceptAgreements?: boolean;
   }): Promise<AccountUser>;
+  /** Set a new password with an emailed reset link; signs in with it. */
+  resetPassword(token: string, password: string): Promise<AccountUser>;
   signOut(): Promise<void>;
   refreshUser(): Promise<void>;
   /** True if the signed-in account's role grants this permission. */
@@ -115,6 +117,12 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
       },
       async register(input) {
         const body = await api.post<SessionEnvelope>('/auth/register', input, { anonymous: true });
+        setSession({ accessToken: body.data.accessToken, refreshToken: body.data.refreshToken });
+        setUser(body.data.user);
+        return body.data.user;
+      },
+      async resetPassword(token, password) {
+        const body = await api.post<SessionEnvelope>('/auth/reset-password', { token, password }, { anonymous: true });
         setSession({ accessToken: body.data.accessToken, refreshToken: body.data.refreshToken });
         setUser(body.data.user);
         return body.data.user;
