@@ -76,10 +76,14 @@ export interface ApplicationForm {
   status: FormStatus;
   version: number;
   accepting: boolean;
+  /** Starting this application needs a code from the team. */
+  requiresCode?: boolean;
   settings: {
     successMessage: string;
     closedMessage: string;
     allowDrafts: boolean;
+    /** Only sent to people who edit forms. Empty means anyone can apply. */
+    accessCode?: string;
   };
   opensAt: string | null;
   closesAt: string | null;
@@ -94,6 +98,8 @@ export interface FormListing {
   status: FormStatus;
   version: number;
   accepting: boolean;
+  /** Open, but only to people with the form's access code. */
+  requiresCode?: boolean;
   sectionCount: number;
   questionCount: number;
   submissionCount: number;
@@ -105,6 +111,7 @@ export interface OpenForm {
   title: string;
   kind: FormKind;
   description: string;
+  requiresCode?: boolean;
 }
 
 export type ApplicationStatus =

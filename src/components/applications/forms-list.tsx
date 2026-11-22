@@ -301,7 +301,15 @@ function OpenSwitch({ form, busy, onChange }: { form: FormListing; busy: boolean
   const open = form.status === 'published';
   // Published but outside its open/close dates: switched on, yet not taking applications.
   const scheduled = open && !form.accepting;
-  const label = open ? (scheduled ? 'Open, but outside its dates' : 'Accepting applications') : form.status === 'draft' ? 'Draft' : 'Closed';
+  const label = open
+    ? scheduled
+      ? 'Open, but outside its dates'
+      : form.requiresCode
+        ? 'Open with a code'
+        : 'Open to everyone'
+    : form.status === 'draft'
+      ? 'Draft'
+      : 'Closed';
 
   return (
     <label className="flex w-full shrink-0 items-center justify-between gap-3 text-sm sm:w-auto sm:justify-start">

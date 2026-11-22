@@ -89,12 +89,35 @@ function blankQuestion(taken: Set<string>): FormQuestion {
   };
 }
 
+/** Who can apply to a published form: anyone, people with the code, or nobody right now. */
+type Access = 'open' | 'code' | 'closed';
+
+function accessOf(form: ApplicationForm): Access | null {
+  if (form.status === 'published') return form.settings.accessCode ? 'code' : 'open';
+  if (form.status === 'closed') return 'closed';
+  return null;
+}
+
+const ACCESS_CHOICES: { value: Access; label: string; help: string }[] = [
+  { value: 'open', label: 'Anyone', help: 'Listed on the Apply page as open. Anyone can apply.' },
+  {
+    value: 'code',
+    label: 'Only people with a code',
+    help: 'Listed as “Open with a code”. People need the code you give them to start. Anyone who already started can finish.',
+  },
+  { value: 'closed', label: 'Nobody right now (closed)', help: 'Shows the “not open” message. Nobody can start or send an application.' },
+];
+
+const codeOf = (value: string) => value.replace(/\s+/g, '').toUpperCase();
+
 export function FormEditor({ slug }: { slug: string }) {
   const [form, setForm] = useState<ApplicationForm | null>(null);
   const [sections, setSections] = useState<FormSection[]>([]);
   const [title, setTitle] = useState('');
   const [description, setDescription] = useState('');
   const [successMessage, setSuccessMessage] = useState('');
+  const [accessCode, setAccessCode] = useState('');
+  const [access, setAccess] = useState<Access | null>(null);
   const [opensAt, setOpensAt] = useState('');
   const [closesAt, setClosesAt] = useState('');
   const [loading, setLoading] = useState(true);
@@ -113,6 +136,8 @@ export function FormEditor({ slug }: { slug: string }) {
         setTitle(body.data.title);
         setDescription(body.data.description);
         setSuccessMessage(body.data.settings.successMessage);
+        setAccessCode(body.data.settings.accessCode ?? '');
+        setAccess(accessOf(body.data));
         setOpensAt(toLocalInput(body.data.opensAt));
         setClosesAt(toLocalInput(body.data.closesAt));
         setOpenSection(body.data.sections[0]?.key ?? null);
@@ -167,23 +192,39 @@ export function FormEditor({ slug }: { slug: string }) {
     return next;
   }
 
+  /** Saves everything on the page, including who can apply. */
   async function save(nextStatus?: FormStatus) {
     if (!form) return;
-    setSaving(true);
     setError(null);
 
+    // "Who can apply" sets the status (published or closed) and the code.
+    const wanted = access === 'closed' ? 'closed' : access ? 'published' : null;
+    const status = nextStatus ?? (wanted && wanted !== form.status ? wanted : undefined);
+    if (access === 'code' && !codeOf(accessCode)) {
+      setError('Add a code, or choose who can apply another way.');
+      return;
+    }
+    if (status === 'published' && !sections.some((section) => section.questions.length)) {
+      setError('Add at least one question before opening the form.');
+      return;
+    }
+
+    setSaving(true);
     try {
       const body = await api.patch<{ data: ApplicationForm }>(`/forms/${form.slug}`, {
         title,
         description,
         sections,
-        settings: { ...form.settings, successMessage },
+        // "Anyone" clears the code; "Closed" keeps it for when the form reopens.
+        settings: { ...form.settings, successMessage, accessCode: access === 'open' ? '' : accessCode },
         opensAt: opensAt ? new Date(opensAt).toISOString() : null,
         closesAt: closesAt ? new Date(closesAt).toISOString() : null,
-        ...(nextStatus ? { status: nextStatus } : {}),
+        ...(status ? { status } : {}),
       });
       setForm(body.data);
       setSections(body.data.sections);
+      setAccessCode(body.data.settings.accessCode ?? '');
+      setAccess(accessOf(body.data));
       setSaved(true);
     } catch (err) {
       setError(err instanceof ApiError ? err.message : 'We could not save this form.');
@@ -364,30 +405,95 @@ export function FormEditor({ slug }: { slug: string }) {
             />
           ))}
 
-          <Card className="flex flex-wrap items-center justify-between gap-4 p-6">
+          <Card className="flex flex-col gap-4 p-6">
             <div>
-              <h2 className="font-medium text-ink">Status</h2>
+              <h2 className="font-medium text-ink">Who can apply</h2>
               <p className="mt-1 text-sm text-ink-soft">
-                {form.status === 'published' && !form.accepting
-                  ? 'Published, but outside its open and close dates, so not taking applications right now.'
-                  : form.status === 'published'
-                  ? 'Live and accepting applications.'
-                  : form.status === 'draft'
-                    ? 'Only admins can see this. Publish when you are ready.'
-                    : 'Visible but not accepting new applications.'}
+                {form.status === 'draft'
+                  ? 'Not published yet: only staff can see it. Choose who can apply, then save to open it.'
+                  : form.status === 'archived'
+                    ? 'Archived. Choose who can apply and save to bring it back.'
+                    : form.status === 'published' && !form.accepting
+                      ? 'Open, but outside its open and close dates, so not taking applications right now.'
+                      : access === accessOf(form) && (access !== 'code' || codeOf(accessCode) === form.settings.accessCode)
+                        ? 'Saved. Change it any time.'
+                        : 'Not saved yet.'}
               </p>
             </div>
 
-            <div className="flex gap-2">
-              {form.status !== 'published' ? (
-                <Button onClick={() => save('published')} disabled={saving || questionCount === 0}>
-                  Publish
-                </Button>
-              ) : (
-                <Button variant="secondary" onClick={() => save('closed')} disabled={saving}>
-                  Close applications
-                </Button>
-              )}
+            <fieldset className="flex flex-col gap-2">
+              <legend className="sr-only">Who can apply</legend>
+              {ACCESS_CHOICES.map((choice) => (
+                <label
+                  key={choice.value}
+                  className={cx(
+                    'flex cursor-pointer items-start gap-3 rounded-lg border p-3 transition-colors',
+                    access === choice.value ? 'border-navy bg-paper' : 'border-line hover:border-line-strong',
+                  )}
+                >
+                  <input
+                    type="radio"
+                    name="who-can-apply"
+                    value={choice.value}
+                    checked={access === choice.value}
+                    onChange={() => {
+                      setAccess(choice.value);
+                      markDirty();
+                    }}
+                    className="mt-1 size-4 accent-navy"
+                  />
+                  <span>
+                    <span className="block text-sm font-medium text-ink">{choice.label}</span>
+                    <span className="block text-sm text-ink-soft">{choice.help}</span>
+                  </span>
+                </label>
+              ))}
+            </fieldset>
+
+            {access === 'code' ? (
+              <Field
+                label="The code"
+                required
+                help="Give it to the people you want to apply. Letters, numbers and hyphens; capitals and spaces don’t matter when they type it."
+              >
+                {({ id, describedBy }) => (
+                  <div className="flex flex-wrap gap-2">
+                    <TextInput
+                      id={id}
+                      aria-describedby={describedBy}
+                      value={accessCode}
+                      maxLength={40}
+                      autoComplete="off"
+                      spellCheck={false}
+                      placeholder="e.g. NBN-SPRING"
+                      className="max-w-xs font-mono uppercase"
+                      onChange={(event) => {
+                        setAccessCode(event.target.value.toUpperCase());
+                        markDirty();
+                      }}
+                    />
+                    <Button
+                      type="button"
+                      variant="secondary"
+                      size="sm"
+                      onClick={() => {
+                        const letters = 'ABCDEFGHJKMNPQRSTUVWXYZ23456789';
+                        const random = crypto.getRandomValues(new Uint32Array(6));
+                        setAccessCode(`NBN-${Array.from(random, (n) => letters[n % letters.length]).join('')}`);
+                        markDirty();
+                      }}
+                    >
+                      Make one
+                    </Button>
+                  </div>
+                )}
+              </Field>
+            ) : null}
+
+            <div className="flex flex-wrap gap-2">
+              <Button onClick={() => save()} disabled={saving || !access}>
+                {saving ? 'Saving…' : 'Save'}
+              </Button>
               {form.status === 'closed' ? (
                 <Button variant="secondary" onClick={() => save('archived')} disabled={saving}>
                   Archive

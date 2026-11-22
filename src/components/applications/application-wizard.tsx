@@ -24,6 +24,7 @@ import { useAuth } from '../account/auth-provider';
 import { AccountStep } from './account-step';
 import { QuestionInput } from './question-input';
 import { Alert, Button, ButtonLink, Card, Spinner, cx } from '../ui';
+import { Field, TextInput } from '../ui/fields';
 import { ParentConsentCard } from '../policies/agreement-cards';
 import { ConductGate } from '../policies/conduct-acceptance';
 
@@ -60,6 +61,15 @@ export function ApplicationWizard({ slug, mentor }: { slug: string; mentor?: str
 
   const [mentorError, setMentorError] = useState<string | null>(null);
   const [mentorPreview, setMentorPreview] = useState<string | null>(null);
+
+  // Forms with an access code: the code, once it's been checked (kept for this
+  // tab so making an account or reloading doesn't ask again), and whether the
+  // API asked for one when starting.
+  const codeKey = `nbn-access-code:${slug}`;
+  const [accessCode, setAccessCode] = useState<string | null>(() =>
+    typeof window === 'undefined' ? null : sessionStorage.getItem(codeKey),
+  );
+  const [codeNeeded, setCodeNeeded] = useState(false);
 
   const headingRef = useRef<HTMLDivElement>(null);
   const dirtyRef = useRef(false);
@@ -98,7 +108,10 @@ export function ApplicationWizard({ slug, mentor }: { slug: string; mentor?: str
     if (!form?.accepting) return;
 
     try {
-      const body = await api.post<{ data: Application }>('/applications', { formSlug: form.slug });
+      const body = await api.post<{ data: Application }>('/applications', {
+        formSlug: form.slug,
+        ...(accessCode ? { accessCode } : {}),
+      });
       setApplication(body.data);
       setAnswers(fromAnswerList(body.data.answers));
 
@@ -119,17 +132,24 @@ export function ApplicationWizard({ slug, mentor }: { slug: string; mentor?: str
         setSubmitted({ message: form.settings.successMessage });
       }
     } catch (err) {
+      if (err instanceof ApiError && err.code === 'access_code') {
+        // No code yet, or the team changed it since this tab checked it.
+        sessionStorage.removeItem(codeKey);
+        setAccessCode(null);
+        setCodeNeeded(true);
+        return;
+      }
       setSubmitError(err instanceof ApiError ? err.message : 'We could not start your application.');
     }
-  }, [form]);
+  }, [form, accessCode, codeKey]);
 
   useEffect(() => {
     // Starting the application needs both an account and a loaded form, and
     // either can arrive last, so an effect is the right trigger. The lint rule
     // cannot see that every setState inside is behind an await.
     // eslint-disable-next-line react-hooks/set-state-in-effect
-    if (user && form && !application) void startApplication();
-  }, [user, form, application, startApplication]);
+    if (user && form && !application && !codeNeeded) void startApplication();
+  }, [user, form, application, codeNeeded, startApplication]);
 
   // --- The mentor a student asked for -----------------------------------------
 
@@ -371,6 +391,34 @@ export function ApplicationWizard({ slug, mentor }: { slug: string; mentor?: str
     );
   }
 
+  // A form with a code asks for it first: before signing in (so nobody makes an
+  // account for nothing), or when starting turned out to need one. People who
+  // already started never see this; the API lets them straight back in.
+  if (form.requiresCode && !application && (codeNeeded || (!user && !accessCode))) {
+    return (
+      <Shell>
+        <CodeGate
+          form={form}
+          onUnlock={(code) => {
+            sessionStorage.setItem(codeKey, code);
+            setAccessCode(code);
+            setCodeNeeded(false);
+            setSubmitError(null);
+          }}
+        />
+      </Shell>
+    );
+  }
+
+  // Signed in without a code: wait to hear whether they started this one before.
+  if (form.requiresCode && user && !application && !accessCode && !submitError) {
+    return (
+      <Shell>
+        <Spinner label="Opening your application" />
+      </Shell>
+    );
+  }
+
   const sectionSteps = steps.filter((entry) => entry.kind === 'section');
   const currentSectionIndex = step?.kind === 'section' ? step.index : -1;
 
@@ -514,6 +562,68 @@ function MentorChoice({
       ) : null}
       {error ? <p className="mt-2 text-danger">{error}</p> : null}
     </div>
+  );
+}
+
+/** "Enter your code": for forms the team has limited to people with a code. */
+function CodeGate({ form, onUnlock }: { form: ApplicationForm; onUnlock: (code: string) => void }) {
+  const [code, setCode] = useState('');
+  const [busy, setBusy] = useState(false);
+  const [error, setError] = useState<string | null>(null);
+
+  async function submit(event: React.FormEvent) {
+    event.preventDefault();
+    setBusy(true);
+    setError(null);
+    try {
+      await api.post(`/forms/${encodeURIComponent(form.slug)}/access`, { code }, { anonymous: true });
+      onUnlock(code.trim());
+    } catch (err) {
+      setError(err instanceof ApiError ? err.message : 'We couldn’t check that code. Please try again.');
+      setBusy(false);
+    }
+  }
+
+  return (
+    <Card className="mx-auto max-w-lg px-6 py-10 sm:px-10">
+      <p className="text-sm font-medium text-accent">{kindLabel(form.kind)}</p>
+      <h1 className="mt-1 text-2xl font-semibold tracking-tight text-ink">{form.title}</h1>
+      <p className="mt-3 text-ink-soft">
+        Right now this application is only open to people with a code from the Note by Note team. Enter yours to
+        continue.
+      </p>
+      <form onSubmit={submit} className="mt-6 space-y-4">
+        {error ? <Alert>{error}</Alert> : null}
+        <Field label="Your code" required>
+          {({ id }) => (
+            <TextInput
+              id={id}
+              required
+              autoComplete="off"
+              spellCheck={false}
+              maxLength={40}
+              value={code}
+              onChange={(event) => setCode(event.target.value)}
+              className="font-mono uppercase"
+            />
+          )}
+        </Field>
+        <Button type="submit" size="lg" className="w-full" disabled={busy || !code.trim()}>
+          {busy ? 'Checking…' : 'Continue'}
+        </Button>
+      </form>
+      <p className="mt-6 text-sm text-ink-soft">
+        Don’t have a code?{' '}
+        <Link href="/contact" className="font-medium text-accent underline underline-offset-2">
+          Get in touch
+        </Link>{' '}
+        or{' '}
+        <Link href="/apply" className="font-medium text-accent underline underline-offset-2">
+          see what else is open
+        </Link>
+        .
+      </p>
+    </Card>
   );
 }
 

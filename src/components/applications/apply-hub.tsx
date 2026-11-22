@@ -78,7 +78,7 @@ const PATHS: Path[] = [
   },
 ];
 
-type Status = 'checking' | 'open' | 'closed' | 'unknown';
+type Status = 'checking' | 'open' | 'code' | 'closed' | 'unknown';
 
 export function ApplyHub() {
   const [forms, setForms] = useState<OpenForm[] | null>(null);
@@ -98,7 +98,7 @@ export function ApplyHub() {
     const ofKind = forms.filter((form) => form.kind === path.kind);
     const main = ofKind.find((form) => `/apply/${form.slug}` === path.href) ?? ofKind[0];
     return main
-      ? { path, status: 'open' as Status, href: `/apply/${main.slug}` }
+      ? { path, status: (main.requiresCode ? 'code' : 'open') as Status, href: `/apply/${main.slug}` }
       : { path, status: 'closed' as Status, href: path.href };
   });
 
@@ -128,7 +128,10 @@ export function ApplyHub() {
                   className="group flex h-full items-center justify-between gap-4 rounded-2xl border border-navy/10 bg-white p-5 transition-colors hover:border-navy/40"
                 >
                   <span>
-                    <span className="block font-semibold text-navy">{form.title}</span>
+                    <span className="block font-semibold text-navy">
+                      {form.title}
+                      {form.requiresCode ? <span className="ml-2 text-xs font-semibold text-navy/60">Code needed</span> : null}
+                    </span>
                     {form.description ? (
                       <span className="mt-1 line-clamp-2 block text-sm text-navy/65">{form.description}</span>
                     ) : null}
@@ -149,6 +152,7 @@ function StatusPill({ status }: { status: Status }) {
   const styles: Record<Exclude<Status, 'unknown'>, { label: string; className: string; dot: string }> = {
     checking: { label: 'Checking…', className: 'bg-white/70 text-navy/60', dot: 'bg-navy/30 animate-pulse' },
     open: { label: 'Open now', className: 'bg-white text-ok', dot: 'bg-ok' },
+    code: { label: 'Open with a code', className: 'bg-white text-navy', dot: 'bg-gold' },
     closed: { label: 'Not open right now', className: 'bg-white/80 text-navy/70', dot: 'bg-navy/30' },
   };
   const style = styles[status];

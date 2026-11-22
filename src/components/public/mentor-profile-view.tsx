@@ -6,6 +6,7 @@
 // published.
 
 import Link from 'next/link';
+import { useRouter } from 'next/navigation';
 import { useEffect, useState } from 'react';
 import { ApiError, api } from '@/lib/api';
 import type { PublicMentor } from '@/lib/types';
@@ -18,6 +19,7 @@ import { ReportConcernButton } from '../policies/report-concern';
 
 export function MentorProfileView({ slug }: { slug: string }) {
   const { user, loading: authLoading } = useAuth();
+  const router = useRouter();
   const standing = useStudentStanding();
   const [mentor, setMentor] = useState<PublicMentor | null>(null);
   const [isOwner, setIsOwner] = useState(false);
@@ -28,12 +30,16 @@ export function MentorProfileView({ slug }: { slug: string }) {
     api
       .get<{ data: PublicMentor; meta?: { isOwner?: boolean } }>(`/mentors/${encodeURIComponent(slug)}`)
       .then((body) => {
+        // An old address (mentor pages used to include last names): move to the current one.
+        if (body.data.slug && body.data.slug !== slug.toLowerCase()) {
+          router.replace(`/find-a-mentor/${body.data.slug}${window.location.search}`);
+        }
         setMentor(body.data);
         setIsOwner(Boolean(body.meta?.isOwner));
         setProblem(null);
       })
       .catch((err: unknown) => setProblem(err instanceof ApiError && err.status === 404 ? 'missing' : 'failed'));
-  }, [slug, authLoading, user?.id]);
+  }, [slug, authLoading, user?.id, router]);
 
   useEffect(() => {
     if (mentor) document.title = `${mentor.name} · Note by Note`;
