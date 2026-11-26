@@ -5,6 +5,7 @@
 import Link from 'next/link';
 import type { ComponentProps, ReactNode } from 'react';
 import { SITE } from '@/lib/site';
+import { SceneArt, type SceneName } from './scene-art';
 
 // Local copy of ui's `cx`: that module is a client module, and a server
 // component cannot call a function imported from one.
@@ -326,10 +327,14 @@ export function StickyNote({ children, className }: { children: ReactNode; class
 /** Stand-in artwork for photo slots: a tinted panel with a big icon. */
 export function ArtPanel({
   icon,
+  scene,
   tone = 'sky',
   className,
 }: {
-  icon: IconName;
+  /** A large icon, when there's no drawing for the spot. */
+  icon?: IconName;
+  /** A drawing made for the site (scene-art.tsx). */
+  scene?: SceneName;
   tone?: 'sky' | 'sage' | 'gold' | 'coral' | 'navy';
   className?: string;
 }) {
@@ -337,12 +342,12 @@ export function ArtPanel({
     sky: 'bg-sky/60 text-navy',
     sage: 'bg-sage/60 text-navy',
     gold: 'bg-gold/70 text-navy',
-    coral: 'bg-coral/70 text-white',
-    navy: 'bg-navy text-gold',
+    coral: scene ? 'bg-coral/55 text-navy' : 'bg-coral/70 text-white',
+    navy: scene ? 'bg-navy text-cream' : 'bg-navy text-gold',
   };
   return (
     <div className={cx('flex h-full w-full items-center justify-center', tones[tone], className)}>
-      <Icon name={icon} className="size-1/3 opacity-80" />
+      {scene ? <SceneArt scene={scene} className="h-full w-full" /> : icon ? <Icon name={icon} className="size-1/3 opacity-80" /> : null}
     </div>
   );
 }

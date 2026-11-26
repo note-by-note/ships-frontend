@@ -49,7 +49,7 @@ export default function AboutPage() {
         description="We’re a student-led initiative offering free online music tutoring. Students who play an instrument volunteer to teach students who want to learn."
         aside={
           <Polaroid caption="Students teaching students" tilt="left" className="w-72">
-            <ArtPanel icon="music" tone="gold" />
+            <ArtPanel scene="teaching" tone="gold" />
           </Polaroid>
         }
       />

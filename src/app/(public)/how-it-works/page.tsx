@@ -84,7 +84,7 @@ export default function HowItWorksPage() {
         description="Students who want to learn an instrument are matched with student volunteers who already play it. Lessons are online and free."
         aside={
           <Polaroid caption="Lesson day" tilt="right" className="w-72">
-            <ArtPanel icon="calendar" tone="gold" />
+            <ArtPanel scene="lesson-day" tone="gold" />
           </Polaroid>
         }
       >

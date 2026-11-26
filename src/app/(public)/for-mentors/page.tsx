@@ -86,7 +86,7 @@ export default function ForMentorsPage() {
         aside={
           <div className="relative">
             <Polaroid caption="Your first student" tilt="right" className="w-72">
-              <ArtPanel icon="users" tone="coral" />
+              <ArtPanel scene="first-student" tone="coral" />
             </Polaroid>
             <StickyNote className="absolute -bottom-6 -left-10">Teach what you love ♪</StickyNote>
           </div>

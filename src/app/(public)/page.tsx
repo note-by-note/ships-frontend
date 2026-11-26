@@ -338,7 +338,7 @@ function HeroArt() {
         </svg>
       </div>
       <Polaroid caption="First lesson" className="absolute bottom-2 left-0 w-[52%]">
-        <ArtPanel icon="music" tone="navy" />
+        <ArtPanel scene="first-lesson" tone="navy" />
       </Polaroid>
       <StickyNote className="absolute right-2 bottom-12">
         You can do this!
@@ -354,10 +354,10 @@ function MissionArt() {
   return (
     <div className="relative mx-auto h-[300px] w-full max-w-[440px]" aria-hidden>
       <Polaroid caption="Practice time" tilt="left" className="absolute top-4 left-0 w-[62%]">
-        <ArtPanel icon="music" tone="coral" />
+        <ArtPanel scene="practice" tone="coral" />
       </Polaroid>
       <Polaroid caption="Online lessons" tilt="right" className="absolute right-0 bottom-0 w-[50%]">
-        <ArtPanel icon="monitor" tone="sky" />
+        <ArtPanel scene="online" tone="sky" />
       </Polaroid>
       <span className="absolute top-0 right-6 flex size-24 items-center justify-center rounded-full bg-gold p-3 text-center font-display text-[11px] leading-tight font-bold tracking-wide text-navy uppercase">
         Community · Music · Learning

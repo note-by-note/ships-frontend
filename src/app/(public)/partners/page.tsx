@@ -180,7 +180,7 @@ export default function PartnersPage() {
         description="We work with schools and organizations to reach students who want music lessons and students who could teach them."
         aside={
           <Polaroid caption="Working together" tilt="right" className="w-72">
-            <ArtPanel icon="school" tone="sky" />
+            <ArtPanel scene="together" tone="sky" />
           </Polaroid>
         }
       />

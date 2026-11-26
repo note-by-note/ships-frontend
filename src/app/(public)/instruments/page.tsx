@@ -17,7 +17,7 @@ export default function InstrumentsPage() {
         description="These are the instruments you can choose when you apply. Lessons start at the beginning, so you don’t need any experience."
         aside={
           <Polaroid caption="Pick one to start" tilt="left" className="w-72">
-            <ArtPanel icon="music" tone="sage" />
+            <ArtPanel scene="pick-instrument" tone="sage" />
           </Polaroid>
         }
       />

@@ -10,6 +10,7 @@ import { useEffect, useState } from 'react';
 import { api } from '@/lib/api';
 import { INSTRUMENT_FAMILIES, INSTRUMENT_HINTS, type InstrumentFamily } from '@/lib/site';
 import { cx } from '../ui';
+import { InstrumentArt, hasInstrumentArt } from './instrument-art';
 
 interface Facets {
   data: { instruments: { value: string; count: number }[] };
@@ -96,11 +97,11 @@ export function InstrumentExplorer() {
                   <div
                     aria-hidden
                     className={cx(
-                      'flex aspect-[4/3] items-center justify-center rounded-xl font-display text-4xl font-bold text-navy/75',
+                      'flex aspect-[4/3] items-center justify-center overflow-hidden rounded-xl font-display text-4xl font-bold text-navy',
                       TONES[group.family],
                     )}
                   >
-                    {instrument.charAt(0)}
+                    {hasInstrumentArt(instrument) ? <InstrumentArt instrument={instrument} className="h-[88%] w-[88%]" /> : instrument.charAt(0)}
                   </div>
                   <div className="flex min-w-0 flex-col items-start gap-1.5 px-1 pt-3 pb-1">
                     <span className="font-display text-base font-bold break-words">{instrument}</span>
