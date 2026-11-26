@@ -19,6 +19,7 @@ import {
 import { Suspense } from 'react';
 import { SignedInHome } from '@/components/account/signed-in-home';
 import { APPLY_LINKS } from '@/lib/site';
+import { InstrumentArt } from '@/components/public/instrument-art';
 
 // Layout follows "note-by-note-homepage-desktop" in the Figma file. Copy is
 // rewritten to the brand voice, and the design's sample statistics, mentors and
@@ -45,15 +46,16 @@ const STEPS: { icon: IconName; tone: 'gold' | 'sage' | 'sky'; title: string; bod
   },
 ];
 
-const INSTRUMENTS: { name: string; detail: string; tone: string }[] = [
-  { name: 'Piano', detail: 'Keys', tone: 'bg-sky/50' },
-  { name: 'Guitar', detail: 'Strings', tone: 'bg-gold/50' },
-  { name: 'Violin', detail: 'Strings', tone: 'bg-coral/40' },
-  { name: 'Woodwinds', detail: 'Flute, clarinet, sax…', tone: 'bg-sage/50' },
-  { name: 'Brass', detail: 'Trumpet, trombone…', tone: 'bg-gold/40' },
-  { name: 'Percussion', detail: 'Drums & mallets', tone: 'bg-sky/40' },
-  { name: 'Ukulele', detail: 'Strings', tone: 'bg-sage/40' },
-  { name: 'Music theory', detail: 'For any instrument', tone: 'bg-coral/30' },
+/** `art` is the drawing to show (instrument-art.tsx). */
+const INSTRUMENTS: { name: string; detail: string; tone: string; art: string }[] = [
+  { name: 'Piano', detail: 'Keys', tone: 'bg-sky/50', art: 'Piano' },
+  { name: 'Guitar', detail: 'Strings', tone: 'bg-gold/50', art: 'Acoustic Guitar' },
+  { name: 'Violin', detail: 'Strings', tone: 'bg-coral/40', art: 'Violin' },
+  { name: 'Woodwinds', detail: 'Flute, clarinet, sax…', tone: 'bg-sage/50', art: 'Alto Saxophone' },
+  { name: 'Brass', detail: 'Trumpet, trombone…', tone: 'bg-gold/40', art: 'Trumpet' },
+  { name: 'Percussion', detail: 'Drums & mallets', tone: 'bg-sky/40', art: 'Drum Set' },
+  { name: 'Ukulele', detail: 'Strings', tone: 'bg-sage/40', art: 'Ukulele' },
+  { name: 'Music theory', detail: 'For any instrument', tone: 'bg-coral/30', art: 'Music Theory' },
 ];
 
 const MENTOR_POINTS: { icon: IconName; title: string; body: string }[] = [
@@ -183,9 +185,10 @@ export default function HomePage() {
                   } hover:rotate-0`}
                 >
                   <div
-                    className={`flex aspect-[4/3] items-center justify-center rounded-xl ${instrument.tone} font-display text-5xl font-bold text-navy/80`}
+                    aria-hidden
+                    className={`flex aspect-[4/3] items-center justify-center overflow-hidden rounded-xl ${instrument.tone} text-navy`}
                   >
-                    {instrument.name.charAt(0)}
+                    <InstrumentArt instrument={instrument.art} className="h-[88%] w-[88%]" />
                   </div>
                   <div className="flex flex-1 flex-col gap-1 px-1 pt-3 pb-1">
                     <span className="font-display text-lg font-bold">{instrument.name}</span>

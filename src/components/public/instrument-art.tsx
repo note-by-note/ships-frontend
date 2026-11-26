@@ -85,11 +85,15 @@ function Piano() {
 const BOWED_BODY =
   'M0 -32 C-10 -32 -16 -28 -15 -20 C-15 -15 -11 -13 -11 -9 C-11 -5 -18 -3 -18 8 C-18 22 -10 32 0 32 C10 32 18 22 18 8 C18 -3 11 -5 11 -9 C11 -13 15 -15 15 -20 C16 -28 10 -32 0 -32 Z';
 
-function BowedBody({ endpin = false }: { endpin?: boolean }) {
+/** The double bass: sloping shoulders instead of the violin family's round ones. */
+const BASS_BODY =
+  'M0 -34 C-5 -34 -8 -31 -10 -25 C-12 -18 -11 -13 -11 -9 C-11 -5 -19 -2 -19 9 C-19 23 -10 33 0 33 C10 33 19 23 19 9 C19 -2 11 -5 11 -9 C11 -13 12 -18 10 -25 C8 -31 5 -34 0 -34 Z';
+
+function BowedBody({ endpin = false, bass = false }: { endpin?: boolean; bass?: boolean }) {
   return (
     <g>
       {endpin ? <path d="M0 32 V46" strokeWidth={2.5} /> : null}
-      <path d={BOWED_BODY} fill={K} />
+      <path d={bass ? BASS_BODY : BOWED_BODY} fill={K} />
       <rect x="-3.5" y="-62" width="7" height="34" rx="1.5" fill={K} />
       <path d="M-3 -62 C-6 -66 -1 -72 3 -69 C6 -67 3 -63 0 -64" fill={K} />
       <path d="M-4 -56 h-3 M-4 -50 h-3 M4 -56 h3 M4 -50 h3" strokeWidth={2.4} />
@@ -150,7 +154,7 @@ function Cello() {
 function StringBass() {
   return (
     <g transform="translate(60 45) rotate(10) scale(0.76)">
-      <BowedBody endpin />
+      <BowedBody endpin bass />
     </g>
   );
 }
@@ -320,16 +324,22 @@ function ClarinetLike({ reed = false, slim = false }: { reed?: boolean; slim?: b
 
 function BassClarinet() {
   return (
-    <g>
-      <Tube d="M56 22 C56 12 50 7 40 9" width={3} fill={W} />
-      <path d="M33 6 L40 7.5 L40 11 L33 12 Z" fill={N} />
-      <rect x="51.5" y="20" width="9" height="50" rx="1.5" fill={N} />
-      <Tube d="M56 69 C56 79 62 83 72 80" width={8} fill={W} />
-      <path d="M70 75 C78 74 84 68 86 60 L96 64 C93 76 84 84 72 86 Z" fill={W} />
-      <path d="M86 60 L96 64" strokeWidth={2.4} />
-      {[28, 35, 42, 49, 56, 63].map((y) => (
+    <g transform="translate(4 0)">
+      {/* Silver neck: up from the body, then back toward the player, mouthpiece angled down. */}
+      <Tube d="M56 22 C56 12 52 7 45 7 C41 7 38 9 37 12" width={3} fill={W} />
+      <path d="M34.5 11 L39.5 13 L36.5 21 L32.5 19.5 Z" fill={N} />
+      {/* Long black body with silver keys and rods. */}
+      <rect x="51.5" y="20" width="9" height="52" rx="1.5" fill={N} />
+      <path d="M62.5 26 V66" stroke={W} strokeWidth={1.2} />
+      {[27, 33, 39, 45, 51, 57, 63].map((y) => (
         <circle key={y} cx="56" cy={y} r="1.9" fill={W} strokeWidth={1} />
       ))}
+      <path d="M49.5 36 h2 M49.5 48 h2 M49.5 60 h2" strokeWidth={2} />
+      {/* Silver U-bend and upturned bell, with the floor peg below. */}
+      <Tube d="M56 71 Q56 81 64 81 Q72 81 73 73" width={7} fill={W} />
+      <path d="M69.5 74 L65 60 L83 60 L77 74 Z" fill={W} />
+      <ellipse cx="74" cy="60" rx="9" ry="2.6" fill={W} />
+      <path d="M62 85 V88" strokeWidth={2.4} />
     </g>
   );
 }
@@ -422,14 +432,24 @@ function Trombone() {
 function FrenchHorn() {
   return (
     <g>
-      <Tube d="M58 20 A24 24 0 1 1 57.9 20" width={3.6} />
-      <Tube d="M58 31 A13 13 0 1 1 57.9 31" width={3} />
-      <path d="M74 56 C84 60 92 68 96 82 L114 74 C106 60 94 52 80 49 Z" fill={G} />
-      <ellipse cx="105" cy="78" rx="10" ry="3.4" transform="rotate(-24 105 78)" fill={G} />
-      <Tube d="M42 30 L22 17" width={2.4} />
-      <path d="M15 13 L22 16 L20.5 19.5 L14 17 Z" fill={W} />
-      {[51, 58, 65].map((x) => (
-        <circle key={x} cx={x} cy="44" r="3.6" fill={W} />
+      {/* The bell flares out of the coil and faces back, to the right. */}
+      <path d="M64 50 C80 50 92 44 106 34 L106 78 C92 70 80 62 64 61 Z" fill={G} />
+      <ellipse cx="106" cy="56" rx="5" ry="22" fill={G} />
+      <ellipse cx="106" cy="56" rx="2.2" ry="17" fill={N} opacity={0.18} stroke="none" />
+      {/* The coiled tubing: an outer wrap and an inner one. */}
+      <Tube d="M44 20 A26 26 0 1 0 70 46" width={3.6} />
+      <Tube d="M70 46 A26 26 0 0 0 44 20" width={3.6} />
+      <Tube d="M46 30 A16 16 0 1 0 62 46 A16 16 0 0 0 46 30" width={2.8} />
+      {/* Leadpipe from the valves out past the coil to the mouthpiece, on the left. */}
+      <Tube d="M36 27 C26 30 16 38 10 50" width={2.4} />
+      <path d="M5 53 L9 47.5 L12.5 50 L8.5 56 Z" fill={W} />
+      {/* Three rotary valves at the top of the coil, levers reaching toward the player's hand. */}
+      {[0, 1, 2].map((i) => (
+        <g key={i}>
+          <path d={`M${36 + i * 8} ${27 - i * 1.5} L${30 + i * 7} ${17 - i * 1.5}`} strokeWidth={2} />
+          <circle cx={36 + i * 8} cy={27 - i * 1.5} r="4" fill={G} />
+          <circle cx={36 + i * 8} cy={27 - i * 1.5} r="1.6" fill={W} strokeWidth={1} />
+        </g>
       ))}
     </g>
   );
@@ -522,7 +542,19 @@ function Mallets({ head = K }: { head?: string }) {
   );
 }
 
-function BarInstrument({ bar, resonators, caseFill, small = false }: { bar: string; resonators?: string; caseFill?: string; small?: boolean }) {
+function BarInstrument({
+  bar,
+  resonators,
+  caseFill,
+  small = false,
+  pedal = false,
+}: {
+  bar: string;
+  resonators?: string;
+  caseFill?: string;
+  small?: boolean;
+  pedal?: boolean;
+}) {
   const count = small ? 9 : 8;
   const step = small ? 9 : 11;
   const width = small ? 6 : 8;
@@ -534,6 +566,7 @@ function BarInstrument({ bar, resonators, caseFill, small = false }: { bar: stri
         <g>
           <path d="M14 34 L106 38 M14 52 L106 48" strokeWidth={2.4} />
           <path d="M20 52 V80 M100 49 V80 M20 80 H100" strokeWidth={1.8} />
+          {pedal ? <path d="M60 80 V84 M52 86 L68 84" strokeWidth={2.6} /> : null}
         </g>
       ) : null}
       {resonators
@@ -660,7 +693,7 @@ const DRAWINGS: Record<string, () => ReactNode> = {
   Timpani: Timpani,
   Xylophone: () => <BarInstrument bar={K} />,
   Marimba: () => <BarInstrument bar={K} resonators={N} />,
-  Vibraphone: () => <BarInstrument bar={W} resonators={C} />,
+  Vibraphone: () => <BarInstrument bar={W} resonators={C} pedal />,
   Glockenspiel: () => <BarInstrument bar={W} caseFill={N} small />,
   'Hand Drums': HandDrums,
   'Auxiliary Percussion': AuxiliaryPercussion,
